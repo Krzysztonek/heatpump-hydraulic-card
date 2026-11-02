@@ -70,7 +70,7 @@ Languages are built into the card and may be partial. [docs/TRANSLATING.md](docs
 
 ## Release contract
 
-`npm run release:check` verifies that `package.json`, `HFC_VERSION`, the HACS distribution filename and the changelog agree and that the changelog fragments are well-formed. On a tag build, the tag must be `v<version>` and no fragment may be left in `changelog.d/`. Before tagging, run `npm run changelog:compile` and rename the `## Unreleased` heading to the version.
+`npm run release:check` verifies that `package.json`, `HFC_VERSION`, the HACS distribution filename and the changelog agree and that the changelog fragments are well-formed. On a tag build, the tag must be `v<version>` and no fragment may be left in `changelog.d/`. Before tagging, run `npm run changelog:compile` and rename the `## Unreleased` heading to the version, and run `npm run coverage`: on a tag build `npm run syntax` also fails when `docs/COVERAGE.md` or the coverage cells of the README are out of date.
 
 The recommended required checks for the default branch are `HACS validation`, `Quality`, `Browser / chromium` and `Browser / firefox`.
 
@@ -86,3 +86,7 @@ The recommended required checks for the default branch are `HACS validation`, `Q
 ## Tracking upstream integrations
 
 Presets depend on other projects' entity ids and state texts. `upstream/<preset>.json` lists the repositories and files a preset is built on, and the workflow `Upstream watch` opens one issue per preset when those files change (see `upstream/README.md`). A pull request for a new preset adds its own `upstream/<preset>.json`. After reviewing an upstream change, run `npm run upstream:ack -- <preset>` and close the issue.
+
+## Preset and language coverage
+
+[docs/COVERAGE.md](docs/COVERAGE.md) shows how much of the card each preset can fill and how complete each language is; the *Coverage* column of the README's preset table comes from it. `scripts/coverage.mjs` measures it from the card: every lookup of a preset is answered as if the entity existed, so the numbers do not depend on one installation. A field the integration does not offer, or offers in a form that does not fit, goes into `unmapped` of `upstream/<preset>.json` with a short reason, and leaves the percentage; `npm run coverage -- --open` lists the fields that are neither mapped nor explained. `npm run syntax` checks that every `unmapped` entry names a counted field that the preset does not map. Contributions do not regenerate the page or the README; the maintainer runs `npm run coverage` before a release.
