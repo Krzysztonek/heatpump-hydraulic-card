@@ -62,12 +62,19 @@ const toStates = (obj) => Object.fromEntries(Object.entries(obj).map(([id, v]) =
 const resolveAll = (card, preset, base) => {
   const { Card } = card;
   const states = new Proxy(base.states, {
-    get: (target, id) => target[id] || (typeof id === 'string' && /^[a-z_]+\.\S+$/.test(id) ? { entity_id: id, state: '1', attributes: {} } : undefined),
+    get: (target, id) => {
+      const current = target[id];
+      const usable = typeof id === 'string' && /^(binary_sensor|switch)\./.test(id) ? 'on' : '1';
+      // Coverage asks what the integration can expose, not what happens to be online in the demo fixture. Preserve useful demo
+      // values (for mode-sensitive mappings), but make an existing unknown/unavailable candidate as readable as a synthesized one.
+      if (current && ['unknown', 'unavailable'].includes(String(current.state).toLowerCase())) return { ...current, state: usable };
+      return current || (typeof id === 'string' && /^[a-z_]+\.\S+$/.test(id) ? { entity_id: id, state: usable, attributes: {} } : undefined);
+    },
     has: () => true,
   });
   const realCtx = Card._ctx;
   Card._ctx = (hass, device, idx) => {
-    const ctx = realCtx({ ...base }, device, idx);
+    const ctx = realCtx({ ...base, states }, device, idx);
     return {
       ...ctx,
       key: (platform, domain, key) => ctx.key(platform, domain, key) || `${domain}.${platform}_${key}`,

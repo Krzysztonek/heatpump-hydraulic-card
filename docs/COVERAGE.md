@@ -30,7 +30,7 @@ The percentage says how complete a preset is, not how well it was tested: see th
 | [`wolf`](#wolf) | 100 % | – | `hc_return` | 10 of 49 | 6 of 29 | – | – | de, en |
 | [`kronoterm`](#kronoterm) | 100 % | – | `volume`, `hc_return` | 11 of 49 | 9 of 29 | yes | – | – |
 | [`luxtronik`](#luxtronik) | 93 % | `hc_return` | – | 19 of 49 | 15 of 29 | – | – | – |
-| [`stiebel_isg`](#stiebel_isg) | 100 % | – | `heat`, `hc_return` | 12 of 49 | 7 of 29 | yes | yes | – |
+| [`stiebel_isg`](#stiebel_isg) | 100 % | – | `heat`, `hc_return` | 17 of 49 | 9 of 29 | yes | yes | – |
 | [`ebusd`](#ebusd) | 100 % | – | `hc_return` | 20 of 49 | 8 of 29 | yes | – | – |
 | [`samsung`](#samsung) | 100 % | – | `hc_return`, `hc_pump` | 11 of 49 | 4 of 29 | yes | – | – |
 
@@ -205,14 +205,14 @@ Luxtronik (Alpha Innotec, Novelan, Roth …). Core fields 93 %, stat tiles: `cop
 
 ### stiebel_isg
 
-Stiebel Eltron ISG (WPM, LWZ) / Tecalor. Core fields 100 %, stat tiles: `cop_heating`, `cop_dhw`, `energy_heating`, `energy_dhw`, `heat_heating`, `heat_dhw`, `aux_hours`.
+Stiebel Eltron ISG (WPM, LWZ) / Tecalor. Core fields 100 %, stat tiles: `cop_heating`, `cop_dhw`, `energy_heating`, `energy_dhw`, `heat_heating`, `heat_dhw`, `heat_cooling`, `starts`, `aux_hours`.
 
 | Area | Mapped | Shown without its own entity | Not mapped, with reason | Open |
 |---|---|---|---|---|
-| Heat pump | **`compressor`**, `defrost`, **`power`**, **`flow`**, **`return`**, **`volume`**, **`outdoor`**, **`valve`**, `heater` | **`mode`** | **`heat`** | `status`, `fan_speed`, `source_volume`, `source_in`, `source_out`, `brine_pressure`, `pv_boost` |
-| Tanks | **`dhw_top`**, **`dhw_target`**, `circulation`, `buffer_top` | – | – | `dhw_middle`, `dhw_bottom`, `dhw_mode`, `dhw_heater`, `buffer_middle`, `buffer_bottom`, `buffer_mode`, `buffer_heater`, `solar_collector`, `solar_pump` |
+| Heat pump | **`compressor`**, `defrost`, **`power`**, **`flow`**, **`return`**, **`volume`**, `source_in`, `brine_pressure`, **`outdoor`**, **`valve`**, `heater` | **`mode`** | **`heat`** | `status`, `fan_speed`, `source_volume`, `source_out`, `pv_boost` |
+| Tanks | **`dhw_top`**, **`dhw_target`**, `circulation`, `buffer_top`, `solar_collector` | – | – | `dhw_middle`, `dhw_bottom`, `dhw_mode`, `dhw_heater`, `buffer_middle`, `buffer_bottom`, `buffer_mode`, `buffer_heater`, `solar_pump` |
 | Heating circuit | **`hc_flow`**, `hc_setpoint`, **`hc_pump`**, `hc_pressure`, **`room`**, `room_target`, `program` | – | **`hc_return`** | `hc_mode`, `hc_volume`, `hc_curve_offset`, `hc_mixer` |
-| Details | `aux_hours`, `hot_gas`, `low_pressure`, `high_pressure` | – | – | `hours`, `starts_total`, `energy_total`, `env_energy`, `heat_total`, `compressor_speed`, `evap_temp`, `cond_temp`, `suction_temp`, `liquid_temp`, `eev`, `superheat`, `subcooling`, `cutout_high_pressure`, `cutout_low_pressure`, `cutout_temperature` |
+| Details | `starts_total`, `aux_hours`, `compressor_speed`, `hot_gas`, `low_pressure`, `high_pressure` | – | – | `hours`, `energy_total`, `env_energy`, `heat_total`, `evap_temp`, `cond_temp`, `suction_temp`, `liquid_temp`, `eev`, `superheat`, `subcooling`, `cutout_high_pressure`, `cutout_low_pressure`, `cutout_temperature` |
 
 Not mapped:
 
