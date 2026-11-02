@@ -1138,7 +1138,7 @@
     const more = (await tilesOf(s, ['heat_heating', 'cop_total', 'energy_aux', { key: 'cost', period: 'today', price: 0.3 }, { entity: 'sensor.heating_curve_flow', name: 'Curve' },
       { key: 'energy', entity: 'sensor.heatpump_energy_today', name: 'Mine' }, 'spread', 'outdoor', { key: 'cop_heating', period: 'month', name: 'Monthly', decimals: 1 }])).t;
     check(more['Heat heating · today'] === '20.4 kWh', 'Lambda heat tile');
-    check(more['COP total · total'] === '≈4.55', `cop_total computed from totals (${more['COP total · total']})`);
+    check(more['COP total'] === '≈4.55', `cop_total computed from totals (${more['COP total']})`);
     check(!Object.keys(more).some((k) => k.startsWith('Electricity heater')), 'unavailable tile hidden');
     check(/1\.53/.test(more['Cost · today'] || ''), `cost tile (${more['Cost · today']})`);
     check(more.Curve === '33.5 °C' && more.Mine === '5.1 kWh', `free entity tiles (${more.Curve} / ${more.Mine})`);
@@ -1165,7 +1165,7 @@
     const { t } = await tilesOf(s, ['energy', 'env_energy', 'env_energy:month', 'env_energy:total', 'cop_total', 'cop_total:month', 'cop_total:total']);
     check(t['Electricity · today'] === '6.1 kWh' && t['Environmental energy · today'] === '24.3 kWh', `environmental energy next to electricity (${JSON.stringify(t)})`);
     check(t['Environmental energy · month'] === '690 kWh' && t['Environmental energy · total'] === '8,200 kWh', `environmental energy periods (${JSON.stringify(t)})`);
-    check(t['COP total · today'] === '≈4.98' && t['COP total · month'] === '≈4.83' && t['COP total · total'] === '≈4.15', `COP from environmental energy (${JSON.stringify(t)})`);
+    check(t['COP total · today'] === '≈4.98' && t['COP total · month'] === '≈4.83' && t['COP total'] === '≈4.15', `COP from environmental energy (${JSON.stringify(t)})`);
     const hass = hassOf(toStates(s.states('heat')), s.registry || {}, s.energy, s);
     const values = C._tileOptions(s.config, C._resolve(s.config, hass), hass).options.map((x) => x.value);
     check(values.includes('env_energy:today') && values.includes('env_energy:month') && values.includes('cop_total:month'), `editor offers environmental energy periods (${values.filter((v) => v.includes('env_energy') || v.includes('cop_total')).join(',')})`);
@@ -1177,6 +1177,12 @@
     check(wolf['Heat heating · today'] === '38.6 kWh' && wolf['Heat · yesterday'] === '51.0 kWh' && wolf['Heat · month'] === '732 kWh' && wolf['Compressor hours · total'] === '7,500 h', `Wolf heat tiles (${JSON.stringify(wolf)})`);
     const vi = (await tilesOf(setups[2], ['cop_heating', 'starts', 'energy'])).t;
     check(vi['COP heating · total'] === '3.90' && vi['Compressor starts · total'] === '4,123' && vi['Electricity · today'] === '8.4 kWh', `ViCare periods (${JSON.stringify(vi)})`);
+    // #288: a tile name that already ends in the period word does not repeat it ("COP gesamt · gesamt" on ViCare).
+    const label = (key, period, lang) => C.prototype._tileLabel.call({}, key, period, hfcBuiltin(HFC_I18N, lang));
+    const labels = [label('cop_total', 'total', 'de'), label('cop_total', 'today', 'de'), label('cop_total', 'total', 'en'), label('cop_total', 'total', 'nl'),
+      label('cop_heating', 'total', 'de'), label('starts', 'today', 'de')];
+    check(labels.join(' | ') === 'COP gesamt | COP gesamt · heute | COP total | COP totaal | COP Heizen · gesamt | Verdichterstarts · heute',
+      `tile labels do not repeat the period (${labels.join(' | ')})`);
     const card = mount({ ...setups[0].config, tiles: [] }, hassOf(toStates(setups[0].states('heat'))));
     check(card.shadowRoot.getElementById('stats').style.display === 'none', 'tiles: [] hides the row');
     card.remove();
@@ -2639,7 +2645,7 @@
     // tiles: electricity per use today, the month from the total counter, COP total from the SCOP, starts as totals
     const { t } = await tilesOf(s, ['energy', 'energy_heating', 'energy:month', 'cop_total', 'cycles_heating', 'cycles_dhw', 'cop_heating']);
     check(t['Electricity · today'] === '27.4 kWh' && t['Electricity heating · today'] === '21.6 kWh' && t['Electricity · month'] === '513 kWh', `Kronoterm electricity tiles (${JSON.stringify(t)})`);
-    check(t['COP total · total'] === '3.43' && t['Heating cycles · total'] === '12,245' && t['DHW cycles · total'] === '641' && !Object.keys(t).some((k) => k.startsWith('COP heating')), `Kronoterm COP and cycle tiles (${JSON.stringify(t)})`);
+    check(t['COP total'] === '3.43' && t['Heating cycles · total'] === '12,245' && t['DHW cycles · total'] === '641' && !Object.keys(t).some((k) => k.startsWith('COP heating')), `Kronoterm COP and cycle tiles (${JSON.stringify(t)})`);
     // the hot water heat pumps of the Kronoterm DHW cloud and the same keys of another integration are not detected
     check(!detects('kronoterm', { 'sensor.kronoterm_dhw_current_temperature': '48', 'sensor.kronoterm_dhw_compressor_status': 'running' },
       { 'sensor.kronoterm_dhw_current_temperature': { platform: 'kronoterm', translation_key: 'dhw_current_temperature' }, 'sensor.kronoterm_dhw_compressor_status': { platform: 'kronoterm', translation_key: 'dhw_compressor_status' } }), 'a Kronoterm hot water heat pump is not taken for a heating heat pump');

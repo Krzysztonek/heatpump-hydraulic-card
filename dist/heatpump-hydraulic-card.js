@@ -3802,7 +3802,10 @@ class HeatpumpFlowCard extends HTMLElement {
 
   _tileLabel(key, period, I = this._i) {
     const def = HFC_TILES[key];
-    return `${I.tiles[key]}${def.live || def.noSuffix || !period ? '' : ` · ${I.periods[period]}`}`;
+    const name = String(I.tiles[key]);
+    const word = def.live || def.noSuffix || !period ? '' : String(I.periods[period]);
+    // A name that already ends in the period word does not repeat it: "COP gesamt" for the total, not "COP gesamt · gesamt" (#288).
+    return word && !name.toLowerCase().endsWith(` ${word.toLowerCase()}`) ? `${name} · ${word}` : name;
   }
 
   // Where a tile's value comes from for a period: an entity, the long-term statistics of a total counter,
