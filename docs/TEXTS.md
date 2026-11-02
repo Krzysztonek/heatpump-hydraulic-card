@@ -68,6 +68,8 @@ pressure_warning
 pressure_critical
 error
 circulation
+circulation_from
+circulation_until
 valve_dhw
 solar
 timeline_title
