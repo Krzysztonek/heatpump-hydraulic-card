@@ -4,6 +4,10 @@
     "date": "2026-11-01",
     "version": "v1.7.3"
   },
+  "unmapped": {
+    "volume": "Kronoterm reports no flow rate of the heating water, neither in the Cloud API nor in the Modbus register map.",
+    "hc_return": "Kronoterm reports the inlet and outlet of the heat pump, no return per circuit."
+  },
   "sources": [
     {
       "repo": "Favio25/Kronoterm-homeassistant",

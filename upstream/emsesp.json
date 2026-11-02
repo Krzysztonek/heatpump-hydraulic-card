@@ -4,6 +4,9 @@
     "date": "2026-11-01",
     "version": "v3.8.6"
   },
+  "unmapped": {
+    "hc_return": "EMS-ESP reports per circuit the flow temperature of the mixer module (MM100) and the thermostat values, no return."
+  },
   "sources": [
     {
       "repo": "emsesp/EMS-ESP32",
