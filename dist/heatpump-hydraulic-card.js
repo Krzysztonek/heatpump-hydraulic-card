@@ -4621,7 +4621,10 @@ class HeatpumpFlowCard extends HTMLElement {
     const measured = configured && this._has('dhw_loss_sensor') && String(configured).startsWith('sensor.') ? configured : null;
     const tankTemps = sensors.map((k) => this._e[k]);
     const temps = measured ? [measured, ...tankTemps.filter((id) => id !== measured)] : tankTemps;
-    const run = this._timelineIds();
+    const timeline = this._timelineIds();
+    // Grid instructions only annotate the public operating timeline. They must not replace a real DHW or gap segment while
+    // deciding whether a tank cool-down happened in verified standby (for example SG forced-on during a DHW charge).
+    const run = timeline ? { ...timeline, sg: null } : null;
     if (!temps.length || (configured ? !measured : sensors[0] !== keys[0]) || !run) return null;
     // A fresh-water station on the buffer has no tank of its own. In a combined storage the circuits draw heat from the same
     // tank, so the pump of every circuit must be known and every window with a running circuit pump is left out (docs/TOPOLOGY.md,

@@ -3116,6 +3116,13 @@
     const often = []; for (let h = 48; h > 0; h -= 2.5) often.push([h, 'on'], [h - 0.3, 'off']);
     r = loss({ 'binary_sensor.comp': often, 'binary_sensor.valve': often });
     check(r === null, `without a standby window of three hours there is no value (${JSON.stringify(r)})`);
+    const sgCard = mount({ entities: { flow: 'sensor.f', compressor: 'binary_sensor.comp', valve: 'binary_sensor.valve', dhw_top: 'sensor.top', sg_ready: 'sensor.sg' } },
+      hassOf(toStates({ 'sensor.f': ['35', '°C'], 'binary_sensor.comp': 'on', 'binary_sensor.valve': 'on', 'sensor.top': ['40', '°C'], 'sensor.sg': '4' }))); await wait(20);
+    const sgIds = sgCard._lossIds();
+    const sgCharge = sgCard._dhwLoss(hist({ 'binary_sensor.comp': [[48, 'on']], 'binary_sensor.valve': [[48, 'on']],
+      'sensor.sg': [[48, '4']], 'sensor.top': cool(48, 0, 52, 0.4) }), sgIds, start, end);
+    check(sgIds && !sgIds.run.sg && sgCharge === null, 'an SG-Ready overlay cannot turn continuous hot-water charging into a standby-loss window');
+    sgCard.remove();
     // History that starts late: the time before the first state is unknown.
     r = loss({ 'binary_sensor.comp': [[10, 'off']], 'binary_sensor.valve': [[10, 'off']] });
     check(r && Math.abs(r.hours - 10) < 0.01, `time before the first known state is not used (${JSON.stringify(r)})`);
