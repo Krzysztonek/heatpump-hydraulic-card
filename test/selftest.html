@@ -92,7 +92,9 @@
     { timeline: 'yes' }, { timeline_hours: 0 }, { timeline_marks: 'yes' }, { timeline_marks: [{ label: 'x' }] }, { timeline_marks: [7] }, { wall_timeout: -1 }, { wall_timeout: 'soon' }, { unit_style: 'tesla' }, { unit_size: 'huge' },
     { animations: 'sometimes' }, { flow_speed: 0 }, { flow_speed: 3.1 }, { source_spread: 'yes' }, { series_buffer: 'yes' }, { primary_pump: 'yes' }, { theme: 'sepia' }, { fullscreen: 'yes' },
     { texts: [] }, { texts: { NL: { title: 'x' } } }, { texts: { nl: { title: 7 } } }, { texts: { nl: { missing_key: 'x' } } },
-    { brine_pressure_min: -0.1 }, { hc_pressure_crit: 1.2, hc_pressure_min: 1.0 }, { hc_pressure_min: 3, hc_pressure_max: 2 }]) {
+    { brine_pressure_min: -0.1 }, { hc_pressure_crit: 1.2, hc_pressure_min: 1.0 }, { hc_pressure_min: 3, hc_pressure_max: 2 },
+    { tile_sources: ['sensor.x'] }, { tile_sources: { nope: 'sensor.x' } }, { tile_sources: { cost: 'sensor.x' } }, { tile_sources: { spread: 'sensor.x' } },
+    { tile_sources: { energy_heating: { fortnight: 'sensor.x' } } }, { tile_sources: { energy_heating: { now: 'sensor.x' } } }, { tile_sources: { energy_heating: { total: 7 } } }]) {
     let threw = false; try { new C().setConfig(cfg); } catch (e) { threw = true; }
     check(threw, `invalid config rejected ${JSON.stringify(cfg)}`);
   }
@@ -246,6 +248,18 @@
     const withMixer = C._resolve(s.config, hassOf(toStates({ ...s.states('heat'), 'sensor.ebusd_ctlv2_hc2mixermovement': ['-15', '%'] }), s.registry)).entities;
     check(withMixer.hc2_mixer_opening === 'sensor.ebusd_ctlv2_hc2mixermovement' && withMixer.hc_mixer_opening === undefined,
       `ebusd: the controller's mixer movement maps to the circuit's mixer (${withMixer.hc2_mixer_opening} / ${withMixer.hc_mixer_opening})`);
+    // #1: the controller and the VR 71 answer the same error message as the heat pump; another daemon's group stays out.
+    const errStates = toStates({ ...s.states('heat'), 'sensor.ebusd_hmu_currenterror_error': '-', 'sensor.ebusd_ctlv2_currenterror_error': '-',
+      'sensor.ebusd_vr_71_currenterror_error': '-', 'sensor.ebusd_other_hmu_rundatastatuscode': 'standby', 'sensor.ebusd_other_hmu_currenterror_error': '-' });
+    const errReg = { ...s.registry, ...Object.fromEntries(Object.keys(errStates).filter((id) => !s.registry[id]).map((id) => [id, { platform: 'mqtt' }])) };
+    const er = C._resolve({ ...s.config, prefix: 'ebusd' }, hassOf(errStates, errReg));
+    check(JSON.stringify(er.errors) === JSON.stringify(['sensor.ebusd_hmu_currenterror_error', 'sensor.ebusd_ctlv2_currenterror_error', 'sensor.ebusd_vr_71_currenterror_error']),
+      `ebusd: errors of the heat pump, the controller and the VR 71, not of another daemon (${JSON.stringify(er.errors)})`);
+    // Review of #265: the other daemon stays out even when its status code is missing.
+    const { 'sensor.ebusd_other_hmu_rundatastatuscode': _status, ...withoutStatus } = errStates;
+    const ns = C._resolve({ ...s.config, prefix: 'ebusd' }, hassOf(withoutStatus, errReg));
+    check(!ns.errors.includes('sensor.ebusd_other_hmu_currenterror_error') && ns.errors.length === 3,
+      `ebusd: another daemon without its status code stays out of the errors (${JSON.stringify(ns.errors)})`);
     check(r.entities.buffer_top === undefined, 'ebusd: buffer stays unmapped');
     check(r.tiles.env_energy?.total === 'sensor.ebusd_hmu_statenvironmentenergysum', 'ebusd: environmental energy tile');
 
@@ -364,6 +378,20 @@
     const registry = { 'binary_sensor.vc_compressor': { platform: 'vicare', translation_key: 'compressor' }, 'sensor.vc_starts': { platform: 'vicare', translation_key: 'compressor_starts' } };
     const v = C._resolve({ preset: 'vicare' }, hassOf(states, registry)).entities;
     check(v.starts_total === 'sensor.vc_starts' && v.starts_today === undefined, `ViCare compressor starts are the total, not today's (${v.starts_total} / ${v.starts_today})`);
+    // #262: own counters per use (Optolink splitter) feed the catalog tiles, their periods and the COP ratio.
+    const counter = (v) => ({ state: v, attributes: { unit_of_measurement: 'kWh', state_class: 'total_increasing' } });
+    const own = { ...states, ...toStates({ 'sensor.ol_el_hc': counter('2100'), 'sensor.ol_heat_hc': counter('9800'), 'sensor.ol_el_dhw_today': ['3.1', 'kWh'] }) };
+    const cfg = { preset: 'vicare', tile_sources: { energy_heating: 'sensor.ol_el_hc', heat_heating: 'sensor.ol_heat_hc', energy_dhw: { today: 'sensor.ol_el_dhw_today' }, heat_dhw: 'sensor.missing' } };
+    const tr = C._resolve(cfg, hassOf(own, registry));
+    check(tr.tiles.energy_heating?.total === 'sensor.ol_el_hc' && tr.tiles.heat_heating?.total === 'sensor.ol_heat_hc'
+      && tr.tiles.energy_dhw?.today === 'sensor.ol_el_dhw_today' && tr.tiles.heat_dhw === undefined,
+    `tile_sources: own counters become tile sources, a missing entity is left out (${JSON.stringify(tr.tiles)})`);
+    const opts = C._tileOptions(cfg, tr, hassOf(own, registry)).options.map((o) => o.value);
+    check(['energy_heating:month', 'heat_heating:year', 'cop_heating:month', 'energy_dhw'].every((o) => opts.includes(o)),
+      `tile_sources: periods from long-term statistics and the heating COP as a ratio (${opts.filter((o) => /heating|dhw/.test(o)).join(', ')})`);
+    const report = C._diagnosticReport(cfg, hassOf(own, registry));
+    check(report.includes('Tile sources (own):') && report.includes('energy_heating total: sensor.ol_el_hc') && report.includes('heat_dhw: none'),
+      'tile_sources: listed in the diagnostic report');
   }
   {
     // #257: the complete "long names" entity list of a Nefit EnviLine (EMS-ESP 3.8.6).
@@ -401,6 +429,19 @@
       `EMS-ESP long names: an unavailable internal tank sensor does not move the external one to the top (${late.dhw_top} / ${late.dhw_bottom})`);
     check(ext.dhw_top === 'sensor.boiler_dhw_current_extern_temperature' && ext.dhw_bottom !== 'sensor.boiler_dhw_current_extern_temperature' && !externOnly[ext.dhw_bottom],
       `EMS-ESP long names with only the external tank sensor keep it as the top (${ext.dhw_top} / ${ext.dhw_bottom})`);
+    // #257: the circulation switch without a fitted circulation pump draws no circulation.
+    const circ = { ...states, ...toStates({ 'switch.boiler_dhw_circulation_active': 'off', 'switch.boiler_dhw_circulation_pump_available': 'off' }) };
+    const circReg = { ...registry, 'switch.boiler_dhw_circulation_active': { platform: 'mqtt' }, 'switch.boiler_dhw_circulation_pump_available': { platform: 'mqtt' } };
+    const none = C._resolve({ preset: 'emsesp' }, hassOf(circ, circReg)).entities;
+    const fitted = C._resolve({ preset: 'emsesp' }, hassOf({ ...circ, ...toStates({ 'switch.boiler_dhw_circulation_pump_available': 'on' }) }, circReg)).entities;
+    check(none.circulation === undefined && fitted.circulation === 'switch.boiler_dhw_circulation_active',
+      `EMS-ESP: circulation only with a fitted circulation pump (${none.circulation} / ${fitted.circulation})`);
+    // Review of #265: a switch that is unavailable at the first build maps nothing (the preset adds it later); no switch keeps the old mapping.
+    const pending = C._resolve({ preset: 'emsesp' }, hassOf({ ...circ, ...toStates({ 'switch.boiler_dhw_circulation_pump_available': 'unavailable' }) }, circReg)).entities;
+    const { 'switch.boiler_dhw_circulation_pump_available': _avail, ...noSwitch } = circ;
+    const legacy = C._resolve({ preset: 'emsesp' }, hassOf(noSwitch, circReg)).entities;
+    check(pending.circulation === undefined && legacy.circulation === 'switch.boiler_dhw_circulation_active',
+      `EMS-ESP: an unavailable "pump fitted" switch maps no circulation yet, a missing one keeps it (${pending.circulation} / ${legacy.circulation})`);
   }
   check(!detects('vicare', { 'sensor.vitodens_outside_temperature': '5', 'sensor.vitodens_boiler_temperature': '60' },
     { 'sensor.vitodens_outside_temperature': { platform: 'vicare', translation_key: 'outside_temperature' } }), 'ViCare gas boiler is not a heat pump');
@@ -1508,8 +1549,12 @@
     check(o.k === '1.4' && o.vol === 'none' && o.pre === 'none' && o.valve === 'none', `narrow schematic: type 1.4x, secondary labels hidden (${JSON.stringify(o)})`);
     const kept = mount({ ...s.config, hc_return_label: true, narrow_values: true }, hass); kept.style.display = 'block'; kept.style.width = '400px'; await wait(30);
     check(getComputedStyle(q(kept, 't-buf-bottom')).display !== 'none' && getComputedStyle(q(kept, 't-hc-rl')).display !== 'none'
-      && getComputedStyle(q(kept, 't-vol')).display === 'none' && getComputedStyle(q(kept, 't-dhw-bottom')).display === 'none',
+      && getComputedStyle(q(kept, 't-vol')).display === 'none' && getComputedStyle(q(kept, 't-valve')).display === 'none',
     'narrow_values keeps buffer sub-values and circuit return, but not unrelated secondary labels');
+    // #257: on a phone the tank bottom tells how much hot water is left; narrow_values keeps it and the target line.
+    check(getComputedStyle(q(kept, 't-dhw-bottom')).display !== 'none' && getComputedStyle(q(kept, 't-dhw-mode')).display !== 'none'
+      && parseFloat(getComputedStyle(q(kept, 't-dhw-bottom')).fontSize) > 15,
+    `narrow_values keeps the hot-water tank bottom and target line (${getComputedStyle(q(kept, 't-dhw-bottom')).fontSize})`);
     // #214 feedback: the kept circuit return grows like the other secondary labels instead of staying at 13 px.
     check(parseFloat(getComputedStyle(q(kept, 't-hc-rl')).fontSize) > 15, `narrow_values: the circuit return label scales on a narrow card (${getComputedStyle(q(kept, 't-hc-rl')).fontSize})`);
     kept.remove();
@@ -3593,6 +3638,13 @@
     ed._changed({ preset: 'lambda', language: 'xy', theme: 'night', fullscreen: false, entities: ed._form.data.entities });
     check(changed.texts.xy.title === 'Warmtepomp & huis' && changed.theme === 'night' && changed.fullscreen === false, 'editor preserves YAML translations and writes theme/full-screen options');
     ed.remove();
+    // #262: own tile sources are YAML-only and survive a change in the editor.
+    const tsEd = document.createElement('heatpump-flow-card-editor'); let tsChanged;
+    tsEd.addEventListener('config-changed', (ev) => { tsChanged = ev.detail.config; });
+    tsEd.setConfig({ ...custom, tile_sources: { energy_heating: 'sensor.x' } }); tsEd.hass = h; await wait(10);
+    tsEd._changed({ preset: 'lambda', theme: 'night', entities: tsEd._form.data.entities });
+    check(tsChanged?.tile_sources?.energy_heating === 'sensor.x', 'editor preserves YAML tile sources');
+    tsEd.remove();
   }
 
   // 20. hydraulic pressure, three-point storage gradients, defrost vapour and column radiators
