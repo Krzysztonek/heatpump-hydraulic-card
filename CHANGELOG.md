@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+## 0.17.2 – 2026-11-02
+- Slovak and Czech: the remaining editor texts (boiler, mixer, mapping assistant, buffer emphasis, narrow values) and the Slovak card texts for the boiler and the mixer, by Havinko1991 (#191).
+- `narrow_values` also keeps the hot-water tank's middle and bottom values and the hot-water target line on narrow cards; on a phone the bottom sensor shows how much hot water is left (#257).
+- EMS-ESP: the circulation is drawn only when EMS-ESP reports a fitted circulation pump (`dhw_circulation_pump_available` / `wwcircpump` on) or has no such switch; a switch that comes up later adds it without reloading (#257).
+- ebusd: the error chip watches the error messages of every unit in the selected daemon (heat pump, controller, VR 71), not only the heat pump's; other daemons stay out (#1).
+- New `tile_sources`: your own counters for the catalog tiles, for example electricity and heat split into heating and hot water from an Optolink splitter. A total counter gives today, week, month and year from its long-term statistics and the COP tiles from heat and electricity; they are listed in the diagnostic report (#262).
+- Solar thermal: the loop's pipe ends no longer stand out at the tank and at the collector; both pipes now enter the lower end of the collector along its axis.
+
 ## 0.17.1 – 2026-11-01
 - EMS-ESP "long names" entity format: heat pump flow and return from TC1/TC0, the compressor and 3-way valve binary sensors, the air inlet (TL2), the internal and external hot-water sensors as tank top and bottom, the hot-water and room targets, compressor starts, total energy and the refrigerant temperatures TR3/TR5/TR6. Entity list by sebastiaan001 (#257).
 - Mixer: `hc_mixer_opening` also accepts a signed movement (above 0 opening, below 0 closing) instead of two on/off outputs, and the ebusd preset maps the controller's `hcNmixermovement` of a mixed circuit (Vaillant VR 71). Suggested by buliwyf42 (#1).
