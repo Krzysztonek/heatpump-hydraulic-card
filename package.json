@@ -14,7 +14,7 @@
     "release:check": "node scripts/release-check.mjs",
     "i18n:check": "node scripts/i18n-check.mjs",
     "coverage": "node scripts/coverage.mjs",
-    "changelog:compile": "node scripts/changelog.mjs",
+    "changelog:compile": "node scripts/changelog.mjs && node scripts/coverage.mjs",
     "topology:update": "node scripts/topology-snapshot.mjs --update",
     "test": "playwright test",
     "test:ui": "playwright test --ui",
