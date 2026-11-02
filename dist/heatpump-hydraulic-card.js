@@ -1408,6 +1408,7 @@ const HFC_I18N = {
       idle: 'Stand-by', heating: 'Verwarmen', dhw: 'Warm water', cooling: 'Koelen', defrost: 'Ontdooien', blocked: 'Geblokkeerd',
       frost: 'Vorstbeveiliging', circulate: 'Circuleren', off: 'Uit', legionella: 'Legionella', trailing: 'Naloop',
     },
+    boiler: 'Ketel', boiler_off: 'Ketel uit', mixer: 'Mengklep', mixer_opening: 'opent', mixer_closing: 'sluit',
   },
 };
 
@@ -1945,6 +1946,14 @@ const HFC_EDITOR = {
     env_energy: 'Omgevingsenergie totaal (kWh)', pv: 'Vermogen uit PV (W)', battery: 'Vermogen uit accu (W)', grid: 'Vermogen uit net (W)',
     cop_heating_today: 'COP verwarmen vandaag', cop_dhw_today: 'COP warm water vandaag', energy_today: 'Energie vandaag (kWh)',
     pv_share_today: 'PV-aandeel vandaag (%)', starts_today: 'Compressorstarts vandaag',
+    assistant_device: 'Entiteiten zoeken op dit warmtepompapparaat',
+    assistant_device_help: 'Alleen beschikbaar als er geen ondersteunde preset is gevonden. Voorstellen worden pas opgeslagen als je ze selecteert en bevestigt.',
+    assistant_title: 'Voorgestelde koppeling van entiteiten',
+    assistant_intro: 'Exacte Engelse en Duitse namen, eenheden en apparaatklassen worden gecontroleerd. Selecteer elk voorstel dat je wilt opslaan.',
+    assistant_apply: 'Geselecteerde voorstellen gebruiken',
+    assistant_none: 'Geen eenduidige voorstellen gevonden op dit apparaat.',
+    sec_boiler: 'Ketel / tweede warmteopwekker', boiler_state: 'Ketel actief (aan/uit, of een vermogen boven 0)', boiler_power: 'Ketelvermogen (W of kW)', boiler_flow: 'Aanvoertemperatuur ketel (°C)',
+    hc_mixer: 'Stand of aandeel mengklep (%, getoond zoals gemeld)', hc_mixer_opening: 'Mengklepmotor opent (aan/uit)', hc_mixer_closing: 'Mengklepmotor sluit (aan/uit)',
   },
 };
 
