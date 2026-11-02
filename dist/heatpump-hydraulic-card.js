@@ -518,6 +518,8 @@ const HFC_PRESETS = {
     tested: true,
     unit_style: 'bosch',
     source_type: (e, hass) => (/hpbrinein$/.test(e.source_in || '') && hass.states[e.source_in] ? 'brine' : 'air'),
+    // The circulation depends on the reading of the "pump fitted" switch.
+    dynamic: true,
     detect: (ctx) => {
       // Gas boilers have curflowtemp as well; only heat pump entities count.
       const id = ctx.match(/^sensor\.(?:(.+)_)?boiler_(hpactivity|hptc1|compressor_activity|heat_carrier_forward_tc1)$/, 'mqtt');
@@ -532,7 +534,8 @@ const HFC_PRESETS = {
       const dhwExtern = `sensor.${x}boiler_dhw_current_extern_temperature`;
       const hasIntern = ctx?.state(dhwIntern) !== undefined;
       const sw = (...ks) => ks.map((k) => `switch.${x}boiler_${k}`);
-      // EMS-ESP publishes whether a circulation pump is fitted at all; without one the card draws no circulation (#257).
+      // EMS-ESP publishes whether a circulation pump is fitted at all; without one the card draws no circulation (#257). Only a
+      // switch that reports on maps it, so a switch that is unavailable at the first build cannot leave a mapping behind.
       const circPump = ['dhw_circulation_pump_available', 'wwcircpump'].map((k) => ctx?.state(`switch.${x}boiler_${k}`)).find((v) => v !== undefined);
       const s = (...ks) => ks.map((k) => `sensor.${x}${k}`);
       const hc = `hc${i.hc}`;
@@ -551,7 +554,7 @@ const HFC_PRESETS = {
         dhw_top: s('boiler_dhw_curtemp', 'boiler_wwcurtemp', 'boiler_dhw_storagetemp1').concat(hasIntern ? dhwIntern : dhwExtern),
         dhw_bottom: s('boiler_dhw_storagetemp2').concat(hasIntern ? [dhwExtern] : []),
         dhw_target: s('boiler_dhw_seltemp', 'boiler_wwseltemp').concat(`number.${x}boiler_dhw_selected_temperature`),
-        circulation: circPump === 'off' ? undefined : b('dhw_circ', 'wwcirc').concat(sw('dhw_circulation_active')),
+        circulation: circPump !== undefined && circPump !== 'on' ? undefined : b('dhw_circ', 'wwcirc').concat(sw('dhw_circulation_active')),
         hc_pump: [`binary_sensor.${x}mixer_${hc}_pumpstatus`, `sensor.${x}mixer_${hc}_pumpstatus`,
           ...(i.hc === 1 ? [`binary_sensor.${x}boiler_heating_pump`] : [])],
         hc_flow: s(`mixer_${hc}_flowtemphc`, `thermostat_${hc}_targetflowtemp`, `thermostat_${hc}_target_flow_temperature`),
@@ -1098,7 +1101,8 @@ const HFC_PRESETS = {
     errors: (p, i, ctx) => {
       const x = hfcEbusdStem(ctx, p);
       // The heat pump, the controller and the VR 71 answer the same error message (#1). A longer stem is another daemon's group.
-      const others = hfcEbusdInstances(ctx, '').map((g) => g.stem).filter((stem) => stem !== x && stem.startsWith(`${x}_`));
+      const others = [...new Set(ctx.ids.map((id) => id.match(/^(?:sensor|binary_sensor|number|select|switch)\.(.+?)_(?:hmu|vwzio|ctl[sv]\d)_/)?.[1]))]
+        .filter((stem) => stem && stem !== x && stem.startsWith(`${x}_`));
       const re = new RegExp(`^sensor\\.${x}_.+_currenterror_error$`);
       const ids = ctx.ids.filter((id) => re.test(id) && !others.some((stem) => id.startsWith(`sensor.${stem}_`))
         && (!ctx.registry[id] || ctx.registry[id].platform === 'mqtt') && (!ctx.device || ctx.registry[id]?.device_id === ctx.device));
@@ -3545,6 +3549,7 @@ class HeatpumpFlowCard extends HTMLElement {
           </g>` : ''}
 
           ${P.station ? this._stationSvg() : ''}
+          ${P.solar ? this._solarPipes() : ''}
           ${P.dhw && !P.station ? `
             <g class="tap" ${de(e.valve ? 'valve' : 'dhw_mode')}>
               <circle class="valve" cx="420" cy="250" r="18"/>
@@ -4903,17 +4908,23 @@ class HeatpumpFlowCard extends HTMLElement {
       <path class="heater-case" d="${d}"/><path class="heater-el" d="${d}"/><g class="waves rod-waves">${waves}</g></g>`;
   }
 
-  // Solar thermal collector on the roof edge of the house, with a loop into the right side of the DHW tank.
+  // Solar thermal loop into the right side of the DHW tank. Drawn before the tank, so the tank covers the pipe ends; at the
+  // collector both pipes run along its axis into the lower end, where the opaque panel covers them.
+  _solarPipes() {
+    const flow = 'M724.3 101.9 L704.9 116.1 Q690 126.9 690 134 Q690 150 674 150 H640';
+    const back = 'M640 166 H700 Q712 166 712 154 V136 Q712 125.7 718.4 121.1 L731.4 111.7';
+    const pp = (id, d) => `<path class="pipe" id="p-${id}" d="${d}"/><path class="flow" id="f-${id}" d="${d}"/>`;
+    return `${pp('sol', flow)}${pp('sol-rl', back)}`;
+  }
+
+  // Solar thermal collector on the roof edge of the house, with the coil of its loop in the DHW tank.
   _solarSvg() {
     const entity = this._e.solar_collector || this._e.solar_pump;
-    const flow = 'M736 112 H706 Q690 112 690 128 V134 Q690 150 674 150 H640';
-    const back = 'M640 166 H700 Q712 166 712 154 V140 Q712 126 727 126';
-    const pp = (id, d) => `<path class="pipe" id="p-${id}" d="${d}"/><path class="flow" id="f-${id}" d="${d}"/>`;
-    return `${pp('sol', flow)}${pp('sol-rl', back)}
-      <path class="coil" id="coil-sol" d="M640 150 H612 Q602 150 602 158 Q602 166 612 166 H640"/>
+    return `<path class="coil" id="coil-sol" d="M640 150 H612 Q602 150 602 158 Q602 166 612 166 H640"/>
       <g class="tap solar" id="solar" data-entity="${this._esc(entity)}">
-        <g transform="translate(728 124) rotate(-36)"><rect class="collector" x="0" y="-24" width="84" height="22" rx="3"/>
-          <path class="collector-cells" d="M21 -24 V-2 M42 -24 V-2 M63 -24 V-2 M0 -13 H84"/></g>
+        <g transform="translate(728 124) rotate(-36)"><rect class="collector-base" x="0" y="-28" width="84" height="26" rx="3"/>
+          <rect class="collector" x="0" y="-28" width="84" height="26" rx="3"/>
+          <path class="collector-cells" d="M21 -28 V-2 M42 -28 V-2 M63 -28 V-2 M0 -15 H84"/></g>
         <text class="small" id="t-sol" x="716" y="94" text-anchor="end"></text>
       </g>`;
   }
@@ -5707,6 +5718,7 @@ HeatpumpFlowCard.styles = `
   .impeller.on .imp { fill: ${hfcVar('heat')}; }
   .house { fill: var(--secondary-background-color, rgba(127,127,127,.1)); stroke: var(--divider-color, rgba(127,127,127,.35)); stroke-width: 2; stroke-linejoin: round; }
   .screed { fill: var(--divider-color, rgba(127,127,127,.35)); }
+  .collector-base { fill: var(--card-background-color, #fff); }
   .collector { fill: var(--secondary-background-color, rgba(127,127,127,.15)); stroke: var(--divider-color, rgba(127,127,127,.5)); stroke-width: 2; transition: fill .4s, stroke .4s; }
   .collector-cells { fill: none; stroke: var(--divider-color, rgba(127,127,127,.5)); stroke-width: 1.5; }
   .solar.on .collector { fill: ${hfcTint('pv', 28)}; stroke: ${hfcVar('pv')}; }
