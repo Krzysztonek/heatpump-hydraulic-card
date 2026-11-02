@@ -2054,6 +2054,8 @@ const hfcTempAttr = (id, key) => (['climate', 'water_heater'].includes(String(id
 // legacy: entity key of the default tiles that serves as "today"; ratio: computed from two other tiles when the integration
 // has no own entity (COP = heat ÷ electricity); live: current value from the schematic entities; periods: allowed periods.
 const HFC_PERIODS = ['now', 'today', 'yesterday', 'week', 'month', 'year', 'total'];
+// Tiles that `tile_sources` can feed: live values and computed tiles (load classes, cost, standby loss, PV share) have no entity.
+const hfcTileSourceKey = (key) => !!HFC_TILES[key] && !HFC_TILES[key].live && !['classes', 'cost', 'loss', 'share'].includes(HFC_TILES[key].kind);
 // Periods that can be taken from the long-term statistics of a total counter: [calendar period, offset].
 const HFC_STAT_PERIODS = { today: ['day', 0], yesterday: ['day', -1], week: ['week', 0], month: ['month', 0], year: ['year', 0] };
 // Home Assistant actions a tile can carry (more-info, navigate, url, toggle, perform-action …).
@@ -2480,6 +2482,18 @@ class HeatpumpFlowCard extends HTMLElement {
         if (s && s.period !== undefined && !HFC_PERIODS.includes(s.period)) throw new Error(`Unknown tile period "${s.period}". Available: ${HFC_PERIODS.join(', ')}`);
       });
     }
+    if (config.tile_sources !== undefined && config.tile_sources !== null) {
+      if (typeof config.tile_sources !== 'object' || Array.isArray(config.tile_sources)) throw new Error('tile_sources must map tile keys to entities');
+      Object.entries(config.tile_sources).forEach(([key, v]) => {
+        if (!hfcTileSourceKey(key)) throw new Error(`tile_sources: "${key}" cannot take an entity. Available: ${Object.keys(HFC_TILES).filter(hfcTileSourceKey).join(', ')}`);
+        if (v === null || v === 'none' || typeof v === 'string') return;
+        if (typeof v !== 'object' || Array.isArray(v)) throw new Error(`tile_sources.${key} must be an entity or a map of periods to entities`);
+        Object.entries(v).forEach(([period, id]) => {
+          if (!HFC_PERIODS.includes(period) || period === 'now') throw new Error(`tile_sources.${key}: unknown period "${period}". Available: ${HFC_PERIODS.filter((p) => p !== 'now').join(', ')}`);
+          if (typeof id !== 'string') throw new Error(`tile_sources.${key}.${period} must be an entity id`);
+        });
+      });
+    }
     if (config.layout !== undefined && config.layout !== null && !HFC_LAYOUTS.includes(config.layout)) {
       throw new Error(`layout must be one of: ${HFC_LAYOUTS.join(', ')}`);
     }
@@ -2678,6 +2692,16 @@ class HeatpumpFlowCard extends HTMLElement {
     // Total counters configured directly are also tile sources. Their calendar periods come from long-term statistics.
     [['energy_total', 'energy'], ['env_energy', 'env_energy'], ['heat_total', 'heat']].forEach(([entityKey, tileKey]) => {
       if (e[entityKey] && hass.states[e[entityKey]]) (tiles[tileKey] = tiles[tileKey] || {}).total = e[entityKey];
+    });
+    // Own tile sources replace the preset's for that tile (#262): an entity id is a total counter, whose calendar periods come
+    // from long-term statistics; a map names the entity of each period. null or "none" removes the tile's preset source.
+    Object.entries(config.tile_sources || {}).forEach(([key, v]) => {
+      if (!hfcTileSourceKey(key)) return;
+      delete tiles[key];
+      const periods = typeof v === 'string' ? (v === 'none' ? {} : { total: v }) : (v || {});
+      Object.entries(periods).forEach(([period, id]) => {
+        if (typeof id === 'string' && hass.states[id] && HFC_PERIODS.includes(period)) (tiles[key] = tiles[key] || {})[period] = id;
+      });
     });
     const presetControls = preset?.controls ? preset.controls(prefix, idx, ctx) : [];
     const presetDetails = preset?.details ? preset.details(prefix, idx, ctx) : [];
@@ -2914,6 +2938,10 @@ class HeatpumpFlowCard extends HTMLElement {
       'Error entities:',
       ...(r.errors?.length ? r.errors.map((id, n) => entityLine(`error_${n + 1}`, id)) : ['- none']),
       '',
+      ...(config.tile_sources ? ['Tile sources (own):', ...Object.keys(config.tile_sources).flatMap((key) => {
+        const periods = Object.entries(r.tiles[key] || {});
+        return periods.length ? periods.map(([period, id]) => entityLine(`${key} ${period}`, id)) : [`- ${key}: none (entity missing or removed)`];
+      }), ''] : []),
       'Quick controls:',
       ...(r.controls.length ? r.controls.map((c, n) => entityLine(`control_${n + 1}`, typeof c === 'string' ? c : c?.entity)) : ['- none']),
     ];
@@ -6164,6 +6192,7 @@ class HeatpumpFlowCardEditor extends HTMLElement {
     const config = { ...value };
     // Nested translations are YAML-only; ha-form does not render them and therefore may omit them from value-changed.
     if (this._config.texts && value.texts === undefined) config.texts = this._config.texts;
+    if (this._config.tile_sources && value.tile_sources === undefined) config.tile_sources = this._config.tile_sources;
     // The entity picker deals in ids; keep YAML-only metadata of controls that stay selected.
     if (Array.isArray(value.controls)) {
       const old = new Map((this._config.controls || []).filter((c) => c && typeof c === 'object' && c.entity).map((c) => [c.entity, c]));

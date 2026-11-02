@@ -2,4 +2,5 @@
 - `narrow_values` also keeps the hot-water tank's middle and bottom values and the hot-water target line on narrow cards; on a phone the bottom sensor shows how much hot water is left (#257).
 - EMS-ESP: the circulation is drawn only when EMS-ESP reports a fitted circulation pump (`dhw_circulation_pump_available` / `wwcircpump` on) or has no such switch; a switch that comes up later adds it without reloading (#257).
 - ebusd: the error chip watches the error messages of every unit in the selected daemon (heat pump, controller, VR 71), not only the heat pump's; other daemons stay out (#1).
+- New `tile_sources`: your own counters for the catalog tiles, for example electricity and heat split into heating and hot water from an Optolink splitter. A total counter gives today, week, month and year from its long-term statistics and the COP tiles from heat and electricity; they are listed in the diagnostic report (#262).
 - Solar thermal: the loop's pipe ends no longer stand out at the tank and at the collector; both pipes now enter the lower end of the collector along its axis.

@@ -92,7 +92,9 @@
     { timeline: 'yes' }, { timeline_hours: 0 }, { timeline_marks: 'yes' }, { timeline_marks: [{ label: 'x' }] }, { timeline_marks: [7] }, { wall_timeout: -1 }, { wall_timeout: 'soon' }, { unit_style: 'tesla' }, { unit_size: 'huge' },
     { animations: 'sometimes' }, { flow_speed: 0 }, { flow_speed: 3.1 }, { source_spread: 'yes' }, { series_buffer: 'yes' }, { primary_pump: 'yes' }, { theme: 'sepia' }, { fullscreen: 'yes' },
     { texts: [] }, { texts: { NL: { title: 'x' } } }, { texts: { nl: { title: 7 } } }, { texts: { nl: { missing_key: 'x' } } },
-    { brine_pressure_min: -0.1 }, { hc_pressure_crit: 1.2, hc_pressure_min: 1.0 }, { hc_pressure_min: 3, hc_pressure_max: 2 }]) {
+    { brine_pressure_min: -0.1 }, { hc_pressure_crit: 1.2, hc_pressure_min: 1.0 }, { hc_pressure_min: 3, hc_pressure_max: 2 },
+    { tile_sources: ['sensor.x'] }, { tile_sources: { nope: 'sensor.x' } }, { tile_sources: { cost: 'sensor.x' } }, { tile_sources: { spread: 'sensor.x' } },
+    { tile_sources: { energy_heating: { fortnight: 'sensor.x' } } }, { tile_sources: { energy_heating: { now: 'sensor.x' } } }, { tile_sources: { energy_heating: { total: 7 } } }]) {
     let threw = false; try { new C().setConfig(cfg); } catch (e) { threw = true; }
     check(threw, `invalid config rejected ${JSON.stringify(cfg)}`);
   }
@@ -376,6 +378,20 @@
     const registry = { 'binary_sensor.vc_compressor': { platform: 'vicare', translation_key: 'compressor' }, 'sensor.vc_starts': { platform: 'vicare', translation_key: 'compressor_starts' } };
     const v = C._resolve({ preset: 'vicare' }, hassOf(states, registry)).entities;
     check(v.starts_total === 'sensor.vc_starts' && v.starts_today === undefined, `ViCare compressor starts are the total, not today's (${v.starts_total} / ${v.starts_today})`);
+    // #262: own counters per use (Optolink splitter) feed the catalog tiles, their periods and the COP ratio.
+    const counter = (v) => ({ state: v, attributes: { unit_of_measurement: 'kWh', state_class: 'total_increasing' } });
+    const own = { ...states, ...toStates({ 'sensor.ol_el_hc': counter('2100'), 'sensor.ol_heat_hc': counter('9800'), 'sensor.ol_el_dhw_today': ['3.1', 'kWh'] }) };
+    const cfg = { preset: 'vicare', tile_sources: { energy_heating: 'sensor.ol_el_hc', heat_heating: 'sensor.ol_heat_hc', energy_dhw: { today: 'sensor.ol_el_dhw_today' }, heat_dhw: 'sensor.missing' } };
+    const tr = C._resolve(cfg, hassOf(own, registry));
+    check(tr.tiles.energy_heating?.total === 'sensor.ol_el_hc' && tr.tiles.heat_heating?.total === 'sensor.ol_heat_hc'
+      && tr.tiles.energy_dhw?.today === 'sensor.ol_el_dhw_today' && tr.tiles.heat_dhw === undefined,
+    `tile_sources: own counters become tile sources, a missing entity is left out (${JSON.stringify(tr.tiles)})`);
+    const opts = C._tileOptions(cfg, tr, hassOf(own, registry)).options.map((o) => o.value);
+    check(['energy_heating:month', 'heat_heating:year', 'cop_heating:month', 'energy_dhw'].every((o) => opts.includes(o)),
+      `tile_sources: periods from long-term statistics and the heating COP as a ratio (${opts.filter((o) => /heating|dhw/.test(o)).join(', ')})`);
+    const report = C._diagnosticReport(cfg, hassOf(own, registry));
+    check(report.includes('Tile sources (own):') && report.includes('energy_heating total: sensor.ol_el_hc') && report.includes('heat_dhw: none'),
+      'tile_sources: listed in the diagnostic report');
   }
   {
     // #257: the complete "long names" entity list of a Nefit EnviLine (EMS-ESP 3.8.6).
@@ -3622,6 +3638,13 @@
     ed._changed({ preset: 'lambda', language: 'xy', theme: 'night', fullscreen: false, entities: ed._form.data.entities });
     check(changed.texts.xy.title === 'Warmtepomp & huis' && changed.theme === 'night' && changed.fullscreen === false, 'editor preserves YAML translations and writes theme/full-screen options');
     ed.remove();
+    // #262: own tile sources are YAML-only and survive a change in the editor.
+    const tsEd = document.createElement('heatpump-flow-card-editor'); let tsChanged;
+    tsEd.addEventListener('config-changed', (ev) => { tsChanged = ev.detail.config; });
+    tsEd.setConfig({ ...custom, tile_sources: { energy_heating: 'sensor.x' } }); tsEd.hass = h; await wait(10);
+    tsEd._changed({ preset: 'lambda', theme: 'night', entities: tsEd._form.data.entities });
+    check(tsChanged?.tile_sources?.energy_heating === 'sensor.x', 'editor preserves YAML tile sources');
+    tsEd.remove();
   }
 
   // 20. hydraulic pressure, three-point storage gradients, defrost vapour and column radiators

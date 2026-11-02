@@ -285,6 +285,7 @@ Everything can be set in the **UI editor**. With a preset, the editor shows whet
 | `details` | Extra rows in the details drawer: list of entity ids or `{entity, name, unit, decimals}`. |
 | `details_open` | Open the details drawer by default (default `false`). |
 | `tiles` | Your own tile selection, in this order: catalog keys with an optional period (`cop_heating`, `cop_heating:month`, `{key, period, name, decimals, unit}`) and free entities (`{entity, name, unit, decimals}`). Every tile can carry `tap_action`, `hold_action` and `double_tap_action`. Without `tiles` the default tiles are shown; `tiles: []` hides the row. See [Stat tiles](#stat-tiles). |
+| `tile_sources` | Your own counters for catalog tiles, replacing the preset's for that tile: `{energy_heating: sensor.x}` (a total counter; its periods come from long-term statistics) or `{energy_dhw: {today: sensor.a, total: sensor.b}}`. See [Stat tiles](#stat-tiles). |
 | `price` | Electricity price per kWh for the `cost` tile: a number or an entity (e.g. a dynamic tariff; ct/kWh and per-MWh prices are converted). `currency` overrides the currency from the HA settings. |
 | `stats` | Extra tiles `[{entity, name, unit, decimals}]`, added after the default tiles or after `tiles`; also with `tap_action`, `hold_action`, `double_tap_action`. |
 
@@ -344,6 +345,24 @@ tiles:
 ```
 
 **Cost:** with a fixed price, cost = electricity of the period × price. With a price entity that has long-term statistics (`state_class: measurement`, true for most tariff sensors), the card bills every hour at that hour's mean price, from Home Assistant's long-term statistics. The current hour, which is not yet in the statistics, is billed at the current price. For the year the card uses daily values and for the total monthly values, so these are marked **≈**. A price entity without statistics is applied to the whole period at its current price, also marked **≈**. A tile can have its own `price` and `currency`. If your tariff sensor once changed its unit (for example from ct/kWh to €/kWh), its older statistics keep the old values and the cost for longer periods comes out too high. In that case, fix the statistics under Developer tools > Statistics.
+
+**Own counters:** when your installation reports counters the preset does not use (for example electricity and heat split into heating and hot water from an Optolink splitter or a heat meter), give them to the catalog tiles with `tile_sources`. A single entity is a total counter: with `state_class: total_increasing` the card derives today, week, month and year from its long-term statistics, and the COP tiles are computed from heat and electricity. A map names the entity of each period. Own sources replace the preset's for that tile; `none` removes them.
+
+```yaml
+tile_sources:
+  energy_heating: sensor.vitocal_electricity_heating_total
+  energy_dhw: sensor.vitocal_electricity_dhw_total
+  heat_heating: sensor.vitocal_heat_heating_total
+  heat_dhw:
+    today: sensor.vitocal_heat_dhw_today
+    total: sensor.vitocal_heat_dhw_total
+tiles:
+  - cop_heating:month
+  - energy_heating:month
+  - heat_dhw:today
+```
+
+Tile keys that take a source: the electricity, environmental energy and heat keys, `cop_heating`, `cop_dhw`, `cop_cooling`, `cop_total`, `spf`, the starts and runtime keys, `pv_production` and `solar_thermal`. Live values (`cop_live`, `spread`, `power` …), `cost`, `load_classes`, `dhw_loss` and `pv_boost_share` are computed and take none.
 
 **Actions:** a tap opens the more-info dialog of the tile's entity. `tap_action`, `hold_action` (500 ms) and `double_tap_action` accept every Home Assistant action (`more-info`, `navigate`, `url`, `toggle`, `perform-action`, `assist`, `none`, with `confirmation`). Tiles with their own name, entity, price or action are edited in YAML.
 
