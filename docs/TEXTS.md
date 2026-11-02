@@ -34,6 +34,11 @@ heating_circuit
 house
 room
 room_target
+humidity
+dew_point
+dew_margin
+dew_warning
+flow_short
 running
 compressor_off
 source_in

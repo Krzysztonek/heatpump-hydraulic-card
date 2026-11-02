@@ -1205,7 +1205,7 @@ const HFC_I18N = {
     not_found: 'No entities of this preset found. Check the integration and the prefix, or open the card editor.',
     start: 'No supported heat pump integration found. Open the card editor to pick a preset or to map your entities.', start_link: 'Supported integrations',
     title: 'Heat pump', heat_pump: 'Heat pump', boiler: 'Boiler', boiler_off: 'Boiler off', dhw: 'Hot water', buffer: 'Buffer', series_tank: 'Series buffer', combined_tank: 'Combined storage', heating_zone: 'Heating', fresh_water_station: 'Fresh-water station', heating_circuit: 'Heating circuit',
-    house: 'Rooms', room: 'Room', room_target: 'Room target', comfort_below: 'below target', comfort_on: 'at target', comfort_above: 'above target', running: 'running', compressor_off: 'Compressor off', source_in: 'Air inlet', outdoor: 'Outdoor',
+    house: 'Rooms', room: 'Room', room_target: 'Room target', humidity: 'Humidity', dew_point: 'Dew point', dew_margin: 'Dew-point margin', dew_warning: 'condensation risk', flow_short: 'Flow', comfort_below: 'below target', comfort_on: 'at target', comfort_above: 'above target', running: 'running', compressor_off: 'Compressor off', source_in: 'Air inlet', outdoor: 'Outdoor',
     energy_missing: 'Energy dashboard: no power sensor for {sources}; energy counters alone cannot show live flow.',
     brine_in: 'Brine in', brine_out: 'Brine out', well_in: 'Well in', well_out: 'Well out',
     details: 'Details', sec_operation: 'Operation', sec_hydraulic: 'Hydraulic pressures', sec_refrigerant: 'Refrigerant circuit', sec_cutouts: 'Cut-outs (number of events)', sec_more: 'More',
@@ -1246,7 +1246,7 @@ const HFC_I18N = {
     not_found: 'Keine Entitäten dieser Voreinstellung gefunden. Integration und Präfix prüfen oder den Karteneditor öffnen.',
     start: 'Keine unterstützte Wärmepumpen-Integration gefunden. Im Karteneditor eine Voreinstellung wählen oder die Entitäten selbst zuordnen.', start_link: 'Unterstützte Integrationen',
     title: 'Wärmepumpe', heat_pump: 'Wärmepumpe', boiler: 'Heizkessel', boiler_off: 'Kessel aus', dhw: 'Warmwasser', buffer: 'Puffer', series_tank: 'Reihenpuffer', combined_tank: 'Kombispeicher', heating_zone: 'Heizung', fresh_water_station: 'Frischwasserstation', heating_circuit: 'Heizkreis',
-    house: 'Wohnräume', room: 'Raum', room_target: 'Raum-Soll', comfort_below: 'unter Soll', comfort_on: 'im Soll', comfort_above: 'über Soll', running: 'läuft', compressor_off: 'Verdichter aus', source_in: 'Luft-Eintritt', outdoor: 'Außen',
+    house: 'Wohnräume', room: 'Raum', room_target: 'Raum-Soll', humidity: 'Luftfeuchte', dew_point: 'Taupunkt', dew_margin: 'Taupunktabstand', dew_warning: 'Kondensationsgefahr', flow_short: 'VL', comfort_below: 'unter Soll', comfort_on: 'im Soll', comfort_above: 'über Soll', running: 'läuft', compressor_off: 'Verdichter aus', source_in: 'Luft-Eintritt', outdoor: 'Außen',
     energy_missing: 'Energie-Dashboard: kein Leistungssensor für {sources}; Energiezähler allein zeigen keinen aktuellen Fluss.',
     brine_in: 'Sole ein', brine_out: 'Sole aus', well_in: 'Brunnen ein', well_out: 'Brunnen aus',
     details: 'Details', sec_operation: 'Betrieb', sec_hydraulic: 'Hydraulikdrücke', sec_refrigerant: 'Kältekreis', sec_cutouts: 'Abschaltungen (Anzahl der Ereignisse)', sec_more: 'Weitere',
@@ -1288,7 +1288,7 @@ const HFC_I18N = {
     not_found: 'Nenašli sa žiadne entity tejto predvoľby. Skontrolujte integráciu a predponu, alebo otvorte editor karty.',
     start: 'Nenašla sa žiadna podporovaná integrácia tepelného čerpadla. Otvorte editor karty a vyberte predvoľbu alebo priraďte svoje entity.', start_link: 'Podporované integrácie',
     title: 'Tepelné čerpadlo', heat_pump: 'Tepelné čerpadlo', dhw: 'Teplá voda', buffer: 'Akumulačný zásobník', series_tank: 'Sériový akumulačný zásobník', combined_tank: 'Kombinovaný zásobník', heating_zone: 'Vykurovanie', fresh_water_station: 'Čerstvá voda (stanica)', heating_circuit: 'Vykurovací okruh',
-    house: 'Miestnosti', room: 'Miestnosť', room_target: 'Cieľová teplota', comfort_below: 'pod cieľom', comfort_on: 'na cieli', comfort_above: 'nad cieľom', running: 'beží', compressor_off: 'Kompresor vypnutý', source_in: 'Prívod vzduchu', outdoor: 'Vonku',
+    house: 'Miestnosti', room: 'Miestnosť', room_target: 'Cieľová teplota', humidity: 'Vlhkosť', dew_point: 'Rosný bod', dew_margin: 'Odstup od rosného bodu', dew_warning: 'riziko kondenzácie', flow_short: 'Prívod', comfort_below: 'pod cieľom', comfort_on: 'na cieli', comfort_above: 'nad cieľom', running: 'beží', compressor_off: 'Kompresor vypnutý', source_in: 'Prívod vzduchu', outdoor: 'Vonku',
     energy_missing: 'Energetický panel: chýba senzor výkonu pre {sources}; samotné merače energie nedokážu zobraziť aktuálny prietok.',
     brine_in: 'Vstup nemrznúcej zmesi', brine_out: 'Výstup nemrznúcej zmesi', well_in: 'Vstup zo studne', well_out: 'Výstup do studne',
     details: 'Podrobnosti', sec_operation: 'Prevádzka', sec_hydraulic: 'Hydraulické tlaky', sec_refrigerant: 'Chladiaci okruh', sec_cutouts: 'Vypnutia (počet udalostí)', sec_more: 'Viac',
@@ -1330,7 +1330,7 @@ const HFC_I18N = {
     not_found: 'Nenalezeny žádné entity této předvolby. Zkontrolujte integraci a předponu, nebo otevřete editor karty.',
     start: 'Nenalezena žádná podporovaná integrace tepelného čerpadla. Otevřete editor karty a vyberte předvolbu nebo přiřaďte své entity.', start_link: 'Podporované integrace',
     title: 'Tepelné čerpadlo', heat_pump: 'Tepelné čerpadlo', dhw: 'Teplá voda', buffer: 'Akumulační zásobník', series_tank: 'Sériový akumulační zásobník', combined_tank: 'Kombinovaný zásobník', heating_zone: 'Vytápění', fresh_water_station: 'Čerstvá voda (stanice)', heating_circuit: 'Topný okruh',
-    house: 'Místnosti', room: 'Místnost', room_target: 'Cílová teplota', comfort_below: 'pod cílem', comfort_on: 'na cíli', comfort_above: 'nad cílem', running: 'běží', compressor_off: 'Kompresor vypnutý', source_in: 'Přívod vzduchu', outdoor: 'Venku',
+    house: 'Místnosti', room: 'Místnost', room_target: 'Cílová teplota', humidity: 'Vlhkost', dew_point: 'Rosný bod', dew_margin: 'Odstup od rosného bodu', dew_warning: 'riziko kondenzace', flow_short: 'Přívod', comfort_below: 'pod cílem', comfort_on: 'na cíli', comfort_above: 'nad cílem', running: 'běží', compressor_off: 'Kompresor vypnutý', source_in: 'Přívod vzduchu', outdoor: 'Venku',
     energy_missing: 'Energetický panel: chybí senzor výkonu pro {sources}; samotné měřiče energie nedokážou zobrazit aktuální průtok.',
     brine_in: 'Vstup nemrznoucí směsi', brine_out: 'Výstup nemrznoucí směsi', well_in: 'Vstup ze studny', well_out: 'Výstup do studny',
     details: 'Podrobnosti', sec_operation: 'Provoz', sec_hydraulic: 'Hydraulické tlaky', sec_refrigerant: 'Chladicí okruh', sec_cutouts: 'Vypnutí (počet událostí)', sec_more: 'Více',
@@ -1372,7 +1372,7 @@ const HFC_I18N = {
     not_found: 'Geen entiteiten van deze preset gevonden. Controleer de integratie en het voorvoegsel, of open de kaarteditor.',
     start: 'Geen ondersteunde warmtepompintegratie gevonden. Open de kaarteditor om een preset te kiezen of je entiteiten te koppelen.', start_link: 'Ondersteunde integraties',
     title: 'Warmtepomp', heat_pump: 'Warmtepomp', dhw: 'Warm water', buffer: 'Buffervat', series_tank: 'Seriebuffer', combined_tank: 'Combivat', heating_zone: 'Verwarming', fresh_water_station: 'Verswaterstation', heating_circuit: 'Verwarmingsgroep',
-    house: 'Woning', room: 'Kamer', room_target: 'Kamerdoel', comfort_below: 'onder doelwaarde', comfort_on: 'op doelwaarde', comfort_above: 'boven doelwaarde', running: 'actief', compressor_off: 'Compressor uit', source_in: 'Luchtinlaat', outdoor: 'Buiten',
+    house: 'Woning', room: 'Kamer', room_target: 'Kamerdoel', humidity: 'Luchtvochtigheid', dew_point: 'Dauwpunt', dew_margin: 'Dauwpuntsmarge', dew_warning: 'condensatierisico', flow_short: 'Aanvoer', comfort_below: 'onder doelwaarde', comfort_on: 'op doelwaarde', comfort_above: 'boven doelwaarde', running: 'actief', compressor_off: 'Compressor uit', source_in: 'Luchtinlaat', outdoor: 'Buiten',
     energy_missing: 'Energiedashboard: geen vermogenssensor voor {sources}; met alleen energietellers is geen live stroom te tonen.',
     brine_in: 'Bron in', brine_out: 'Bron uit', well_in: 'Put in', well_out: 'Put uit',
     details: 'Details', sec_operation: 'Bedrijf', sec_hydraulic: 'Hydraulische druk', sec_refrigerant: 'Koudemiddelcircuit', sec_cutouts: 'Uitschakelingen (aantal keer)', sec_more: 'Meer',
@@ -1440,7 +1440,7 @@ const HFC_EDITOR = {
     flow_speed: 'Animation speed', source_spread: 'Show source spread',
     theme: 'Card theme', theme_auto: 'Automatic (dashboard)', theme_night: 'Night', theme_contrast: 'High contrast', fullscreen: 'Full-screen button',
     wall_timeout: 'Hide controls after (seconds, 0 = never)',
-    hc_return_label: 'Show circuit return temperature', narrow_values: 'Keep tank sub-values, hot-water target and circuit return on narrow cards', buffer_values: 'Buffer temperature emphasis', buffer_values_default: 'Top value prominent (default)', buffer_values_equal: 'All configured values equal', storage: 'Storage', storage_separate: 'Separate hot-water tank and buffer', storage_combined: 'Combined storage (one tank, hot-water zone on top)', dhw_type: 'Hot-water preparation', dhw_type_coil: 'Tank with heat-exchanger coil', dhw_type_fresh_water: 'Fresh-water station (on the buffer or the combined storage)', dhw_type_tank_in_tank: 'Tank in tank (combined storage)', series_buffer: 'Series buffer in the return', series_bypass: 'Series buffer with bypass valve (off: the circuits run in defrost)', primary_pump: 'Primary pump', hc_name: 'Circuit 1 name', hc2_name: 'Circuit 2 name', hc3_name: 'Circuit 3 name', hc4_name: 'Circuit 4 name', hc5_name: 'Circuit 5 name', hc6_name: 'Circuit 6 name',
+    hc_return_label: 'Show circuit return temperature', dew_point_margin: 'Minimum dew-point margin (K)', narrow_values: 'Keep tank sub-values, hot-water target and circuit return on narrow cards', buffer_values: 'Buffer temperature emphasis', buffer_values_default: 'Top value prominent (default)', buffer_values_equal: 'All configured values equal', storage: 'Storage', storage_separate: 'Separate hot-water tank and buffer', storage_combined: 'Combined storage (one tank, hot-water zone on top)', dhw_type: 'Hot-water preparation', dhw_type_coil: 'Tank with heat-exchanger coil', dhw_type_fresh_water: 'Fresh-water station (on the buffer or the combined storage)', dhw_type_tank_in_tank: 'Tank in tank (combined storage)', series_buffer: 'Series buffer in the return', series_bypass: 'Series buffer with bypass valve (off: the circuits run in defrost)', primary_pump: 'Primary pump', hc_name: 'Circuit 1 name', hc2_name: 'Circuit 2 name', hc3_name: 'Circuit 3 name', hc4_name: 'Circuit 4 name', hc5_name: 'Circuit 5 name', hc6_name: 'Circuit 6 name',
     sec_hc2: 'Heating circuit 2', sec_hc3: 'Heating circuit 3', sec_hc4: 'Heating circuit 4', sec_hc5: 'Heating circuit 5', sec_hc6: 'Heating circuit 6', sec_details: 'Details: operation', sec_refrigerant: 'Details: refrigerant circuit', sec_cutouts: 'Details: cut-out counters',
     controls: 'Quick controls (switch, button, select, number …)', details_open: 'Details open by default',
     from_preset: 'Found by the preset', more_fields: 'More fields',
@@ -1512,7 +1512,7 @@ const HFC_EDITOR = {
     hc_flow: 'Circuit flow temperature (°C)', hc_return: 'Circuit return temperature (°C)', hc_setpoint: 'Circuit flow target (°C)',
     hc_mode: 'Circuit mode (state text)', hc_pump: 'Circuit pump running (on/off)', hc_volume: 'Flow rate of the heating circuit (l/h or l/min, circuit pump)', hc_curve_offset: 'Heating curve shift (K)', hc_mixer: 'Mixer position or share (%, shown as reported)', hc_mixer_opening: 'Mixer motor opening (on/off)', hc_mixer_closing: 'Mixer motor closing (on/off)', hc_pressure: 'Heating circuit pressure (bar)', brine_pressure: 'Brine circuit pressure (bar)',
     cutout_high_pressure: 'High-pressure cut-outs (count of events, not a pressure)', cutout_low_pressure: 'Low-pressure cut-outs (count of events, not a pressure)', cutout_temperature: 'Temperature cut-outs (count of events, not a temperature)',
-    room: 'Room temperature (°C)', room_target: 'Room target (°C)',
+    room: 'Room temperature (°C)', room_target: 'Room target (°C)', room_humidity: 'Room humidity (%)', dew_point: 'Dew point (°C, optional)',
     env_energy: 'Environmental energy total (kWh)', pv: 'Power from PV (W)', battery: 'Power from battery (W)', grid: 'Power from grid (W)',
     cop_heating_today: 'COP heating today', cop_dhw_today: 'COP DHW today', energy_today: 'Energy today (kWh)',
     pv_share_today: 'PV share today (%)', starts_today: 'Compressor starts today',
@@ -1531,7 +1531,7 @@ const HFC_EDITOR = {
     flow_speed: 'Animationsgeschwindigkeit', source_spread: 'Quellenspreizung anzeigen',
     theme: 'Kartendarstellung', theme_auto: 'Automatisch (Dashboard)', theme_night: 'Nacht', theme_contrast: 'Hoher Kontrast', fullscreen: 'Vollbild-Schaltfläche',
     wall_timeout: 'Bedienelemente ausblenden nach (Sekunden, 0 = nie)',
-    hc_return_label: 'Heizkreis-Rücklauf anzeigen', narrow_values: 'Speicher-Unterwerte, WW-Soll und Heizkreis-Rücklauf auf schmalen Karten zeigen', buffer_values: 'Gewichtung der Puffertemperaturen', buffer_values_default: 'Oberen Wert hervorheben (Standard)', buffer_values_equal: 'Alle vorhandenen Werte gleich', storage: 'Speicher', storage_separate: 'Getrennter Warmwasserspeicher und Puffer', storage_combined: 'Kombispeicher (ein Speicher, Warmwasserzone oben)', dhw_type: 'Warmwasserbereitung', dhw_type_coil: 'Speicher mit Wärmetauscher-Wendel', dhw_type_fresh_water: 'Frischwasserstation (am Puffer oder Kombispeicher)', dhw_type_tank_in_tank: 'Tank im Tank (Kombispeicher)', series_buffer: 'Reihenpuffer im Rücklauf', series_bypass: 'Reihenpuffer mit Bypass-Ventil (aus: die Heizkreise laufen beim Abtauen)', primary_pump: 'Primärpumpe', hc_name: 'Name Heizkreis 1', hc2_name: 'Name Heizkreis 2', hc3_name: 'Name Heizkreis 3', hc4_name: 'Name Heizkreis 4', hc5_name: 'Name Heizkreis 5', hc6_name: 'Name Heizkreis 6',
+    hc_return_label: 'Heizkreis-Rücklauf anzeigen', dew_point_margin: 'Mindestabstand zum Taupunkt (K)', narrow_values: 'Speicher-Unterwerte, WW-Soll und Heizkreis-Rücklauf auf schmalen Karten zeigen', buffer_values: 'Gewichtung der Puffertemperaturen', buffer_values_default: 'Oberen Wert hervorheben (Standard)', buffer_values_equal: 'Alle vorhandenen Werte gleich', storage: 'Speicher', storage_separate: 'Getrennter Warmwasserspeicher und Puffer', storage_combined: 'Kombispeicher (ein Speicher, Warmwasserzone oben)', dhw_type: 'Warmwasserbereitung', dhw_type_coil: 'Speicher mit Wärmetauscher-Wendel', dhw_type_fresh_water: 'Frischwasserstation (am Puffer oder Kombispeicher)', dhw_type_tank_in_tank: 'Tank im Tank (Kombispeicher)', series_buffer: 'Reihenpuffer im Rücklauf', series_bypass: 'Reihenpuffer mit Bypass-Ventil (aus: die Heizkreise laufen beim Abtauen)', primary_pump: 'Primärpumpe', hc_name: 'Name Heizkreis 1', hc2_name: 'Name Heizkreis 2', hc3_name: 'Name Heizkreis 3', hc4_name: 'Name Heizkreis 4', hc5_name: 'Name Heizkreis 5', hc6_name: 'Name Heizkreis 6',
     sec_hc2: 'Heizkreis 2', sec_hc3: 'Heizkreis 3', sec_hc4: 'Heizkreis 4', sec_hc5: 'Heizkreis 5', sec_hc6: 'Heizkreis 6', sec_details: 'Details: Betrieb', sec_refrigerant: 'Details: Kältekreis', sec_cutouts: 'Details: Abschaltzähler',
     controls: 'Schnellbedienung (Schalter, Taste, Auswahl, Zahl …)', details_open: 'Details standardmäßig offen',
     from_preset: 'Von der Voreinstellung gefunden', more_fields: 'Weitere Felder',
@@ -1603,7 +1603,7 @@ const HFC_EDITOR = {
     hc_flow: 'Heizkreis-Vorlauf (°C)', hc_return: 'Heizkreis-Rücklauf (°C)', hc_setpoint: 'Heizkreis-Vorlauf-Soll (°C)',
     hc_mode: 'Heizkreis-Betriebsart (Statustext)', hc_pump: 'Heizkreispumpe läuft (ein/aus)', hc_volume: 'Volumenstrom Heizkreis (l/h oder l/min, Heizkreispumpe)', hc_curve_offset: 'Heizkurven-Verschiebung (K)', hc_mixer: 'Mischer-Stellung oder -Anteil (%, wird angezeigt wie gemeldet)', hc_mixer_opening: 'Mischermotor öffnet (ein/aus)', hc_mixer_closing: 'Mischermotor schließt (ein/aus)', hc_pressure: 'Heizkreis-Druck (bar)', brine_pressure: 'Solekreis-Druck (bar)',
     cutout_high_pressure: 'Hochdruck-Abschaltungen (Anzahl der Ereignisse, kein Druck)', cutout_low_pressure: 'Niederdruck-Abschaltungen (Anzahl der Ereignisse, kein Druck)', cutout_temperature: 'Temperatur-Abschaltungen (Anzahl der Ereignisse, keine Temperatur)',
-    room: 'Raumtemperatur (°C)', room_target: 'Raum-Soll (°C)',
+    room: 'Raumtemperatur (°C)', room_target: 'Raum-Soll (°C)', room_humidity: 'Raumluftfeuchte (%)', dew_point: 'Taupunkt (°C, optional)',
     env_energy: 'Umweltenergie gesamt (kWh)', pv: 'Strom aus PV (W)', battery: 'Strom aus Akku (W)', grid: 'Strom aus Netz (W)',
     cop_heating_today: 'COP Heizen heute', cop_dhw_today: 'COP WW heute', energy_today: 'Verbrauch heute (kWh)',
     pv_share_today: 'PV-Anteil heute (%)', starts_today: 'Verdichterstarts heute',
@@ -1633,7 +1633,7 @@ const HFC_EDITOR = {
     sec_boiler: 'Kotol / druhý zdroj tepla', boiler_state: 'Kotol v prevádzke (zap/vyp, alebo výkon nad 0)', boiler_power: 'Výkon kotla (W alebo kW)', boiler_flow: 'Teplota výstupu z kotla (°C)',
     dhw_loss_sensor: 'Meranie pohotovostných strát TÚV (°C)',
     hc_mixer: 'Poloha alebo podiel zmiešavacieho ventilu (%, zobrazené podľa stavu)', hc_mixer_opening: 'Otváranie motora zmiešavača (zap/vyp)', hc_mixer_closing: 'Zatváranie motora zmiešavača (zap/vyp)',
-    hc_return_label: 'Zobraziť spiatočku okruhu', series_buffer: 'Sériový akumulačný zásobník na spiatočke', series_bypass: 'Sériový akumulačný zásobník s obtokovým ventilom (vypnuté: okruhy bežia v odmrazovaní)', primary_pump: 'Primárne čerpadlo', hc_name: 'Názov okruhu 1', hc2_name: 'Názov okruhu 2', hc3_name: 'Názov okruhu 3', hc4_name: 'Názov okruhu 4', hc5_name: 'Názov okruhu 5', hc6_name: 'Názov okruhu 6',
+    hc_return_label: 'Zobraziť spiatočku okruhu', dew_point_margin: 'Minimálny odstup od rosného bodu (K)', series_buffer: 'Sériový akumulačný zásobník na spiatočke', series_bypass: 'Sériový akumulačný zásobník s obtokovým ventilom (vypnuté: okruhy bežia v odmrazovaní)', primary_pump: 'Primárne čerpadlo', hc_name: 'Názov okruhu 1', hc2_name: 'Názov okruhu 2', hc3_name: 'Názov okruhu 3', hc4_name: 'Názov okruhu 4', hc5_name: 'Názov okruhu 5', hc6_name: 'Názov okruhu 6',
     sec_hc2: 'Vykurovací okruh 2', sec_hc3: 'Vykurovací okruh 3', sec_hc4: 'Vykurovací okruh 4', sec_hc5: 'Vykurovací okruh 5', sec_hc6: 'Vykurovací okruh 6', sec_details: 'Podrobnosti: prevádzka', sec_refrigerant: 'Podrobnosti: chladiaci okruh', sec_cutouts: 'Podrobnosti: počítadlá vypnutí',
     controls: 'Rýchle ovládanie (prepínač, tlačidlo, výber, číslo…)', details_open: 'Podrobnosti predvolene otvorené',
     from_preset: 'Nájdené predvoľbou',
@@ -1677,7 +1677,7 @@ const HFC_EDITOR = {
     hc_flow: 'Teplota prívodu okruhu', hc_return: 'Teplota spiatočky okruhu', hc_setpoint: 'Cieľová teplota prívodu okruhu',
     hc_mode: 'Režim okruhu', hc_pump: 'Čerpadlo okruhu beží (binárne)', hc_volume: 'Prietok okruhu', hc_curve_offset: 'Posun vykurovacej krivky (K)', hc_pressure: 'Tlak vo vykurovacom okruhu', brine_pressure: 'Tlak v okruhu nemrznúcej zmesi',
     cutout_high_pressure: 'Vysokotlakové vypnutia (počet udalostí, nie tlak)', cutout_low_pressure: 'Nízkotlakové vypnutia (počet udalostí, nie tlak)', cutout_temperature: 'Teplotné vypnutia (počet udalostí, nie teplota)',
-    room: 'Teplota v miestnosti', room_target: 'Cieľová teplota v miestnosti',
+    room: 'Teplota v miestnosti', room_target: 'Cieľová teplota v miestnosti', room_humidity: 'Vlhkosť v miestnosti (%)', dew_point: 'Rosný bod (°C, voliteľné)',
     env_energy: 'Celková energia prostredia', pv: 'Výkon z FVE (W)', battery: 'Výkon z batérie (W)', grid: 'Výkon zo siete (W)',
     cop_heating_today: 'COP vykurovania dnes', cop_dhw_today: 'COP TÚV dnes', energy_today: 'Energia dnes (kWh)',
     pv_share_today: 'Podiel FVE dnes (%)', starts_today: 'Počet štartov kompresora dnes',
@@ -1759,7 +1759,7 @@ const HFC_EDITOR = {
     sec_boiler: 'Kotel / druhý zdroj tepla', boiler_state: 'Kotel v provozu (zap/vyp, nebo výkon nad 0)', boiler_power: 'Výkon kotle (W nebo kW)', boiler_flow: 'Teplota výstupu z kotle (°C)',
     dhw_loss_sensor: 'Měření pohotovostních ztrát TÚV (°C)',
     hc_mixer: 'Poloha nebo podíl směšovacího ventilu (%, zobrazeno podle stavu)', hc_mixer_opening: 'Otevírání motoru směšovače (zap/vyp)', hc_mixer_closing: 'Zavírání motoru směšovače (zap/vyp)',
-    hc_return_label: 'Zobrazit zpátečku okruhu', series_buffer: 'Sériový akumulační zásobník na zpátečce', series_bypass: 'Sériový akumulační zásobník s obtokovým ventilem (vypnuto: okruhy běží v odmrazování)', primary_pump: 'Primární čerpadlo', hc_name: 'Název okruhu 1', hc2_name: 'Název okruhu 2', hc3_name: 'Název okruhu 3', hc4_name: 'Název okruhu 4', hc5_name: 'Název okruhu 5', hc6_name: 'Název okruhu 6',
+    hc_return_label: 'Zobrazit zpátečku okruhu', dew_point_margin: 'Minimální odstup od rosného bodu (K)', series_buffer: 'Sériový akumulační zásobník na zpátečce', series_bypass: 'Sériový akumulační zásobník s obtokovým ventilem (vypnuto: okruhy běží v odmrazování)', primary_pump: 'Primární čerpadlo', hc_name: 'Název okruhu 1', hc2_name: 'Název okruhu 2', hc3_name: 'Název okruhu 3', hc4_name: 'Název okruhu 4', hc5_name: 'Název okruhu 5', hc6_name: 'Název okruhu 6',
     sec_hc2: 'Topný okruh 2', sec_hc3: 'Topný okruh 3', sec_hc4: 'Topný okruh 4', sec_hc5: 'Topný okruh 5', sec_hc6: 'Topný okruh 6', sec_details: 'Podrobnosti: provoz', sec_refrigerant: 'Podrobnosti: chladicí okruh', sec_cutouts: 'Podrobnosti: počítadla vypnutí',
     controls: 'Rychlé ovládání (přepínač, tlačítko, výběr, číslo…)', details_open: 'Podrobnosti výchozně otevřené',
     from_preset: 'Nalezeno předvolbou',
@@ -1803,7 +1803,7 @@ const HFC_EDITOR = {
     hc_flow: 'Teplota přívodu okruhu', hc_return: 'Teplota zpátečky okruhu', hc_setpoint: 'Cílová teplota přívodu okruhu',
     hc_mode: 'Režim okruhu', hc_pump: 'Čerpadlo okruhu běží (binární)', hc_volume: 'Průtok okruhu', hc_curve_offset: 'Posun topné křivky (K)', hc_pressure: 'Tlak v topném okruhu', brine_pressure: 'Tlak v okruhu nemrznoucí směsi',
     cutout_high_pressure: 'Vysokotlaká vypnutí (počet událostí, nikoli tlak)', cutout_low_pressure: 'Nízkotlaká vypnutí (počet událostí, nikoli tlak)', cutout_temperature: 'Teplotní vypnutí (počet událostí, nikoli teplota)',
-    room: 'Teplota v místnosti', room_target: 'Cílová teplota v místnosti',
+    room: 'Teplota v místnosti', room_target: 'Cílová teplota v místnosti', room_humidity: 'Vlhkost v místnosti (%)', dew_point: 'Rosný bod (°C, volitelné)',
     env_energy: 'Celková energie prostředí', pv: 'Výkon z FVE (W)', battery: 'Výkon z baterie (W)', grid: 'Výkon ze sítě (W)',
     cop_heating_today: 'COP vytápění dnes', cop_dhw_today: 'COP TUV dnes', energy_today: 'Energie dnes (kWh)',
     pv_share_today: 'Podíl FVE dnes (%)', starts_today: 'Počet startů kompresoru dnes',
@@ -1874,7 +1874,7 @@ const HFC_EDITOR = {
     flow_speed: 'Animatiesnelheid', source_spread: 'ΔT van de bron tonen',
     theme: 'Kaartthema', theme_auto: 'Automatisch (dashboard)', theme_night: 'Nacht', theme_contrast: 'Hoog contrast', fullscreen: 'Knop volledig scherm',
     wall_timeout: 'Bediening verbergen na (seconden, 0 = nooit)',
-    hc_return_label: 'Retourtemperatuur per groep tonen', narrow_values: 'Vat-subwaarden, warmwaterdoel en groepsretour op smalle kaarten tonen', buffer_values: 'Nadruk buffertemperaturen', buffer_values_default: 'Bovenste waarde prominent (standaard)', buffer_values_equal: 'Alle ingestelde waarden gelijk', storage: 'Opslag', storage_separate: 'Apart warmwatervat en buffervat', storage_combined: 'Combivat (één vat, warmwaterzone bovenin)', dhw_type: 'Warmwaterbereiding', dhw_type_coil: 'Vat met warmtewisselaarspiraal', dhw_type_fresh_water: 'Verswaterstation (op het buffervat of het combivat)', dhw_type_tank_in_tank: 'Tank in tank (combivat)', series_buffer: 'Seriebuffer in de retour', series_bypass: 'Seriebuffer met bypassklep (uit: de groepen draaien door bij ontdooien)', primary_pump: 'Primaire pomp', hc_name: 'Naam groep 1', hc2_name: 'Naam groep 2', hc3_name: 'Naam groep 3', hc4_name: 'Naam groep 4', hc5_name: 'Naam groep 5', hc6_name: 'Naam groep 6',
+    hc_return_label: 'Retourtemperatuur per groep tonen', dew_point_margin: 'Minimale dauwpuntsmarge (K)', narrow_values: 'Vat-subwaarden, warmwaterdoel en groepsretour op smalle kaarten tonen', buffer_values: 'Nadruk buffertemperaturen', buffer_values_default: 'Bovenste waarde prominent (standaard)', buffer_values_equal: 'Alle ingestelde waarden gelijk', storage: 'Opslag', storage_separate: 'Apart warmwatervat en buffervat', storage_combined: 'Combivat (één vat, warmwaterzone bovenin)', dhw_type: 'Warmwaterbereiding', dhw_type_coil: 'Vat met warmtewisselaarspiraal', dhw_type_fresh_water: 'Verswaterstation (op het buffervat of het combivat)', dhw_type_tank_in_tank: 'Tank in tank (combivat)', series_buffer: 'Seriebuffer in de retour', series_bypass: 'Seriebuffer met bypassklep (uit: de groepen draaien door bij ontdooien)', primary_pump: 'Primaire pomp', hc_name: 'Naam groep 1', hc2_name: 'Naam groep 2', hc3_name: 'Naam groep 3', hc4_name: 'Naam groep 4', hc5_name: 'Naam groep 5', hc6_name: 'Naam groep 6',
     sec_hc2: 'Verwarmingsgroep 2', sec_hc3: 'Verwarmingsgroep 3', sec_hc4: 'Verwarmingsgroep 4', sec_hc5: 'Verwarmingsgroep 5', sec_hc6: 'Verwarmingsgroep 6', sec_details: 'Details: bedrijf', sec_refrigerant: 'Details: koudemiddelcircuit', sec_cutouts: 'Details: uitschakeltellers',
     controls: 'Snelbediening (schakelaar, knop, keuzelijst, getal …)', details_open: 'Details standaard open',
     from_preset: 'Gevonden door de preset', more_fields: 'Meer velden',
@@ -1939,7 +1939,7 @@ const HFC_EDITOR = {
     hc_flow: 'Aanvoertemperatuur groep (°C)', hc_return: 'Retourtemperatuur groep (°C)', hc_setpoint: 'Aanvoerdoel groep (°C)',
     hc_mode: 'Stand groep (statustekst)', hc_pump: 'Groepspomp actief (aan/uit)', hc_volume: 'Debiet van de verwarmingsgroep (l/h of l/min, groepspomp)', hc_curve_offset: 'Verschuiving stooklijn (K)', hc_pressure: 'Druk verwarmingsgroep (bar)', brine_pressure: 'Druk broncircuit (bar)',
     cutout_high_pressure: 'Hogedrukuitschakelingen (aantal keer, geen druk)', cutout_low_pressure: 'Lagedrukuitschakelingen (aantal keer, geen druk)', cutout_temperature: 'Temperatuuruitschakelingen (aantal keer, geen temperatuur)',
-    room: 'Kamertemperatuur (°C)', room_target: 'Kamerdoel (°C)',
+    room: 'Kamertemperatuur (°C)', room_target: 'Kamerdoel (°C)', room_humidity: 'Luchtvochtigheid kamer (%)', dew_point: 'Dauwpunt (°C, optioneel)',
     env_energy: 'Omgevingsenergie totaal (kWh)', pv: 'Vermogen uit PV (W)', battery: 'Vermogen uit accu (W)', grid: 'Vermogen uit net (W)',
     cop_heating_today: 'COP verwarmen vandaag', cop_dhw_today: 'COP warm water vandaag', energy_today: 'Energie vandaag (kWh)',
     pv_share_today: 'PV-aandeel vandaag (%)', starts_today: 'Compressorstarts vandaag',
@@ -1956,13 +1956,13 @@ const HFC_ENTITY_GROUPS = {
   sec_hp: ['mode', 'status', 'compressor', 'fan_speed', 'defrost', 'power', 'heat', 'flow', 'return', 'volume', 'source_volume', 'source_in', 'source_out', 'brine_pressure', 'outdoor', 'valve', 'heater', 'pv_boost'],
   sec_boiler: ['boiler_state', 'boiler_power', 'boiler_flow'],
   sec_storage: ['dhw_top', 'dhw_middle', 'dhw_bottom', 'dhw_target', 'dhw_mode', 'circulation', 'dhw_loss_sensor', 'dhw_heater', 'dhw_heater_top', 'dhw_heater_middle', 'dhw_heater_bottom', 'buffer_top', 'buffer_middle', 'buffer_bottom', 'buffer_mode', 'buffer_heater', 'buffer_heater_top', 'buffer_heater_middle', 'buffer_heater_bottom', 'bypass_valve', 'solar_collector', 'solar_pump'],
-  sec_hc: ['hc_flow', 'hc_return', 'hc_setpoint', 'hc_mode', 'hc_pump', 'hc_volume', 'hc_curve_offset', 'hc_mixer', 'hc_mixer_opening', 'hc_mixer_closing', 'hc_pressure', 'room', 'room_target', 'program'],
+  sec_hc: ['hc_flow', 'hc_return', 'hc_setpoint', 'hc_mode', 'hc_pump', 'hc_volume', 'hc_curve_offset', 'hc_mixer', 'hc_mixer_opening', 'hc_mixer_closing', 'hc_pressure', 'room', 'room_target', 'room_humidity', 'dew_point', 'program'],
   // The room of circuit 1 uses room/room_target; circuits 2 to 6 use their numbered keys in the shared house overview.
-  sec_hc2: ['hc2_flow', 'hc2_return', 'hc2_setpoint', 'hc2_mode', 'hc2_pump', 'hc2_volume', 'hc2_curve_offset', 'hc2_mixer', 'hc2_mixer_opening', 'hc2_mixer_closing', 'hc2_room', 'hc2_room_target'],
-  sec_hc3: ['hc3_flow', 'hc3_return', 'hc3_setpoint', 'hc3_mode', 'hc3_pump', 'hc3_volume', 'hc3_curve_offset', 'hc3_mixer', 'hc3_mixer_opening', 'hc3_mixer_closing', 'hc3_room', 'hc3_room_target'],
-  sec_hc4: ['hc4_flow', 'hc4_return', 'hc4_setpoint', 'hc4_mode', 'hc4_pump', 'hc4_volume', 'hc4_curve_offset', 'hc4_mixer', 'hc4_mixer_opening', 'hc4_mixer_closing', 'hc4_room', 'hc4_room_target'],
-  sec_hc5: ['hc5_flow', 'hc5_return', 'hc5_setpoint', 'hc5_mode', 'hc5_pump', 'hc5_volume', 'hc5_curve_offset', 'hc5_mixer', 'hc5_mixer_opening', 'hc5_mixer_closing', 'hc5_room', 'hc5_room_target'],
-  sec_hc6: ['hc6_flow', 'hc6_return', 'hc6_setpoint', 'hc6_mode', 'hc6_pump', 'hc6_volume', 'hc6_curve_offset', 'hc6_mixer', 'hc6_mixer_opening', 'hc6_mixer_closing', 'hc6_room', 'hc6_room_target'],
+  sec_hc2: ['hc2_flow', 'hc2_return', 'hc2_setpoint', 'hc2_mode', 'hc2_pump', 'hc2_volume', 'hc2_curve_offset', 'hc2_mixer', 'hc2_mixer_opening', 'hc2_mixer_closing', 'hc2_room', 'hc2_room_target', 'hc2_room_humidity', 'hc2_dew_point'],
+  sec_hc3: ['hc3_flow', 'hc3_return', 'hc3_setpoint', 'hc3_mode', 'hc3_pump', 'hc3_volume', 'hc3_curve_offset', 'hc3_mixer', 'hc3_mixer_opening', 'hc3_mixer_closing', 'hc3_room', 'hc3_room_target', 'hc3_room_humidity', 'hc3_dew_point'],
+  sec_hc4: ['hc4_flow', 'hc4_return', 'hc4_setpoint', 'hc4_mode', 'hc4_pump', 'hc4_volume', 'hc4_curve_offset', 'hc4_mixer', 'hc4_mixer_opening', 'hc4_mixer_closing', 'hc4_room', 'hc4_room_target', 'hc4_room_humidity', 'hc4_dew_point'],
+  sec_hc5: ['hc5_flow', 'hc5_return', 'hc5_setpoint', 'hc5_mode', 'hc5_pump', 'hc5_volume', 'hc5_curve_offset', 'hc5_mixer', 'hc5_mixer_opening', 'hc5_mixer_closing', 'hc5_room', 'hc5_room_target', 'hc5_room_humidity', 'hc5_dew_point'],
+  sec_hc6: ['hc6_flow', 'hc6_return', 'hc6_setpoint', 'hc6_mode', 'hc6_pump', 'hc6_volume', 'hc6_curve_offset', 'hc6_mixer', 'hc6_mixer_opening', 'hc6_mixer_closing', 'hc6_room', 'hc6_room_target', 'hc6_room_humidity', 'hc6_dew_point'],
   sec_power: ['pv', 'battery', 'grid'],
   sec_details: ['hours', 'starts_total', 'aux_hours', 'energy_total', 'env_energy', 'heat_total'],
   sec_refrigerant: ['compressor_speed', 'evap_temp', 'cond_temp', 'suction_temp', 'hot_gas', 'liquid_temp', 'low_pressure', 'high_pressure', 'eev', 'superheat', 'subcooling'],
@@ -2004,14 +2004,14 @@ const HFC_KINDS = {
 // Keys of circuits 2 to 6 use the kind of circuit 1 (hc2_flow → hc_flow, hc2_room → room); keys not listed are not checked.
 const HFC_KEY_KINDS = Object.fromEntries(Object.entries({
   temperature: ['flow', 'return', 'source_in', 'source_out', 'outdoor', 'boiler_flow', 'dhw_top', 'dhw_middle', 'dhw_bottom', 'dhw_target', 'dhw_loss_sensor', 'buffer_top', 'buffer_middle',
-    'buffer_bottom', 'solar_collector', 'hc_flow', 'hc_return', 'hc_setpoint', 'room', 'room_target', 'evap_temp', 'cond_temp', 'suction_temp', 'hot_gas', 'liquid_temp'],
+    'buffer_bottom', 'solar_collector', 'hc_flow', 'hc_return', 'hc_setpoint', 'room', 'room_target', 'dew_point', 'evap_temp', 'cond_temp', 'suction_temp', 'hot_gas', 'liquid_temp'],
   offset: ['hc_curve_offset', 'superheat', 'subcooling'],
   power: ['power', 'heat', 'boiler_power', 'pv', 'battery', 'grid'],
   energy: ['energy_total', 'env_energy', 'heat_total', 'energy_today'],
   pressure: ['brine_pressure', 'hc_pressure', 'low_pressure', 'high_pressure'],
   flowrate: ['volume', 'source_volume', 'hc_volume'],
   hours: ['hours', 'aux_hours'],
-  percent: ['pv_share_today', 'hc_mixer'],
+  percent: ['pv_share_today', 'hc_mixer', 'room_humidity'],
   counter: ['starts_total', 'starts_today', 'cutout_high_pressure', 'cutout_low_pressure', 'cutout_temperature'],
   ratio: ['cop_heating_today', 'cop_dhw_today'],
   speed: ['compressor', 'fan_speed', 'compressor_speed'],
@@ -2402,6 +2402,7 @@ class HeatpumpFlowCard extends HTMLElement {
               { name: 'language', selector: { select: { mode: 'dropdown', options: languageOptions } } },
               { name: 'fullscreen', selector: { boolean: {} } },
               { name: 'hc_return_label', selector: { boolean: {} } },
+              { name: 'dew_point_margin', selector: { number: { min: 0, max: 10, step: 0.5, mode: 'box', unit_of_measurement: 'K' } } },
               { name: 'narrow_values', selector: { boolean: {} } },
               { name: 'buffer_values', selector: { select: { mode: 'dropdown', options: HFC_BUFFER_VALUES.map((v) => ({ value: v, label: L[`buffer_values_${v}`] })) } } },
               { name: 'storage', selector: { select: { mode: 'dropdown', options: HFC_STORAGES.map((v) => ({ value: v, label: L[`storage_${v}`] })) } } },
@@ -2549,6 +2550,10 @@ class HeatpumpFlowCard extends HTMLElement {
     }
     if (config.source_spread !== undefined && config.source_spread !== null && typeof config.source_spread !== 'boolean') {
       throw new Error('source_spread must be true or false');
+    }
+    if (config.dew_point_margin !== undefined && config.dew_point_margin !== null && config.dew_point_margin !== ''
+      && !(Number.isFinite(+config.dew_point_margin) && +config.dew_point_margin >= 0 && +config.dew_point_margin <= 10)) {
+      throw new Error('dew_point_margin must be a number from 0 to 10 K');
     }
     ['brine_pressure_min', 'brine_pressure_crit', 'brine_pressure_max', 'hc_pressure_min', 'hc_pressure_crit', 'hc_pressure_max'].forEach((key) => {
       if (config[key] !== undefined && config[key] !== null && config[key] !== '' && !(Number.isFinite(+config[key]) && +config[key] >= 0)) throw new Error(`${key} must be a number of bar, 0 or more`);
@@ -3350,6 +3355,22 @@ class HeatpumpFlowCard extends HTMLElement {
   // Room keys of circuit n: circuit 1 uses the room and target of the house, circuits 2 to 6 their own.
   _roomKey(n, key = 'room') { return n === 1 ? key : `hc${n}_${key}`; }
 
+  // Dew point per circuit: an explicit sensor wins. Otherwise calculate it from room temperature and relative humidity with the
+  // Magnus approximation (valid for normal indoor conditions). Missing or implausible values deliberately produce no warning.
+  _roomHumidity(n) {
+    const value = this._n(this._roomKey(n, 'room_humidity'));
+    return Number.isFinite(value) && value > 0 && value <= 100 ? value : NaN;
+  }
+  _dewPoint(n) {
+    const explicit = this._n(this._roomKey(n, 'dew_point'));
+    if (Number.isFinite(explicit)) return explicit;
+    const temperature = this._n(this._roomKey(n)); const humidity = this._roomHumidity(n);
+    if (!Number.isFinite(temperature) || !Number.isFinite(humidity)) return NaN;
+    const a = 17.62; const b = 243.12;
+    const gamma = Math.log(humidity / 100) + (a * temperature) / (b + temperature);
+    return (b * gamma) / (a - gamma);
+  }
+
   // Room values have their own overview in the house (#140); the line below an emitter is reserved for its operating mode.
   _hcStatus(n, status) {
     const s = n === 1 ? '' : String(n);
@@ -3395,7 +3416,7 @@ class HeatpumpFlowCard extends HTMLElement {
       // Circuit 1 exists wherever the heat loop is drawn, without a sensor of its own: it hangs on the buffer (whose temperature
       // it shows as its flow), or on the heat pump's flow and return in a direct system.
       hc: this._has('hc_flow') || this._has('hc_mode') || this._has('hc_pump') || buffer || this._has('flow') || this._has('return'),
-      house: Array.from({ length: this._hcCount }, (_, n) => this._has(this._roomKey(n + 1)) || this._has(this._roomKey(n + 1, 'room_target'))).some(Boolean),
+      house: Array.from({ length: this._hcCount }, (_, n) => ['room', 'room_target', 'room_humidity'].some((key) => this._has(this._roomKey(n + 1, key)))).some(Boolean),
       circ: this._has('circulation'),
       primaryPump: this._primaryPump(),
       hcPump: this._has('hc_pump'),
@@ -4193,7 +4214,8 @@ class HeatpumpFlowCard extends HTMLElement {
     const i = this._i; const e = this._e;
     const de = (key) => (e[key] ? `data-entity="${this._esc(e[key])}"` : '');
     if (this._hcCount === 1) {
-      return `<g class="tap" ${de(e.room ? 'room' : 'room_target')}>
+      const entityKey = ['room', 'room_target', 'room_humidity'].find((key) => e[key]);
+      return `<g class="tap" ${de(entityKey)}>
         <path class="house" d="M720 130 L830 50 L940 130 V240 H720 Z"/>
         <text class="tank-title" x="830" y="118" text-anchor="middle">${this._esc(i.house)}</text>
         <text class="house-temp" id="t-room" x="830" y="172" text-anchor="middle"></text>
@@ -4203,7 +4225,8 @@ class HeatpumpFlowCard extends HTMLElement {
     }
     const rows = Array.from({ length: this._hcCount }, (_, x) => {
       const n = x + 1; const s = n === 1 ? '' : String(n); const key = this._roomKey(n);
-      const target = this._roomKey(n, 'room_target'); const entityKey = e[key] ? key : target;
+      const target = this._roomKey(n, 'room_target'); const humidity = this._roomKey(n, 'room_humidity');
+      const entityKey = [key, target, humidity].find((candidate) => e[candidate]);
       const name = this._config[n === 1 ? 'hc_name' : `hc${n}_name`] || `${i.heating_circuit} ${n}`;
       const y = 118 + x * 21.5;
       return `<g class="tap house-row" id="house-row${s}" ${de(entityKey)} data-name="${this._esc(name)}">
@@ -5359,15 +5382,29 @@ class HeatpumpFlowCard extends HTMLElement {
         const set = this._n(k('setpoint'));
         const showFlow = this._has(k('flow')) || (n === 1 && !P.buffer && this._has('flow'));
         const hcVol = this._lh(k('volume'));
+        const dew = this._dewPoint(n); const circuitCooling = cooling || cMode === 'cooling';
+        const dewKnown = circuitCooling && Number.isFinite(tHc) && Number.isFinite(dew);
+        const dewMargin = dewKnown ? tHc - dew : NaN;
+        const dewWarning = dewKnown && dewMargin < (this._config.dew_point_margin === undefined || this._config.dew_point_margin === '' ? 2 : +this._config.dew_point_margin);
         this._txt(`t-hc-vol${s}`, this._has(k('volume')) && Number.isFinite(hcVol) ? `${this._fmt(hcVol, 0)} l/h` : '');
         if (this._$(`t-hc-now${s}`)) {
           // Heating curve shift: "Target 36 °C (curve 34 °C + 2 K shift)" above the pump, the flow temperature below it.
           // Only the circuit's own flow sensor: the heat pump's flow already stands at the VL label.
-          this._txt(`t-hc-now${s}`, this._has(k('flow')) ? this._t(tHc) : '');
-          this._hcTarget(n, set, this._n(k('curve_offset')), this._unit(k('curve_offset')));
+          this._txt(`t-hc-now${s}`, dewKnown ? `${i.flow_short} ${this._t(tHc)}` : (this._has(k('flow')) ? this._t(tHc) : ''));
+          if (dewKnown) {
+            const label = this._$(`t-hc${s}`); if (label) label._k = '';
+            this._txt(`t-hc${s}`, `${i.dew_point} ${this._t(dew)}`);
+          } else this._hcTarget(n, set, this._n(k('curve_offset')), this._unit(k('curve_offset')));
         } else {
-          this._txt(`t-hc${s}`, showFlow ? `${this._t(tHc)}${Number.isFinite(set) ? ` · ${i.target} ${this._fmt(set)}` : ''}` : '');
+          this._txt(`t-hc${s}`, dewKnown ? `${i.flow_short} ${this._t(tHc)} · ${i.dew_point} ${this._t(dew)}`
+            : showFlow ? `${this._t(tHc)}${Number.isFinite(set) ? ` · ${i.target} ${this._fmt(set)}` : ''}` : '');
         }
+        [`t-hc${s}`, `t-hc-now${s}`].forEach((id) => {
+          const label = this._$(id); if (!label) return;
+          label.classList.toggle('dew-warning', dewWarning);
+          if (dewKnown) label.dataset.a11y = `${i.flow_short} ${this._t(tHc)}, ${i.dew_point} ${this._t(dew)}, ${i.dew_margin} ${this._fmt(dewMargin)} K${dewWarning ? `, ${i.dew_warning}` : ''}`;
+          else delete label.dataset.a11y;
+        });
         // Own return sensor of the circuit only; the fallback to the buffer or heat pump return would repeat another label.
         if (this._config.hc_return_label) this._txtPre(`t-hc-rl${s}`, i.return_short, this._has(k('return')) && Number.isFinite(this._n(k('return'))) ? this._t(this._n(k('return'))) : '');
         this._hcStatus(n, this._has(k('mode')) ? this._modeLabel(cMode, this._s(k('mode'))) : (hcPump ? i.running : ''));
@@ -5499,22 +5536,25 @@ class HeatpumpFlowCard extends HTMLElement {
       if (this._hcCount === 1) {
         const rt = this._n('room_target'); const r = this._n('room');
         const tgt = Number.isFinite(rt) ? `${i.target} ${this._fmt(rt)} °C` : '';
+        const humidity = this._roomHumidity(1); const humidityText = Number.isFinite(humidity) ? `${i.humidity} ${this._fmt(humidity, 0)} %` : '';
         // Room sensor missing or unknown: promote the target to the big line.
         this._txt('t-room', Number.isFinite(r) ? this._t(r) : tgt);
-        this._txt('t-room-target', Number.isFinite(r) ? tgt : '');
+        this._txt('t-room-target', [Number.isFinite(r) ? tgt : '', humidityText].filter(Boolean).join(' · '));
       } else {
         for (let n = 1; n <= this._hcCount; n++) {
           const s = n === 1 ? '' : String(n); const key = this._roomKey(n); const targetKey = this._roomKey(n, 'room_target');
           const r = this._n(key); const rt = this._n(targetKey); const value = (x) => (Number.isFinite(x) ? this._fmt(x) : '–');
           const hasRoom = !!this._e[key]; const hasTarget = !!this._e[targetKey];
-          const text = hasRoom && hasTarget ? `${value(r)} / ${value(rt)} °C` : hasRoom ? `${value(r)} °C` : hasTarget ? `${i.target} ${value(rt)} °C` : '–';
+          const humidity = this._roomHumidity(n); const humidityText = Number.isFinite(humidity) ? `${this._fmt(humidity, 0)} %` : '';
+          const temperatures = hasRoom && hasTarget ? `${value(r)} / ${value(rt)} °C` : hasRoom ? `${value(r)} °C` : hasTarget ? `${i.target} ${value(rt)} °C` : '';
+          const text = [temperatures, humidityText].filter(Boolean).join(' · ') || '–';
           this._txt(`t-house-room${s}`, text);
           const state = Number.isFinite(r) && Number.isFinite(rt) ? (r < rt - 0.5 ? 'below' : r > rt + 0.5 ? 'above' : 'on') : 'unknown';
           const dot = this._$(`house-comfort${s}`); const row = this._$(`house-row${s}`);
           if (dot) dot.setAttribute('class', `house-comfort ${state}`);
           if (row) {
             const comfort = state === 'unknown' ? '' : i[`comfort_${state}`];
-            row.dataset.a11y = `${row.dataset.name}: ${hasRoom ? `${i.room} ${value(r)} °C` : ''}${hasRoom && hasTarget ? ', ' : ''}${hasTarget ? `${i.target} ${value(rt)} °C` : ''}${comfort ? `; ${comfort}` : ''}`;
+            row.dataset.a11y = `${row.dataset.name}: ${hasRoom ? `${i.room} ${value(r)} °C` : ''}${hasRoom && hasTarget ? ', ' : ''}${hasTarget ? `${i.target} ${value(rt)} °C` : ''}${humidityText ? `${hasRoom || hasTarget ? ', ' : ''}${i.humidity} ${humidityText}` : ''}${comfort ? `; ${comfort}` : ''}`;
           }
         }
       }
@@ -5666,6 +5706,7 @@ HeatpumpFlowCard.styles = `
   .series-title { font-size: 14px; fill: var(--primary-text-color); }
   .room-temp { font-weight: 600; fill: var(--primary-text-color); }
   .pipe-label { font-size: calc(15px * var(--kp, 1)); font-weight: 600; }
+  .pipe-label.dew-warning { fill: var(--error-color, #db4437); font-weight: 750; }
   .vol-label { font-size: 13px; fill: var(--hfc-muted); }
   .curve-part { font-size: calc(13px * var(--kp, 1)); font-weight: 500; }
   .pressure-label { font-size: 13px; font-weight: 600; fill: var(--hfc-muted); paint-order: stroke; stroke: var(--card-background-color, #fff); stroke-width: 4px; }
