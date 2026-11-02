@@ -26,7 +26,7 @@ The percentage says how complete a preset is, not how well it was tested: see th
 | [`open3e`](#open3e) | 92 % | `volume` | `hc_return` | 20 of 49 | 15 of 29 | – | – | – |
 | [`vaillant`](#vaillant) | 100 % | – | `heat`, `return`, `volume`, `hc_return`, `hc_pump` | 11 of 49 | 11 of 29 | yes | – | de, en |
 | [`emsesp`](#emsesp) | 92 % | `heat` | `hc_return` | 18 of 49 | 20 of 29 | – | – | – |
-| [`heishamon`](#heishamon) | 92 % | `hc_pump` | `hc_return` | 18 of 49 | 17 of 29 | yes | – | – |
+| [`heishamon`](#heishamon) | 92 % | `hc_pump` | `hc_return` | 19 of 49 | 17 of 29 | yes | – | – |
 | [`wolf`](#wolf) | 100 % | – | `hc_return` | 10 of 49 | 6 of 29 | – | – | de, en |
 | [`kronoterm`](#kronoterm) | 100 % | – | `volume`, `hc_return` | 11 of 49 | 9 of 29 | yes | – | – |
 | [`luxtronik`](#luxtronik) | 93 % | `hc_return` | – | 19 of 49 | 15 of 29 | – | – | – |
@@ -154,7 +154,7 @@ Panasonic Aquarea (HeishaMon). Core fields 92 %, stat tiles: `cop_heating`, `cop
 |---|---|---|---|---|
 | Heat pump | **`compressor`**, `fan_speed`, `defrost`, **`power`**, **`heat`**, **`flow`**, **`return`**, **`volume`**, **`outdoor`**, **`valve`**, `heater` | **`mode`** | – | `status`, `source_volume`, `source_in`, `source_out`, `brine_pressure`, `pv_boost` |
 | Tanks | **`dhw_top`**, **`dhw_target`** | – | – | `dhw_middle`, `dhw_bottom`, `dhw_mode`, `circulation`, `dhw_heater`, `buffer_top`, `buffer_middle`, `buffer_bottom`, `buffer_mode`, `buffer_heater`, `solar_collector`, `solar_pump` |
-| Heating circuit | **`hc_flow`**, `hc_setpoint`, **`room`**, `program` | – | **`hc_return`** | `hc_mode`, **`hc_pump`**, `hc_volume`, `hc_curve_offset`, `hc_mixer`, `hc_pressure`, `room_target` |
+| Heating circuit | **`hc_flow`**, `hc_setpoint`, `hc_curve_offset`, **`room`**, `program` | – | **`hc_return`** | `hc_mode`, **`hc_pump`**, `hc_volume`, `hc_mixer`, `hc_pressure`, `room_target` |
 | Details | `hours`, `starts_total`, `aux_hours`, `energy_total`, `heat_total`, `compressor_speed`, `evap_temp`, `suction_temp`, `hot_gas`, `liquid_temp`, `low_pressure`, `high_pressure`, `eev` | – | – | `env_energy`, `cond_temp`, `superheat`, `subcooling`, `cutout_high_pressure`, `cutout_low_pressure`, `cutout_temperature` |
 
 Not mapped:

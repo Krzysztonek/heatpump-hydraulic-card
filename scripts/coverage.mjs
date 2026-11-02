@@ -25,6 +25,9 @@ const cardSource = read('dist/heatpump-hydraulic-card.js');
 const pointtBlock = cardSource.match(/  bosch_buderus_heating: \{([\s\S]*?)\n  lambda: \{/)?.[1] || '';
 const POINTT_SENSOR_RESOURCES = [...new Set([...pointtBlock.matchAll(/['"]([^'"\n]*:[^'"\n]*)['"]/g)]
   .map((m) => m[1]).filter((key) => !key.includes('${')))];
+// A preset may expose different roles in different controller modes. Re-run capability resolution for every literal state branch
+// used by a preset and union the results; today this covers HeishaMon's "compensation curve" offset mapping automatically.
+const CONDITIONAL_STATE_VALUES = [...new Set([...cardSource.matchAll(/\bctx(?:\?\.)?\.state\([^\n)]*\)\s*===\s*(['"])(.*?)\1/g)].map((m) => m[2]))];
 
 // The card and the demo installations in a sandbox with just enough of a browser to define the element.
 const load = () => {
@@ -68,7 +71,7 @@ const toStates = (obj) => Object.fromEntries(Object.entries(obj).map(([id, v]) =
 }));
 
 // Resolves a preset as if every entity it looks for existed. `base` is a demo installation (or an empty one) for the detection.
-const resolveAll = (card, preset, base) => {
+const resolveAll = (card, preset, base, forcedState) => {
   const { Card } = card;
   let simulatedBase = base;
   if (preset === 'bosch_buderus_heating') {
@@ -101,6 +104,7 @@ const resolveAll = (card, preset, base) => {
       ...ctx,
       key: (platform, domain, key) => ctx.key(platform, domain, key) || `${domain}.${platform}_${key}`,
       match: (re, platform) => ctx.match(re, platform) || `sensor.pattern_${re.source.replace(/\W/g, '').slice(0, 60)}`,
+      state: forcedState === undefined ? ctx.state : () => forcedState,
     };
   };
   try {
@@ -119,12 +123,14 @@ export const measure = () => {
     const keys = new Set(); const tiles = new Set();
     let errors = false; let controls = false; let details = false;
     for (const base of bases) {
-      const r = resolveAll(card, name, base);
-      Object.keys(r.fromPreset).forEach((k) => keys.add(k));
-      Object.keys(r.tiles).forEach((k) => tiles.add(k));
-      errors ||= r.presetErrors.length > 0;
-      controls ||= r.presetControls.length > 0;
-      details ||= r.details.length > 0;
+      for (const forcedState of [undefined, ...CONDITIONAL_STATE_VALUES]) {
+        const r = resolveAll(card, name, base, forcedState);
+        Object.keys(r.fromPreset).forEach((k) => keys.add(k));
+        Object.keys(r.tiles).forEach((k) => tiles.add(k));
+        errors ||= r.presetErrors.length > 0;
+        controls ||= r.presetControls.length > 0;
+        details ||= r.details.length > 0;
+      }
     }
     // A ratio tile (COP = heat ÷ electricity, hours per start) is filled when the preset supplies both of its counters.
     const catalog = Object.keys(card.HFC_TILES).filter(card.hfcTileSourceKey);
