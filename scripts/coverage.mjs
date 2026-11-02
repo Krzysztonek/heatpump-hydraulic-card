@@ -223,15 +223,15 @@ Then run \`npm run coverage\`.
 `;
 };
 
-// README: the coverage link of every preset in the list of supported heat pumps ("[92 %](docs/COVERAGE.md#heishamon), 1 open"),
-// and the language table.
+// README: the coverage link of every preset in the list of supported heat pumps ("[92 %](docs/COVERAGE.md#heishamon), 1 open",
+// with a no-break space so that a narrow screen keeps the number and the percent sign together), and the language table.
 const readmeWith = (readme, { card, presets, languages }) => {
   const seen = {};
-  let text = readme.replace(/\[\d+ %\]\(docs\/COVERAGE\.md#([a-z0-9_]+)\)(?:, \d+ open)?/g, (link, name) => {
+  let text = readme.replace(/\[\d+[ \u00a0]%\]\(docs\/COVERAGE\.md#([a-z0-9_]+)\)(?:, \d+ open)?/g, (link, name) => {
     if (!presets[name]) throw new Error(`README.md: coverage link to unknown preset "${name}"`);
     seen[name] = (seen[name] || 0) + 1;
     const c = coreScore(presets[name]);
-    return `[${c.percent} %](docs/COVERAGE.md#${name})${c.open ? `, ${c.open} open` : ''}`;
+    return `[${c.percent} %](docs/COVERAGE.md#${name})${c.open ? `, ${c.open} open` : ''}`;
   });
   const wrong = Object.keys(presets).filter((name) => seen[name] !== 1);
   if (wrong.length) throw new Error(`README.md: needs exactly one coverage link "[0 %](docs/COVERAGE.md#<preset>)" for ${wrong.join(', ')}`);
