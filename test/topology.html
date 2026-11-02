@@ -164,6 +164,8 @@
   combos.push({ storage: 'direct', dhw: 'tank', primary: false, hcs: 1, boiler: true });
   combos.push({ storage: 'parallel', dhw: 'tank', primary: true, hcs: 2, boiler: true });
   combos.push({ storage: 'combined', dhw: 'fws', primary: false, hcs: 3, boiler: true });
+  // Sensorless parallel buffers (#266), appended so every older generated case keeps its index, source type and layout.
+  for (const dhw of DHW) for (const primary of [false, true]) for (let hcs = 1; hcs <= 6; hcs++) combos.push({ storage: 'parallel-empty', dhw, primary, hcs });
 
   // A synthetic installation without preset: every entity is mapped by hand, so the case shows exactly the parts it names.
   const installation = (c, idx) => {
@@ -176,6 +178,7 @@
     if (c.dhw !== 'none' && idx % 2) ent.dhw_middle = 'sensor.t_dhw_middle';
     if (c.dhw === 'solar') Object.assign(ent, { solar_collector: 'sensor.t_collector', solar_pump: 'binary_sensor.t_solar_pump' });
     if (['parallel', 'combined'].includes(c.storage)) Object.assign(ent, { buffer_top: 'sensor.t_buffer_top', buffer_bottom: 'sensor.t_buffer_bottom' });
+    if (c.storage === 'parallel-empty') config.buffer = true;
     if (c.storage === 'combined') config.storage = 'combined';
     if (c.dhw === 'fws') config.dhw_type = 'fresh_water';
     if (c.dhw === 'tit') config.dhw_type = 'tank_in_tank';
@@ -185,7 +188,7 @@
     if (c.boiler) Object.assign(ent, { boiler_state: 'binary_sensor.t_boiler', boiler_power: 'sensor.t_boiler_power', boiler_flow: 'sensor.t_boiler_flow' });
     if (idx % 5 === 1) ent.heater = 'sensor.t_heater';
     if (idx % 5 === 2 && c.dhw !== 'none') ent.dhw_heater = 'sensor.t_dhw_heater';
-    if (idx % 5 === 3 && ['parallel', 'combined'].includes(c.storage)) ent.buffer_heater = 'sensor.t_buffer_heater';
+    if (idx % 5 === 3 && ['parallel', 'parallel-empty', 'combined'].includes(c.storage)) ent.buffer_heater = 'sensor.t_buffer_heater';
     if (idx % 4 === 1) Object.assign(ent, { pv: 'sensor.t_pv', battery: 'sensor.t_battery', grid: 'sensor.t_grid' });
     if (idx % 4 === 1) config.power_sources = 'manual';
     for (let n = 1; n <= c.hcs; n++) {
