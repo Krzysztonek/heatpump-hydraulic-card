@@ -1,0 +1,1 @@
+- Dutch translation completed for the boiler, mixer and entity assistant texts.
