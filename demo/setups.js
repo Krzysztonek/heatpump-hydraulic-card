@@ -853,4 +853,19 @@ setups.push({
   },
 });
 
+// A real parallel buffer without usable buffer sensors (#266): the heat-pump side stays measured, the tank and circuit side neutral.
+setups.push({
+  name: 'Parallel buffer without sensors', sub: 'manual topology: the real buffer is drawn neutrally without invented temperature entities',
+  states: combinedStates,
+  config: {
+    title: 'Heat pump', buffer: true, hc_type: 'radiator',
+    entities: {
+      mode: 'sensor.cs_mode', flow: 'sensor.cs_flow', return: 'sensor.cs_return', power: 'sensor.cs_power', volume: 'sensor.cs_volume',
+      valve: 'binary_sensor.cs_valve', dhw_top: 'sensor.cs_top', dhw_bottom: 'sensor.cs_middle', hc_pump: 'binary_sensor.cs_hc_pump',
+      outdoor: 'sensor.cs_outdoor', room: 'sensor.cs_room', room_target: 'sensor.cs_room_target',
+    },
+    mode_map: { Heating: 'heating', 'Hot water': 'dhw', Defrost: 'defrost', Standby: 'idle' },
+  },
+});
+
 const scenarios = [['heat', 'Heating'], ['dhw', 'Hot water'], ['defrost', 'Defrost'], ['idle', 'Standby + error']];
