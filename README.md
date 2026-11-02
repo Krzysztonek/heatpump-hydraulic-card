@@ -244,7 +244,7 @@ Everything can be set in the **UI editor**. With a preset, the editor shows whet
 | `hc2_type` to `hc6_type` | Emitter of circuits 2 to 6 (default `underfloor`). |
 | `hc_name`, `hc2_name` to `hc6_name` | Circuit titles (default "Heating circuit 1", "Heating circuit 2", …). |
 | `hc_return_label` | Show the return temperature of each heating circuit under its return pipe, from `hc_return`, `hc2_return` … (default `false`). Only the circuit's own return sensor is shown; narrow cards hide the label. The prefix `RL` is the text `return_short`. |
-| `narrow_values` | Keep configured buffer middle/bottom values and circuit-return labels visible below 500 px (default `false`). Other secondary labels stay hidden to preserve the responsive layout. |
+| `narrow_values` | Keep configured buffer and hot-water tank middle/bottom values, the hot-water target line and circuit-return labels visible below 500 px (default `false`). Other secondary labels stay hidden to preserve the responsive layout. |
 | `buffer_values` | `default`: large top buffer temperature with smaller middle/bottom values. `equal`: all configured buffer temperatures use the same size and are distributed evenly over the tank. |
 | `source_type` | `air` (default), `brine` (ground loop) or `water` (groundwater wells). |
 | `primary_pump` | Draw the heat pump's own primary pump on the flow pipe next to the heat pump block, instead of a pump in the heating circuit. It turns while the flow rate is above 0, else with the heating or hot-water loop, and slowly while the heat pump only circulates water. A single direct circuit without a `hc_pump` sensor then shows no pump of its own. The default comes from the preset: on for HeishaMon, Samsung and Kronoterm, off otherwise. Also in the editor. |
@@ -407,7 +407,7 @@ badges:
 
 An action for a key the card has no entity for does nothing; the browser console says so. Actions are edited in YAML.
 
-**Narrow cards.** The type size follows the width of the schematic, not the screen: below about 640 px the labels grow, below about 500 px (phones, narrow columns) they grow further and secondary labels (flow rates, tank bottom temperature, the VL / RL prefixes, valve and circulation labels, the hot water target line) are left out, so the important numbers stay readable. Set `narrow_values: true` to keep the configured buffer middle/bottom values and circuit-return labels; other collision protection remains active. Chip text takes the colour of your theme text, so it reads in light and dark themes.
+**Narrow cards.** The type size follows the width of the schematic, not the screen: below about 640 px the labels grow, below about 500 px (phones, narrow columns) they grow further and secondary labels (flow rates, tank bottom temperature, the VL / RL prefixes, valve and circulation labels, the hot water target line) are left out, so the important numbers stay readable. Set `narrow_values: true` to keep the configured buffer and hot-water tank middle/bottom values, the hot-water target line and circuit-return labels; other collision protection remains active. Chip text takes the colour of your theme text, so it reads in light and dark themes.
 
 **Colours.** The card draws with these CSS variables. Set them in a theme or per card with card-mod; without a value the default applies. The card keeps styles injected by card-mod across its initial setup and later configuration or entity-registry rebuilds.
 

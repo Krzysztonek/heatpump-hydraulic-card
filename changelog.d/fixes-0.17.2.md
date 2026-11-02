@@ -1,0 +1,4 @@
+- Slovak and Czech: the remaining editor texts (boiler, mixer, mapping assistant, buffer emphasis, narrow values) and the Slovak card texts for the boiler and the mixer, by Havinko1991 (#191).
+- `narrow_values` also keeps the hot-water tank's middle and bottom values and the hot-water target line on narrow cards; on a phone the bottom sensor shows how much hot water is left (#257).
+- EMS-ESP: no circulation is drawn when EMS-ESP reports that no circulation pump is fitted (`dhw_circulation_pump_available` / `wwcircpump` off) (#257).
+- ebusd: the error chip watches the error messages of every unit in the selected daemon (heat pump, controller, VR 71), not only the heat pump's; other daemons stay out (#1).
