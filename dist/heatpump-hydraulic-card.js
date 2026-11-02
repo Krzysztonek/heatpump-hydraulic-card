@@ -348,6 +348,11 @@ const HFC_PRESETS = {
       heating: 'heating', cooling: 'cooling', defrost: 'defrost', passive_defrost: 'defrost',
       pause: 'idle', ready: 'idle', preparing: 'idle', off: 'off',
     },
+    // compressor_phase has no hot-water state, and some units (Vitocal 250, #186) report neither domestic_hot_water_charging
+    // nor a phase other than ready/pause while the compressor runs. Without a valve entity hot water is read from the flow
+    // (valve_rule), and a running compressor wins over an idle phase (#196).
+    valve_rule: 'flow_above_dhw',
+    compressor_over_idle: true,
     stat_labels: {
       cop_heating_today: { de: 'COP Heizen', en: 'COP heating' },
       cop_dhw_today: { de: 'COP Warmwasser', en: 'COP DHW' },
@@ -2934,6 +2939,8 @@ class HeatpumpFlowCard extends HTMLElement {
         : [`${entityLine(key, r.entities[key])} [${source(key, r.entities[key])}]`])),
       ...(cleared.length ? [`- Cleared on purpose: ${cleared.join(', ')}`] : []),
       `- Not mapped: ${unmapped.length ? unmapped.join(', ') : 'none'} (an empty key is fine when the installation does not have it)`,
+      ...(r.preset?.valve_rule === 'flow_above_dhw' && !r.entities.valve && r.entities.flow && r.entities.dhw_top
+        ? ['- Hot water without a valve entity: while the heat pump runs and flow is above dhw_top (preset rule)'] : []),
       '',
       // Plausibility checks (#192), in English like the rest of the report.
       'Checks:',
@@ -4698,10 +4705,20 @@ class HeatpumpFlowCard extends HTMLElement {
   /* ---------- timeline of the operating mode ---------- */
   // Entities whose history tells what the heat pump did: the operating mode, else the compressor (and the valve for hot water).
   // A `pv_boost` entity adds its history: the heating periods in PV surplus mode become their own kind.
+  // A preset may let a running compressor win over an idle mode; without a valve, `valve_rule` adds flow and tank temperature.
   _timelineIds() {
-    const base = this._has('mode') ? { mode: this._e.mode }
-      : this._has('compressor') ? { comp: this._e.compressor, valve: this._has('valve') ? this._e.valve : null } : null;
+    const comp = this._has('compressor') ? { comp: this._e.compressor, valve: this._has('valve') ? this._e.valve : null } : null;
+    const byFlow = comp && this._valveByFlow() ? { vflow: this._e.flow, vtank: this._e.dhw_top } : {};
+    const base = this._has('mode') ? { mode: this._e.mode, ...(comp && this._preset?.compressor_over_idle ? { ...comp, ...byFlow } : {}) }
+      : comp ? { ...comp, ...byFlow } : null;
     return base && this._has('pv_boost') ? { ...base, pv: this._e.pv_boost } : base;
+  }
+
+  // Preset rule for units without a valve or hot-water charging entity (`valve_rule: 'flow_above_dhw'`, ViCare #196): hot water
+  // while the heat pump runs and its flow is above the tank temperature, since heating keeps the flow below a charged tank.
+  // A tank that has cooled below the heating flow reads as hot water for that time.
+  _valveByFlow() {
+    return this._preset?.valve_rule === 'flow_above_dhw' && !this._has('valve') && this._has('flow') && this._has('dhw_top');
   }
 
   // The parts of the heating periods in which the PV surplus entity was on become periods of the kind `pv`.
@@ -4779,17 +4796,26 @@ class HeatpumpFlowCard extends HTMLElement {
       return { heating: 'heat', dhw: 'dhw', defrost: 'defrost', cooling: 'cool', blocked: 'blocked' }[m] || 'idle';
     };
     const points = [];
-    if (ids.mode) hist[ids.mode].forEach((e) => points.push({ t: e.t, kind: kindOfMode(e.s), raw: e.s }));
+    if (ids.mode && !ids.comp) hist[ids.mode].forEach((e) => points.push({ t: e.t, kind: kindOfMode(e.s), raw: e.s }));
     else {
-      // Compressor on = heating, with the valve on hot water = dhw.
-      const comp = hist[ids.comp]; const valve = ids.valve ? hist[ids.valve] : [];
-      const at = (list, t) => { let s; for (const e of list) { if (e.t <= t) s = e.s; else break; } return s; };
+      // Compressor on = heating, with the valve on hot water = dhw. With a mode as well, the compressor only decides while the
+      // mode is idle. The times are walked in order, so each list keeps a pointer to the state held at that time.
+      const list = (id) => (id ? hist[id] || [] : []);
+      const held = (entries) => { let n = -1; return (t) => { while (n + 1 < entries.length && entries[n + 1].t <= t) n++; return entries[n]?.s; }; };
+      const mode = held(list(ids.mode)); const comp = held(list(ids.comp)); const valve = held(list(ids.valve));
+      const vflow = held(list(ids.vflow)); const vtank = held(list(ids.vtank));
       const on = (s) => s !== undefined && !['off', 'unavailable', 'unknown', '0', '0.0'].includes(String(s).toLowerCase());
       const dhw = (s) => s !== undefined && (this._valveMapped(s) ?? ['on', 'tank', 'dhw', 'hot water', 'warmwasser'].includes(String(s).toLowerCase()));
-      [...new Set([...comp.map((e) => e.t), ...valve.map((e) => e.t)])].sort((a, b) => a - b).forEach((t) => {
-        const cs = at(comp, t);
-        if (['unknown', 'unavailable'].includes(cs)) points.push({ t, kind: 'gap', raw: cs });
-        else points.push({ t, kind: on(cs) ? (dhw(at(valve, t)) ? 'dhw' : 'heat') : 'idle', raw: on(cs) ? 'on' : 'off' });
+      const times = [...new Set([ids.mode, ids.comp, ids.valve, ids.vflow, ids.vtank].flatMap((id) => list(id).map((e) => e.t)))].sort((a, b) => a - b);
+      times.forEach((t) => {
+        const ms = mode(t); const cs = comp(t); const vs = valve(t); const fl = parseFloat(vflow(t)); const tk = parseFloat(vtank(t));
+        const toDhw = ids.valve ? dhw(vs) : !!ids.vflow && fl > tk;
+        if (ids.mode) {
+          if (ms === undefined) return;
+          const kind = kindOfMode(ms);
+          points.push({ t, kind: kind === 'idle' && on(cs) ? (toDhw ? 'dhw' : 'heat') : kind, raw: ms });
+        } else if (['unknown', 'unavailable'].includes(cs)) points.push({ t, kind: 'gap', raw: cs });
+        else points.push({ t, kind: on(cs) ? (toDhw ? 'dhw' : 'heat') : 'idle', raw: on(cs) ? 'on' : 'off' });
       });
     }
     const segs = [];
@@ -5191,12 +5217,15 @@ class HeatpumpFlowCard extends HTMLElement {
     // Valve: binary (on = DHW) or a state such as "Tank" / "DHW".
     // A `valve_map` (raw state → dhw | heating) decides first, for valves that report 1 for heating or other texts.
     const valveMapped = this._has('valve') ? this._valveMapped(this._s('valve')) : undefined;
-    const valveDhw = this._has('valve') && (valveMapped ?? (this._on('valve') || ['tank', 'tank (dhw)', 'dhw', 'hot water', 'hot_water', 'warmwasser'].includes(String(this._s('valve')).toLowerCase())));
+    const valveDhw = this._has('valve') ? (valveMapped ?? (this._on('valve') || ['tank', 'tank (dhw)', 'dhw', 'hot water', 'hot_water', 'warmwasser'].includes(String(this._s('valve')).toLowerCase())))
+      : this._valveByFlow() && running && this._n('flow') > this._n('dhw_top');
     // Integrations without an operating-mode entity: a running compressor means heating unless the valve says DHW.
     // Defrost wins over a stopped compressor: it pauses for about a minute while the 4-way valve switches (HeishaMon).
     if (!this._has('mode')) hp = defrost ? 'defrost' : !running ? 'idle' : (valveDhw ? 'dhw' : 'heating');
     // A defrost entity wins over an operating mode that keeps reporting heating while the unit defrosts (e.g. Kronoterm).
     else if (this._has('defrost') && this._on('defrost') && ['heating', 'cooling', 'dhw'].includes(hp)) hp = 'defrost';
+    // An operating mode that stays idle while the compressor runs (preset flag compressor_over_idle, ViCare #196).
+    else if (hp === 'idle' && compOn && this._preset?.compressor_over_idle) hp = valveDhw ? 'dhw' : 'heating';
     const cooling = hp === 'cooling' || bufMode === 'cooling';
 
     const dhwActive = P.dhw && (hp === 'dhw' || ['dhw', 'legionella'].includes(dhwMode) || valveDhw);
