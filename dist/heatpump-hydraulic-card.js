@@ -5385,7 +5385,9 @@ class HeatpumpFlowCard extends HTMLElement {
         const dew = this._dewPoint(n); const circuitCooling = cooling || cMode === 'cooling';
         const dewKnown = circuitCooling && Number.isFinite(tHc) && Number.isFinite(dew);
         const dewMargin = dewKnown ? tHc - dew : NaN;
-        const dewWarning = dewKnown && dewMargin < (this._config.dew_point_margin === undefined || this._config.dew_point_margin === '' ? 2 : +this._config.dew_point_margin);
+        const configuredDewMargin = this._config.dew_point_margin;
+        const minimumDewMargin = configuredDewMargin === undefined || configuredDewMargin === null || configuredDewMargin === '' ? 2 : +configuredDewMargin;
+        const dewWarning = dewKnown && dewMargin < minimumDewMargin;
         this._txt(`t-hc-vol${s}`, this._has(k('volume')) && Number.isFinite(hcVol) ? `${this._fmt(hcVol, 0)} l/h` : '');
         if (this._$(`t-hc-now${s}`)) {
           // Heating curve shift: "Target 36 °C (curve 34 °C + 2 K shift)" above the pump, the flow temperature below it.
@@ -5402,8 +5404,15 @@ class HeatpumpFlowCard extends HTMLElement {
         [`t-hc${s}`, `t-hc-now${s}`].forEach((id) => {
           const label = this._$(id); if (!label) return;
           label.classList.toggle('dew-warning', dewWarning);
-          if (dewKnown) label.dataset.a11y = `${i.flow_short} ${this._t(tHc)}, ${i.dew_point} ${this._t(dew)}, ${i.dew_margin} ${this._fmt(dewMargin)} K${dewWarning ? `, ${i.dew_warning}` : ''}`;
-          else delete label.dataset.a11y;
+          const accessible = dewKnown ? `${i.flow_short} ${this._t(tHc)}, ${i.dew_point} ${this._t(dew)}, ${i.dew_margin} ${this._fmt(dewMargin)} K${dewWarning ? `, ${i.dew_warning}` : ''}` : '';
+          const tap = label.closest('[data-entity]');
+          if (accessible) {
+            label.dataset.a11y = accessible;
+            if (tap) tap.dataset.a11y = accessible;
+          } else {
+            delete label.dataset.a11y;
+            if (tap) delete tap.dataset.a11y;
+          }
         });
         // Own return sensor of the circuit only; the fallback to the buffer or heat pump return would repeat another label.
         if (this._config.hc_return_label) this._txtPre(`t-hc-rl${s}`, i.return_short, this._has(k('return')) && Number.isFinite(this._n(k('return'))) ? this._t(this._n(k('return'))) : '');
