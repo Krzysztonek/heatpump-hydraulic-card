@@ -14,7 +14,7 @@ A preset is measured by what it can map, not by one installation: every lookup o
 
 **Core fields** are the fields the card editor shows first (`mode`, `compressor`, `power`, `heat`, `flow`, `return`, `volume`, `outdoor`, `valve`, `dhw_top`, `dhw_target`, `hc_flow`, `hc_return`, `hc_pump`, `room`). Their percentage counts the core fields the integration offers: a field that is not mapped with a reason is left out, and listed as not offered. **Further roles** count the other roles of an integration: source, tanks, heating circuit, operating data and the refrigerant circuit. Roles that depend on the installation rather than on the integration (a boiler, heater rods at three heights, a bypass valve, power sources, circuits 2 to 6) are not counted. **Stat tiles** are the catalog tiles a preset can fill from its own counters, including the COP from heat and electricity; tiles computed from live values work with every preset and are not counted.
 
-The percentage says how complete a preset is, not how well it was tested: see the status column of [Supported heat pumps](../README.md#supported-heat-pumps).
+The percentage says how complete a preset is, not how well it was tested: see the test status in [Supported heat pumps](../README.md#supported-heat-pumps).
 
 ## Presets
 

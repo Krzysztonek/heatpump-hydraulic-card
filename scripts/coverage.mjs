@@ -195,7 +195,7 @@ A preset is measured by what it can map, not by one installation: every lookup o
 
 **Core fields** are the fields the card editor shows first (${list(presets[Object.keys(presets)[0]].core)}). Their percentage counts the core fields the integration offers: a field that is not mapped with a reason is left out, and listed as not offered. **Further roles** count the other roles of an integration: source, tanks, heating circuit, operating data and the refrigerant circuit. Roles that depend on the installation rather than on the integration (a boiler, heater rods at three heights, a bypass valve, power sources, circuits 2 to 6) are not counted. **Stat tiles** are the catalog tiles a preset can fill from its own counters, including the COP from heat and electricity; tiles computed from live values work with every preset and are not counted.
 
-The percentage says how complete a preset is, not how well it was tested: see the status column of [Supported heat pumps](../README.md#supported-heat-pumps).
+The percentage says how complete a preset is, not how well it was tested: see the test status in [Supported heat pumps](../README.md#supported-heat-pumps).
 
 ## Presets
 
@@ -223,20 +223,19 @@ Then run \`npm run coverage\`.
 `;
 };
 
-// README: the "Coverage" cell of every preset row in the table of supported heat pumps, and the language table.
+// README: the coverage link of every preset in the list of supported heat pumps ("[92 %](docs/COVERAGE.md#heishamon), 1 open"),
+// and the language table.
 const readmeWith = (readme, { card, presets, languages }) => {
-  const lines = readme.split('\n');
-  const header = lines.findIndex((line) => line.startsWith('| Preset |') && line.includes('| Coverage |'));
-  if (header < 0) throw new Error('README.md: the table of supported heat pumps needs a "Coverage" column');
-  const column = lines[header].split('|').map((cell) => cell.trim()).indexOf('Coverage');
-  for (let i = header + 2; lines[i]?.startsWith('|'); i++) {
-    const cells = lines[i].split('|');
-    const name = cells[1].match(/`([a-z0-9_]+)`/)?.[1];
-    if (!presets[name]) throw new Error(`README.md: unknown preset in row "${lines[i].slice(0, 40)}"`);
+  const seen = {};
+  let text = readme.replace(/\[\d+ %\]\(docs\/COVERAGE\.md#([a-z0-9_]+)\)(?:, \d+ open)?/g, (link, name) => {
+    if (!presets[name]) throw new Error(`README.md: coverage link to unknown preset "${name}"`);
+    seen[name] = (seen[name] || 0) + 1;
     const c = coreScore(presets[name]);
-    cells[column] = ` [${c.percent} %](docs/COVERAGE.md#${name})${c.open ? `, ${c.open} open` : ''} `;
-    lines[i] = cells.join('|');
-  }
+    return `[${c.percent} %](docs/COVERAGE.md#${name})${c.open ? `, ${c.open} open` : ''}`;
+  });
+  const wrong = Object.keys(presets).filter((name) => seen[name] !== 1);
+  if (wrong.length) throw new Error(`README.md: needs exactly one coverage link "[0 %](docs/COVERAGE.md#<preset>)" for ${wrong.join(', ')}`);
+  const lines = text.split('\n');
   const start = lines.indexOf('<!-- coverage:languages -->'); const end = lines.indexOf('<!-- /coverage:languages -->');
   if (start < 0 || end < start) throw new Error('README.md: the language table needs the markers <!-- coverage:languages --> and <!-- /coverage:languages -->');
   lines.splice(start + 1, end - start - 1, languagesMarkdown(card, languages));
