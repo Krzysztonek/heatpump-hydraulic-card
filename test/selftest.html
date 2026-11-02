@@ -2521,6 +2521,24 @@
     check(!/Dew point/.test(q(card, 't-hc').textContent) && !q(card, 't-hc').classList.contains('dew-warning'), 'dew-point warning and label stay out of heating mode');
     card.remove();
 
+    const unavailableFlow = { ...base, 'sensor.circuit_flow': 'unavailable', 'sensor.buffer': ['25', '°C'] };
+    card = mount({ entities: { ...entities, hc_flow: 'sensor.circuit_flow', buffer_top: 'sensor.buffer', dew_point: 'sensor.dew' } }, hassOf(toStates(unavailableFlow))); await wait(25);
+    check(!/Dew point/.test(q(card, 't-hc').textContent) && !q(card, 't-hc').classList.contains('dew-warning'),
+      'an unavailable configured circuit flow does not assess condensation from the buffer fallback');
+    card.remove();
+
+    const fahrenheit = { ...base, 'sensor.flow': ['57.2', '°F'], 'sensor.room': ['71.6', '°F'] };
+    card = mount({ entities }, hassOf(toStates(fahrenheit))); await wait(25);
+    check(card._dewPoint(1) > 11 && card._dewPoint(1) < 12 && /Flow 14\.0 °C/.test(q(card, 't-hc').textContent)
+      && !q(card, 't-hc').classList.contains('dew-warning'), 'Fahrenheit temperatures are normalized before calculating dew point and margin');
+    card.remove();
+
+    const kelvin = { ...base, 'sensor.flow': ['291.15', 'K'], 'sensor.dew': ['290.15', 'K'] };
+    card = mount({ entities: { ...entities, dew_point: 'sensor.dew' } }, hassOf(toStates(kelvin))); await wait(25);
+    check(card._dewPoint(1) === 17 && /Flow 18\.0 °C/.test(q(card, 't-hc').textContent) && q(card, 't-hc').classList.contains('dew-warning'),
+      'Kelvin flow and measured dew point are normalized before comparing the margin');
+    card.remove();
+
     const multiEntities = { ...entities, dew_point: 'sensor.dew', hc2_flow: 'sensor.flow2', hc2_pump: 'binary_sensor.pump2',
       hc2_room: 'sensor.room2', hc2_room_humidity: 'sensor.humidity2' };
     card = mount({ hc_count: 2, entities: multiEntities }, hassOf(toStates(base))); await wait(25);

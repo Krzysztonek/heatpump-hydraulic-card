@@ -3149,6 +3149,16 @@ class HeatpumpFlowCard extends HTMLElement {
     return Number.isFinite(v) ? v : NaN;
   }
   _unit(key) { return String(this._st(key)?.attributes?.unit_of_measurement || '').toLowerCase(); }
+  // Absolute temperature normalized to Celsius. Most of the drawing uses the installation's native values, but physical
+  // calculations (dew point and its margin) need one common scale; a temperature difference in °F is not a kelvin difference.
+  _tempC(key) {
+    const value = this._n(key);
+    if (!Number.isFinite(value)) return NaN;
+    const unit = this._unit(key).trim().replace(/º/g, '°').replace('℃', '°c').replace('℉', '°f');
+    if (unit === '°f') return (value - 32) * 5 / 9;
+    if (unit === 'k') return value - 273.15;
+    return value;
+  }
   // Unit-aware readings: power in W, heat in kW, flow rates in l/h. A list of entities gives the sum of the members that report a number.
   _w(key) { return this._sumPower(key, 1); }
   _kw(key) { return this._sumPower(key, 1000); }
@@ -3362,9 +3372,9 @@ class HeatpumpFlowCard extends HTMLElement {
     return Number.isFinite(value) && value > 0 && value <= 100 ? value : NaN;
   }
   _dewPoint(n) {
-    const explicit = this._n(this._roomKey(n, 'dew_point'));
+    const explicit = this._tempC(this._roomKey(n, 'dew_point'));
     if (Number.isFinite(explicit)) return explicit;
-    const temperature = this._n(this._roomKey(n)); const humidity = this._roomHumidity(n);
+    const temperature = this._tempC(this._roomKey(n)); const humidity = this._roomHumidity(n);
     if (!Number.isFinite(temperature) || !Number.isFinite(humidity)) return NaN;
     const a = 17.62; const b = 243.12;
     const gamma = Math.log(humidity / 100) + (a * temperature) / (b + temperature);
@@ -5382,9 +5392,13 @@ class HeatpumpFlowCard extends HTMLElement {
         const set = this._n(k('setpoint'));
         const showFlow = this._has(k('flow')) || (n === 1 && !P.buffer && this._has('flow'));
         const hcVol = this._lh(k('volume'));
+        const ownFlow = this._e[k('flow')];
+        // A configured circuit sensor that is unavailable is unknown, not a license to assess condensation from the warmer
+        // buffer/common trunk. Only a direct first circuit with no own sensor inherits the heat-pump flow for this calculation.
+        const dewFlow = ownFlow ? this._tempC(k('flow')) : (n === 1 && !P.buffer ? this._tempC('flow') : NaN);
         const dew = this._dewPoint(n); const circuitCooling = cooling || cMode === 'cooling';
-        const dewKnown = circuitCooling && Number.isFinite(tHc) && Number.isFinite(dew);
-        const dewMargin = dewKnown ? tHc - dew : NaN;
+        const dewKnown = circuitCooling && Number.isFinite(dewFlow) && Number.isFinite(dew);
+        const dewMargin = dewKnown ? dewFlow - dew : NaN;
         const configuredDewMargin = this._config.dew_point_margin;
         const minimumDewMargin = configuredDewMargin === undefined || configuredDewMargin === null || configuredDewMargin === '' ? 2 : +configuredDewMargin;
         const dewWarning = dewKnown && dewMargin < minimumDewMargin;
@@ -5392,19 +5406,19 @@ class HeatpumpFlowCard extends HTMLElement {
         if (this._$(`t-hc-now${s}`)) {
           // Heating curve shift: "Target 36 °C (curve 34 °C + 2 K shift)" above the pump, the flow temperature below it.
           // Only the circuit's own flow sensor: the heat pump's flow already stands at the VL label.
-          this._txt(`t-hc-now${s}`, dewKnown ? `${i.flow_short} ${this._t(tHc)}` : (this._has(k('flow')) ? this._t(tHc) : ''));
+          this._txt(`t-hc-now${s}`, dewKnown ? `${i.flow_short} ${this._t(dewFlow)}` : (this._has(k('flow')) ? this._t(tHc) : ''));
           if (dewKnown) {
             const label = this._$(`t-hc${s}`); if (label) label._k = '';
             this._txt(`t-hc${s}`, `${i.dew_point} ${this._t(dew)}`);
           } else this._hcTarget(n, set, this._n(k('curve_offset')), this._unit(k('curve_offset')));
         } else {
-          this._txt(`t-hc${s}`, dewKnown ? `${i.flow_short} ${this._t(tHc)} · ${i.dew_point} ${this._t(dew)}`
+          this._txt(`t-hc${s}`, dewKnown ? `${i.flow_short} ${this._t(dewFlow)} · ${i.dew_point} ${this._t(dew)}`
             : showFlow ? `${this._t(tHc)}${Number.isFinite(set) ? ` · ${i.target} ${this._fmt(set)}` : ''}` : '');
         }
         [`t-hc${s}`, `t-hc-now${s}`].forEach((id) => {
           const label = this._$(id); if (!label) return;
           label.classList.toggle('dew-warning', dewWarning);
-          const accessible = dewKnown ? `${i.flow_short} ${this._t(tHc)}, ${i.dew_point} ${this._t(dew)}, ${i.dew_margin} ${this._fmt(dewMargin)} K${dewWarning ? `, ${i.dew_warning}` : ''}` : '';
+          const accessible = dewKnown ? `${i.flow_short} ${this._t(dewFlow)}, ${i.dew_point} ${this._t(dew)}, ${i.dew_margin} ${this._fmt(dewMargin)} K${dewWarning ? `, ${i.dew_warning}` : ''}` : '';
           const tap = label.closest('[data-entity]');
           if (accessible) {
             label.dataset.a11y = accessible;
