@@ -16,6 +16,15 @@ import vm from 'node:vm';
 const root = resolve(import.meta.dirname, '..');
 const read = (path) => readFileSync(resolve(root, path), 'utf8');
 const args = process.argv.slice(2);
+const branch = process.env.GITHUB_HEAD_REF || (process.env.GITHUB_REF_TYPE === 'branch' ? process.env.GITHUB_REF_NAME : '') || '';
+const releaseCheck = /(^|\/)release[-/]/.test(branch);
+const cardSource = read('dist/heatpump-hydraulic-card.js');
+
+// PointT resolves stable resource keys by scanning the entity registry instead of using ctx.key()/ctx.match(). Supply every
+// literal sensor resource referenced by that preset, so capability coverage does not depend on the demo fixture's hardware.
+const pointtBlock = cardSource.match(/  bosch_buderus_heating: \{([\s\S]*?)\n  lambda: \{/)?.[1] || '';
+const POINTT_SENSOR_RESOURCES = [...new Set([...pointtBlock.matchAll(/['"]([^'"\n]*:[^'"\n]*)['"]/g)]
+  .map((m) => m[1]).filter((key) => !key.includes('${')))];
 
 // The card and the demo installations in a sandbox with just enough of a browser to define the element.
 const load = () => {
@@ -27,7 +36,7 @@ const load = () => {
   };
   sandbox.window = sandbox;
   vm.createContext(sandbox);
-  vm.runInContext(`${read('dist/heatpump-hydraulic-card.js')}
+  vm.runInContext(`${cardSource}
 globalThis.__card = { HFC_PRESETS, HFC_TILES, HFC_LANGUAGES, HFC_I18N, HFC_EDITOR, HFC_CORE_FIELDS, hfcTileSourceKey };`, sandbox, { filename: 'heatpump-hydraulic-card.js' });
   vm.runInContext(`${read('demo/setups.js')}\nglobalThis.__setups = setups;`, sandbox, { filename: 'setups.js' });
   return { ...sandbox.__card, setups: sandbox.__setups, Card: elements.get('heatpump-flow-card') };
@@ -61,7 +70,20 @@ const toStates = (obj) => Object.fromEntries(Object.entries(obj).map(([id, v]) =
 // Resolves a preset as if every entity it looks for existed. `base` is a demo installation (or an empty one) for the detection.
 const resolveAll = (card, preset, base) => {
   const { Card } = card;
-  const states = new Proxy(base.states, {
+  let simulatedBase = base;
+  if (preset === 'bosch_buderus_heating') {
+    const registry = { ...base.entities }; const rawStates = { ...base.states };
+    const pointtRows = Object.values(registry).filter((entry) => entry?.platform === 'bosch_buderus_heating' && typeof entry.unique_id === 'string');
+    const first = pointtRows[0]; const gateway = first?.unique_id.split(':')[0];
+    const existing = new Set(pointtRows.map((entry) => entry.unique_id.slice(entry.unique_id.indexOf(':') + 1)));
+    if (gateway) POINTT_SENSOR_RESOURCES.filter((key) => !existing.has(key)).forEach((key, n) => {
+      const id = `sensor.coverage_pointt_${n}`;
+      registry[id] = { platform: 'bosch_buderus_heating', unique_id: `${gateway}:${key}`, device_id: first.device_id };
+      rawStates[id] = { entity_id: id, state: '1', attributes: {} };
+    });
+    simulatedBase = { ...base, states: rawStates, entities: registry };
+  }
+  const states = new Proxy(simulatedBase.states, {
     get: (target, id) => {
       const current = target[id];
       const usable = typeof id === 'string' && /^(binary_sensor|switch)\./.test(id) ? 'on' : '1';
@@ -74,7 +96,7 @@ const resolveAll = (card, preset, base) => {
   });
   const realCtx = Card._ctx;
   Card._ctx = (hass, device, idx) => {
-    const ctx = realCtx({ ...base, states }, device, idx);
+    const ctx = realCtx({ ...simulatedBase, states }, device, idx);
     return {
       ...ctx,
       key: (platform, domain, key) => ctx.key(platform, domain, key) || `${domain}.${platform}_${key}`,
@@ -82,7 +104,7 @@ const resolveAll = (card, preset, base) => {
     };
   };
   try {
-    return Card._resolve({ preset }, { ...base, states, locale: { language: 'en' }, language: 'en' });
+    return Card._resolve({ preset }, { ...simulatedBase, states, locale: { language: 'en' }, language: 'en' });
   } finally {
     Card._ctx = realCtx;
   }
@@ -240,7 +262,11 @@ const readmeWith = (readme, { card, presets, languages }) => {
     const c = coreScore(presets[name]);
     return `[${c.percent} %](docs/COVERAGE.md#${name})${c.open ? `, ${c.open} open` : ''}`;
   });
-  const wrong = Object.keys(presets).filter((name) => seen[name] !== 1);
+  const missing = Object.keys(presets).filter((name) => seen[name] === undefined);
+  const duplicate = Object.keys(presets).filter((name) => seen[name] !== undefined && seen[name] !== 1);
+  // Ordinary contribution checks intentionally leave README generation to the release PR (CONTRIBUTING.md). Keep replacing
+  // links that exist so staleness is reported, but do not reject a newly contributed preset before its README row is added.
+  const wrong = [...duplicate, ...(args.includes('--check') && !releaseCheck ? [] : missing)];
   if (wrong.length) throw new Error(`README.md: needs exactly one coverage link "[0 %](docs/COVERAGE.md#<preset>)" for ${wrong.join(', ')}`);
   const lines = text.split('\n');
   const start = lines.indexOf('<!-- coverage:languages -->'); const end = lines.indexOf('<!-- /coverage:languages -->');
@@ -274,10 +300,8 @@ if (args.includes('--open')) {
     // Contributions do not touch the README (CONTRIBUTING.md), so the files are brought up to date in the release pull request
     // (npm run changelog:compile writes them). Its branch (release-<version>) fails when they are stale. A tag build only
     // notes it: the release exists by then, and a failed check would skip attaching the card file.
-    const branch = process.env.GITHUB_HEAD_REF || (process.env.GITHUB_REF_TYPE === 'branch' ? process.env.GITHUB_REF_NAME : '') || '';
-    const release = /(^|\/)release[-/]/.test(branch);
     const note = `${stale.join(' and ')} out of date: run npm run coverage`;
-    if (stale.length && release) problems.push(note);
+    if (stale.length && releaseCheck) problems.push(note);
     if (problems.length) { console.error(problems.map((p) => `- ${p}`).join('\n')); process.exit(1); }
     console.log(stale.length ? `Coverage valid; ${note} before the release.` : 'Coverage valid and up to date.');
   } else {
