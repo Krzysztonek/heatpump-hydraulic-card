@@ -3309,6 +3309,12 @@
       'an unmeasured buffer does not copy heat-pump temperatures to the circuit side');
     check(/parallel buffer: yes, configured/.test(C._diagnosticReport(card._config, card._hass)), 'diagnostic report names the explicitly configured parallel buffer');
     card.remove();
+    card = mount({ buffer: true, dhw_type: 'fresh_water', entities: { flow: 'sensor.f', return: 'sensor.r', compressor: 'sensor.c', hc_pump: 'binary_sensor.p' } }, hassOf(st())); await wait(20);
+    const stationShape = { station: card._parts.station, fws: !!q(card, 'fws'), valve: !!q(card, 'valve-arrow'), tank: !!card.shadowRoot.querySelector('rect.tank[x="520"][y="40"][height="200"]') };
+    check(stationShape.station && stationShape.fws && !stationShape.valve && !stationShape.tank,
+      `a fresh-water station is placed on an explicitly configured sensorless buffer (${JSON.stringify(stationShape)})`);
+    check(card._lossIds() === null, 'a fresh-water station on a sensorless buffer is excluded from the hot-water standby-loss fit');
+    card.remove();
     card = mount({ entities: { flow: 'sensor.f', buffer_top: 'sensor.t4' } }, hassOf(st())); await wait(20);
     check(card._parts.buffer && !card._parts.configuredBuffer && q(card, 't-buf-top').textContent.includes('40'), 'a mapped buffer sensor still draws and colours the parallel buffer automatically');
     card.remove();

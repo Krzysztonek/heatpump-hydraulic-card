@@ -4150,7 +4150,8 @@ class HeatpumpFlowCard extends HTMLElement {
 
   // A fresh-water station next to separate storages needs a parallel buffer; without one the tank with its coil is drawn.
   _station() {
-    return this._config.dhw_type === 'fresh_water' && this._config.storage !== 'combined' && (this._has('buffer_top') || this._has('buffer_mode'));
+    return this._config.dhw_type === 'fresh_water' && this._config.storage !== 'combined'
+      && (this._config.buffer === true || this._has('buffer_top') || this._has('buffer_mode'));
   }
 
   // Fresh-water station (dhw_type: fresh_water): a plate heat exchanger that heats the tap water from the storage; the tap side is not drawn.
