@@ -4,6 +4,10 @@
     "date": "2026-11-01",
     "version": "v0.8.2"
   },
+  "unmapped": {
+    "power": "Left out on purpose: the Home Comfort API offers kWh counters, which are no instantaneous power.",
+    "heat": "Left out on purpose: without an instantaneous power and flow rate there is no live heat output."
+  },
   "sources": [
     {
       "repo": "SoftwareSchmied/ha-bosch-buderus-heating",

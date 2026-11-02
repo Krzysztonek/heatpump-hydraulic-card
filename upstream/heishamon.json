@@ -4,6 +4,9 @@
     "date": "2026-11-01",
     "version": "2.12.1"
   },
+  "unmapped": {
+    "hc_return": "HeishaMon reports per zone the water temperature and its target, no return."
+  },
   "sources": [
     {
       "repo": "kamaradclimber/heishamon-homeassistant",

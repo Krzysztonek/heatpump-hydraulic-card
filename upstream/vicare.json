@@ -5,6 +5,11 @@
     "version": null,
     "note": "HA dev 2026-11-01: room_temperature/room_humidity come from ViCare room controls, one device per room, without translation key; not mapped (no unambiguous room for the card). Holiday program and pellet sensors not used."
   },
+  "unmapped": {
+    "heat": "ViCare reports no live heat output, only consumption and production counters; the card estimates it from flow rate and spread.",
+    "hc_return": "ViCare has no return temperature per heating circuit; return_temperature belongs to the heat generator.",
+    "room": "Room temperatures come from ViCare room controls, one device per room without a translation key, so there is no unambiguous room per circuit."
+  },
   "sources": [
     {
       "repo": "home-assistant/core",
