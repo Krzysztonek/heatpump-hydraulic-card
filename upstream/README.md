@@ -22,6 +22,7 @@ One file per preset, `upstream/<preset>.json`:
 - `reviewed.date`: the day the preset was last checked against the sources. Commits and releases after that day are reported. `version` is the release that was checked (or `null`).
 - `sources[].paths`: only the files that define entities, translation keys, state texts or units. Fewer files mean fewer false alarms.
 - `sources[].releases: false`: do not report releases, for repositories where a release is not specific to the integration (Home Assistant core).
+- `unmapped` (optional): fields of the card the preset does not map because the integration does not offer them, or not in a form that fits, each with a short reason, for example `"hc_return": "The integration reports no return temperature per circuit."`. They leave the coverage percentage in [docs/COVERAGE.md](../docs/COVERAGE.md); `npm run syntax` rejects a field the preset does map.
 
 ## What happens
 

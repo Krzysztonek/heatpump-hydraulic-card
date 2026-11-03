@@ -1,8 +1,12 @@
 {
   "preset": "samsung",
   "reviewed": {
-    "date": "2026-11-01",
+    "date": "2026-11-02",
     "version": "2026.10.0"
+  },
+  "unmapped": {
+    "hc_return": "The NASA bus reports the return of the heat pump (0x4236), not one per circuit.",
+    "hc_pump": "The primary water pump (0x4089) also runs for hot water, so the circuit follows the diverter valve instead of a pump of its own."
   },
   "sources": [
     {

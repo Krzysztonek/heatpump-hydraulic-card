@@ -544,11 +544,19 @@ const HFC_PRESETS = {
       const circPump = ['dhw_circulation_pump_available', 'wwcircpump'].map((k) => ctx?.state(`switch.${x}boiler_${k}`)).find((v) => v !== undefined);
       const s = (...ks) => ks.map((k) => `sensor.${x}${k}`);
       const hc = `hc${i.hc}`;
+      // With the heat pump's own flow sensor (TC1) the boiler's current flow temperature is T0, the flow to the heating side
+      // (WLW indoor units, #224); without TC1 it is the heat pump flow itself. The thermostat's flow temperature is a target (#287).
+      const tc1 = ['boiler_hptc1', 'boiler_heat_carrier_forward_tc1'].some((k) => ctx?.state(`sensor.${x}${k}`) !== undefined);
       return {
         mode: s('boiler_hpactivity', 'boiler_compressor_activity'),
-        compressor: b('hpcompon', 'hp_compressor').concat(s('boiler_compressor_speed')),
+        // Long names: binary_sensor.boiler_hp_compressor read off while the compressor ran at 31 % (EMS-ESP 3.9.0-dev, #287),
+        // so the compressor speed comes first there.
+        compressor: b('hpcompon').concat(s('boiler_compressor_speed'), b('hp_compressor')),
         valve: b('hp3way', 'dhw_3_way_valve_active').concat(sw('3_way_valve')),
         power: s('boiler_hpcurrpower', 'boiler_compressor_current_power'),
+        // "Compressor power output" is the heat output in kW, next to the electrical current power in W.
+        heat: s('boiler_hppower', 'boiler_compressor_power_output'),
+        fan_speed: s('boiler_fan_speed'),
         flow: s('boiler_hptc1', 'boiler_heat_carrier_forward_tc1', 'boiler_curflowtemp', 'boiler_current_flow_temperature'),
         return: s('boiler_hptc0', 'boiler_heat_carrier_return_tc0', 'boiler_rettemp', 'boiler_return_temperature'),
         volume: s('boiler_pc0flow'),
@@ -562,16 +570,18 @@ const HFC_PRESETS = {
         circulation: circPump !== undefined && circPump !== 'on' ? undefined : b('dhw_circ', 'wwcirc').concat(sw('dhw_circulation_active')),
         hc_pump: [`binary_sensor.${x}mixer_${hc}_pumpstatus`, `sensor.${x}mixer_${hc}_pumpstatus`,
           ...(i.hc === 1 ? [`binary_sensor.${x}boiler_heating_pump`] : [])],
-        hc_flow: s(`mixer_${hc}_flowtemphc`, `thermostat_${hc}_targetflowtemp`, `thermostat_${hc}_target_flow_temperature`),
+        hc_flow: s(`mixer_${hc}_flowtemphc`).concat(tc1 && i.hc === 1 ? s('boiler_curflowtemp', 'boiler_current_flow_temperature') : []),
+        hc_setpoint: s(`thermostat_${hc}_targetflowtemp`, `thermostat_${hc}_target_flow_temperature`),
         room: s(`thermostat_${hc}_currtemp`, `thermostat_${hc}_current_room_temperature`),
         room_target: s(`thermostat_${hc}_seltemp`).concat(`number.${x}thermostat_${hc}_selected_room_temperature`),
         program: s(`thermostat_${hc}_modetype`),
-        hours: s('boiler_uptimecomp', 'boiler_uptimetotal'),
+        hours: s('boiler_uptimecomp', 'boiler_uptimetotal', 'boiler_heatpump_total_uptime'),
         starts_total: s('boiler_totalcompstarts', 'boiler_total_compressor_control_starts'),
         energy_total: s('boiler_nrgconstotal', 'boiler_total_energy_consumption'),
-        heat_total: s('boiler_nrgsupptotal'),
+        heat_total: s('boiler_nrgsupptotal', 'boiler_total_energy_supplied'),
         compressor_speed: s('boiler_hpcompspd', 'boiler_compressor_speed'),
-        evap_temp: s('boiler_hppl1'),
+        evap_temp: s('boiler_hppl1', 'boiler_evaporator_inlet_temperature_tr4'),
+        eev: s('boiler_expansion_valve_vr1'),
         cond_temp: s('boiler_hpph1'),
         suction_temp: s('boiler_hptr5', 'boiler_compressor_inlet_temperature_tr5'),
         hot_gas: s('boiler_hptr6', 'boiler_compressor_outlet_temperature_tr6'),
@@ -582,11 +592,11 @@ const HFC_PRESETS = {
     tiles: (p) => {
       const t = (...ks) => ({ total: ks.map((k) => `sensor.${p ? `${p}_` : ''}boiler_${k}`) });
       return {
-        energy: t('nrgconstotal', 'metertotal'), energy_heating: t('nrgconscompheating', 'meterheat'), energy_dhw: t('dhw_nrgconscomp', 'dhw_meter'),
+        energy: t('nrgconstotal', 'metertotal', 'total_energy_consumption'), energy_heating: t('nrgconscompheating', 'meterheat'), energy_dhw: t('dhw_nrgconscomp', 'dhw_meter'),
         energy_cooling: t('nrgconscompcooling', 'metercool'), energy_aux: t('auxelecheatnrgconstotal', 'metereheat'),
-        heat: t('nrgsupptotal'), heat_heating: t('nrgsuppheating'), heat_dhw: t('dhw_nrgsupp'), heat_cooling: t('nrgsuppcooling'),
-        starts: t('totalcompstarts'), cycles_heating: t('heatingstarts'), cycles_dhw: t('dhw_startshp'), cycles_cooling: t('coolingstarts'),
-        hours: t('uptimetotal', 'uptimecompheating'),
+        heat: t('nrgsupptotal', 'total_energy_supplied'), heat_heating: t('nrgsuppheating'), heat_dhw: t('dhw_nrgsupp'), heat_cooling: t('nrgsuppcooling'),
+        starts: t('totalcompstarts', 'total_compressor_control_starts'), cycles_heating: t('heatingstarts'), cycles_dhw: t('dhw_startshp'), cycles_cooling: t('coolingstarts'),
+        hours: t('uptimetotal', 'uptimecompheating', 'heatpump_total_uptime'),
       };
     },
     mode_map: {
@@ -1413,6 +1423,7 @@ const HFC_I18N = {
       idle: 'Stand-by', heating: 'Verwarmen', dhw: 'Warm water', cooling: 'Koelen', defrost: 'Ontdooien', blocked: 'Geblokkeerd',
       frost: 'Vorstbeveiliging', circulate: 'Circuleren', off: 'Uit', legionella: 'Legionella', trailing: 'Naloop',
     },
+    boiler: 'Ketel', boiler_off: 'Ketel uit', mixer: 'Mengklep', mixer_opening: 'opent', mixer_closing: 'sluit',
   },
 };
 
@@ -1950,6 +1961,14 @@ const HFC_EDITOR = {
     env_energy: 'Omgevingsenergie totaal (kWh)', pv: 'Vermogen uit PV (W)', battery: 'Vermogen uit accu (W)', grid: 'Vermogen uit net (W)',
     cop_heating_today: 'COP verwarmen vandaag', cop_dhw_today: 'COP warm water vandaag', energy_today: 'Energie vandaag (kWh)',
     pv_share_today: 'PV-aandeel vandaag (%)', starts_today: 'Compressorstarts vandaag',
+    assistant_device: 'Entiteiten zoeken op dit warmtepompapparaat',
+    assistant_device_help: 'Alleen beschikbaar als er geen ondersteunde preset is gevonden. Voorstellen worden pas opgeslagen als je ze selecteert en bevestigt.',
+    assistant_title: 'Voorgestelde koppeling van entiteiten',
+    assistant_intro: 'Exacte Engelse en Duitse namen, eenheden en apparaatklassen worden gecontroleerd. Selecteer elk voorstel dat je wilt opslaan.',
+    assistant_apply: 'Geselecteerde voorstellen gebruiken',
+    assistant_none: 'Geen eenduidige voorstellen gevonden op dit apparaat.',
+    sec_boiler: 'Ketel / tweede warmteopwekker', boiler_state: 'Ketel actief (aan/uit, of een vermogen boven 0)', boiler_power: 'Ketelvermogen (W of kW)', boiler_flow: 'Aanvoertemperatuur ketel (°C)',
+    hc_mixer: 'Stand of aandeel mengklep (%, getoond zoals gemeld)', hc_mixer_opening: 'Mengklepmotor opent (aan/uit)', hc_mixer_closing: 'Mengklepmotor sluit (aan/uit)',
   },
 };
 
@@ -3790,7 +3809,10 @@ class HeatpumpFlowCard extends HTMLElement {
 
   _tileLabel(key, period, I = this._i) {
     const def = HFC_TILES[key];
-    return `${I.tiles[key]}${def.live || def.noSuffix || !period ? '' : ` · ${I.periods[period]}`}`;
+    const name = String(I.tiles[key]);
+    const word = def.live || def.noSuffix || !period ? '' : String(I.periods[period]);
+    // A name that already ends in the period word does not repeat it: "COP gesamt" for the total, not "COP gesamt · gesamt" (#288).
+    return word && !name.toLowerCase().endsWith(` ${word.toLowerCase()}`) ? `${name} · ${word}` : name;
   }
 
   // Where a tile's value comes from for a period: an entity, the long-term statistics of a total counter,
@@ -4157,7 +4179,8 @@ class HeatpumpFlowCard extends HTMLElement {
 
   // A fresh-water station next to separate storages needs a parallel buffer; without one the tank with its coil is drawn.
   _station() {
-    return this._config.dhw_type === 'fresh_water' && this._config.storage !== 'combined' && (this._has('buffer_top') || this._has('buffer_mode'));
+    return this._config.dhw_type === 'fresh_water' && this._config.storage !== 'combined'
+      && (this._config.buffer === true || this._has('buffer_top') || this._has('buffer_mode'));
   }
 
   // Fresh-water station (dhw_type: fresh_water): a plate heat exchanger that heats the tap water from the storage; the tap side is not drawn.
