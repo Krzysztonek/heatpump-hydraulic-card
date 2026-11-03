@@ -42,6 +42,7 @@ Each entry names the brands, the preset with its setup page, the integration it 
 - **Alpha Innotec**, **Novelan**, **Roth**, **Siemens**, **Elco**, **Buderus**, **Nibe**, **Wolf** heat pumps with a Luxtronik controller: preset [`luxtronik`](docs/presets/luxtronik.md), integration [Luxtronik](https://github.com/BenPru/luxtronik) (HACS, `luxtronik2`). Confirmed on one water-to-water installation; air and brine reports welcome. Coverage [93 %](docs/COVERAGE.md#luxtronik), 1 open.
 - **Stiebel Eltron** (WPM 3, WPM 3i, WPMsystem, LWZ) and **Tecalor** heat pumps with an ISG: preset [`stiebel_isg`](docs/presets/stiebel-isg.md), integration [Stiebel Eltron ISG](https://github.com/pail23/stiebel_eltron_isg_component) (HACS, `stiebel_eltron_isg`). Confirmed on a WPMsystem; WPM 3, WPM 3i and LWZ from the integration source. Coverage [100 %](docs/COVERAGE.md#stiebel_isg).
 - **Samsung** EHS (Mono, Split, TDM) on the NASA bus: preset [`samsung`](docs/presets/samsung.md), integration [esphome-samsung-nasa](https://github.com/Beormund/esphome-samsung-nasa) (ESPHome). Tested on a real installation. Coverage [100 %](docs/COVERAGE.md#samsung).
+- **Daikin** Altherma, **ROTEX** (Altherma 3, LT, EPRA, ERGA, EBLA …): preset [`espaltherma`](docs/presets/espaltherma.md), integration [ESPAltherma](https://github.com/raomin/ESPAltherma) (ESP32 on the X10A port, MQTT device discovery of the beta branch). Untested.
 - **Any other heat pump**: no preset; the editor's mapping assistant or your own `entities` ([any other heat pump](#any-other-heat-pump)).
 
 *Coverage* is the share of the core fields (the fields the editor shows first) that the preset fills, out of those its integration offers; open fields could still be mapped or need checking. It is generated from the card, and [docs/COVERAGE.md](docs/COVERAGE.md) has the details: the fields an integration does not offer and why, the further fields, stat tiles and texts. Which outdoor-unit drawing each preset selects is listed under [Outdoor-unit style coverage](#outdoor-unit-style-coverage).
@@ -92,7 +93,7 @@ The current release is **[0.17.2](https://github.com/Sturmi77/heatpump-hydraulic
 
 Each `unit_style`, the unit its drawing is based on, the brands it covers and when it is selected automatically:
 
-- `generic`: neutral fan symbol for any air-source heat pump. Fallback without a known style; ground and groundwater sources show their loop symbol instead.
+- `generic`: neutral fan symbol for any air-source heat pump. Fallback without a known style, and the drawing of `preset: espaltherma` (Daikin Altherma has no drawing of its own yet); ground and groundwater sources show their loop symbol instead.
 - `lambda`: Lambda EU-L. With `preset: lambda`.
 - `viessmann`: Viessmann Vitocal 250-A, for Viessmann Vitocal. With `preset: vicare` and `preset: open3e`.
 - `vaillant`: Vaillant aroTHERM plus, for Vaillant and as the default for the other myPyllant brands. With `preset: vaillant`.
@@ -225,7 +226,7 @@ Everything can be set in the **UI editor**. With a preset, the editor shows whet
 
 | Option | Description |
 |---|---|
-| `preset` | `lambda`, `vicare`, `vaillant`, `emsesp`, `bosch_buderus_heating`, `heishamon`, `wolf`, `kronoterm`, `ebusd`, `open3e`, `luxtronik`, `stiebel_isg`, `samsung` or omit. Fills entities, mode maps and error sensors. |
+| `preset` | `lambda`, `vicare`, `vaillant`, `emsesp`, `bosch_buderus_heating`, `heishamon`, `wolf`, `kronoterm`, `ebusd`, `open3e`, `luxtronik`, `stiebel_isg`, `samsung`, `espaltherma` or omit. Fills entities, mode maps and error sensors. |
 | `prefix` | Preset prefix (Lambda device name, Vaillant home slug, EMS-ESP instance prefix, HeishaMon MQTT prefix, Wolf device slug (`wolflink` only), ebusd topic prefix). Omit for auto-detection, `""` for unprefixed Lambda ids. |
 | `device` | Device id: restricts preset detection to one device (several heat pumps of the same brand). |
 | `index` | Unit numbers for presets: `{hp, dhw, buffer, hc}` (default 1; Vaillant counts from 0). |
