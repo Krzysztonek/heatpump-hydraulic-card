@@ -1,20 +1,21 @@
 # Issue plan for the roadmap draft
 
-**GitHub assignments · 3 November 2026.** The milestone table records the assigned issues, including three new lead issues. The recommendations below give the scope and evidence for each item. A field report can belong to a milestone without committing an entire preset or layout to that release. [Roadmap and milestone criteria](ROADMAP-DRAFT.md) · [Open issues](https://github.com/Sturmi77/heatpump-hydraulic-card/issues?q=is%3Aissue+is%3Aopen)
+**GitHub assignments · 3 November 2026, updated in the evening after the merges #297 and #303–#306.** The milestone table records the assigned issues, including three new lead issues. The recommendations below give the scope and evidence for each item. A field report can belong to a milestone without committing an entire preset or layout to that release. [Roadmap and milestone criteria](ROADMAP-DRAFT.md) · [Open issues](https://github.com/Sturmi77/heatpump-hydraulic-card/issues?q=is%3Aissue+is%3Aopen)
 
 ## Pull requests
 
 | PR | State at review | Proposed treatment |
 | --- | --- | --- |
 | [#296 · Circuit pump states](https://github.com/Sturmi77/heatpump-hydraulic-card/pull/296) | Merged to `main`, #295 is closed. | Check running, stopped and unavailable states on the reporting ebusd installation after release. |
-| [#297 · EMS-ESP PC1](https://github.com/Sturmi77/heatpump-hydraulic-card/pull/297) | Targeted for 0.18 on the pump handling from #296. | Check both entity-name formats on WLW circuit 1 and that circuit 2 never inherits PC1. Link the mapping result to #224. |
+| [#297 · EMS-ESP PC1](https://github.com/Sturmi77/heatpump-hydraulic-card/pull/297) | Merged to `main`. The reporter in #224 confirmed that `boiler_pc1on` exists, so it comes before `pc1rate`. | Check both entity-name formats on WLW circuit 1 after release. |
+| [#303 · Circuit flow label](https://github.com/Sturmi77/heatpump-hydraulic-card/pull/303), [#304 · Mode check](https://github.com/Sturmi77/heatpump-hydraulic-card/pull/304), [#305 · Tested presets](https://github.com/Sturmi77/heatpump-hydraulic-card/pull/305), [#306 · ESPAltherma](https://github.com/Sturmi77/heatpump-hydraulic-card/pull/306) | Merged to `main`; #291 is closed. | Include all four in the 0.18 release notes. Ask for a field confirmation of `espaltherma` in #254. |
 | [#281 · Circulation window](https://github.com/Sturmi77/heatpump-hydraulic-card/pull/281) and [#286 · ViCare DHW](https://github.com/Sturmi77/heatpump-hydraulic-card/pull/286) | Merged to `main`. The latest public release is 0.17.2. | Include both in 0.18 release notes. Follow up on field verification for the temperature-based ViCare fallback with #282. |
 
 ## GitHub milestones
 
 | Milestone | Assigned issues at publication | Scope |
 | --- | --- | --- |
-| [0.18.0](https://github.com/Sturmi77/heatpump-hydraulic-card/milestone/11) | #34, #283, #291 | Release follow-up, kiosk triage and circuit temperature correctness. PR #297 also targets this release. |
+| [0.18.0](https://github.com/Sturmi77/heatpump-hydraulic-card/milestone/11) | #34, #283 (#291 done) | Release follow-up and kiosk triage. PRs #297 and #303–#306 are merged for this release. |
 | [Field baseline (0.18.x)](https://github.com/Sturmi77/heatpump-hydraulic-card/milestone/13) | #298 (lead), #1, #282, #254 | Supported-preset cohort and field confirmations. Daikin is a separate exploratory pilot outside the cohort. |
 | [0.19.0](https://github.com/Sturmi77/heatpump-hydraulic-card/milestone/12) | #299 (lead), #269, #4, #289 | Installation confirmation, phone readability trial and display units. |
 | [0.20.0](https://github.com/Sturmi77/heatpump-hydraulic-card/milestone/14) | #300 (lead), #290, #23, #173 | Cycle details, circuit spread, and complete heat/power pairs on a real cascade. |
@@ -35,9 +36,9 @@
 | Issue | Recommendation |
 | --- | --- |
 | [#34 · Circulation times](https://github.com/Sturmi77/heatpump-hydraulic-card/issues/34) | Keep for 0.18. Check the single window and next schedule change in the release. Additional weekday programs need a separate use case. |
-| [#291 · Circuit flow label](https://github.com/Sturmi77/heatpump-hydraulic-card/issues/291) | Prioritize for the next corrective release. Reproduce DHW diversion without a circuit sensor. Suppress a misleading inherited temperature on the inactive path while preserving valid readings on a direct, flowing circuit. |
+| [#291 · Circuit flow label](https://github.com/Sturmi77/heatpump-hydraulic-card/issues/291) | Done in #303: `hc_flow_label: false` hides the circuit flow and keeps the target; the default is unchanged. Hiding an inherited temperature automatically on the inactive path remains a possible follow-up. |
 | [#283 · Chromium kiosk failure](https://github.com/Sturmi77/heatpump-hydraulic-card/issues/283) | Triage as a potential total outage. Obtain browser version and console error. Expedite a reproducible card regression. |
-| [#282 · Vitocal 200-S](https://github.com/Sturmi77/heatpump-hydraulic-card/issues/282) | Record heating as confirmed on this model. Request a DHW trace or screenshot and valve/charging signal to validate the released path. |
+| [#282 · Vitocal 200-S](https://github.com/Sturmi77/heatpump-hydraulic-card/issues/282) | Confirmed: the diagnostic report shows the charging signal (`ww_aufladung`) during a hot-water charge, with combined storage and fresh-water station. ViCare is marked as tested (#305). The temperature-based fallback of #286 still needs a unit without that signal. |
 | [#195 · Home Comfort pumps](https://github.com/Sturmi77/heatpump-hydraulic-card/issues/195) | Keep evidence-dependent. Obtain the Home Comfort PC0/PC1 resource keys and compare WP and circuit flow when only PC1 runs. The EMS-ESP mapping in #297 covers a different integration. |
 
 ### Measure setup and simplify the editor
@@ -48,7 +49,7 @@
 | [#269 · Heating-circuit remapping](https://github.com/Sturmi77/heatpump-hydraulic-card/issues/269) | Use the reported contiguous Open3E circuits 2–4 as a milestone 2 example. Confirm the existing start index and count solve this case. Consider arbitrary reordering only if a different installation requires it. |
 | [#4 · Phone layout](https://github.com/Sturmi77/heatpump-hydraulic-card/issues/4) | Use in 0.19 and 0.20 usability checks. Prototype the glance view with a target, an active path and a readable temperature. Decide about a separate portrait schematic after observing phone use. |
 | [#289 · Flow units](https://github.com/Sturmi77/heatpump-hydraulic-card/issues/289) | Small 0.19 usability candidate after the editor work. Apply the unit consistently in schema, circuit and tile. Preserve calculation units. |
-| [#276 · Panasonic suggestions](https://github.com/Sturmi77/heatpump-hydraulic-card/issues/276) | Keep as field evidence for #289 and #290. Close the umbrella after confirming both requests are tracked and any remaining recorder question is resolved. |
+| [#276 · Panasonic suggestions](https://github.com/Sturmi77/heatpump-hydraulic-card/issues/276) | Keep as field evidence for #289 and #290. The missing spread and the grey timeline came from a select mapped as `mode`; the editor flags that since #304. Close the umbrella once the reporter confirms and both requests are tracked. |
 
 ### Make measurements useful in an operating cycle
 
@@ -66,7 +67,7 @@
 | Issue | Recommendation |
 | --- | --- |
 | [#12 · Preset wishlist](https://github.com/Sturmi77/heatpump-hydraulic-card/issues/12) | Keep as intake. Rank candidates by a willing tester, usable entity data and a repeatable mapping. Track first-setup results per integration and model. |
-| [#254 · Daikin Altherma](https://github.com/Sturmi77/heatpump-hydraulic-card/issues/254) | First pilot. Validate the available ESPAltherma EPRA12EAV3 attribute sample, the required number of helpers, and the mode on a second run. Track Onecta separately. |
+| [#254 · Daikin Altherma](https://github.com/Sturmi77/heatpump-hydraulic-card/issues/254) | First pilot. The ESPAltherma beta branch publishes one entity per value, so no helpers are needed; the `espaltherma` preset (#306) is built from the source and the EPRA12EAV3 entity list. Confirm heating, hot water and the behaviour of "I/U operation mode" on the reporting installation. Track Onecta separately. |
 | [#82 · Older ebusd brine units](https://github.com/Sturmi77/heatpump-hydraulic-card/issues/82) | Continue from the existing `ehp` mapping once the entity list and mode meanings are confirmed. |
 | [#253 · NIBE](https://github.com/Sturmi77/heatpump-hydraulic-card/issues/253) and [#255 · Mitsubishi](https://github.com/Sturmi77/heatpump-hydraulic-card/issues/255) | Candidate queue. Pick a specific local or cloud integration, obtain states and units, and recruit an operator for mode checks before assigning a version. |
 | [#256 · Viessmann Optolink](https://github.com/Sturmi77/heatpump-hydraulic-card/issues/256) | Start with a verified example profile from the submitted splitter configuration. User-defined MQTT names limit automatic detection across installations. |
@@ -78,6 +79,6 @@
 | --- | --- |
 | [#248 · Pool](https://github.com/Sturmi77/heatpump-hydraulic-card/issues/248) | First candidate for a new consumer after the three product milestones. Request a charging signal and a real pipe layout because pool mode can currently appear as space heating. |
 | [#36 · Wood stove](https://github.com/Sturmi77/heatpump-hydraulic-card/issues/36), [#250 · Ventilation](https://github.com/Sturmi77/heatpump-hydraulic-card/issues/250) and [#267 · Domestic-water side](https://github.com/Sturmi77/heatpump-hydraulic-card/issues/267) | Hold for a field diagram, sensors, and a question the addition would answer in operation. Revisit layout architecture if several variants qualify. |
-| [#224 · Indoor enclosure](https://github.com/Sturmi77/heatpump-hydraulic-card/issues/224) | Credit the pump evidence used by #297. Park the enclosure itself until it clarifies an operator decision. |
+| [#224 · Indoor enclosure](https://github.com/Sturmi77/heatpump-hydraulic-card/issues/224) | The pump evidence is used in #297 (credited in the issue). Park the enclosure itself until it clarifies an operator decision. |
 | [#261 · Resizable segments](https://github.com/Sturmi77/heatpump-hydraulic-card/issues/261) | Park per-segment controls. Use the #4 phone trial to identify which components actually need more space. |
 | [#252 · House load and wallbox](https://github.com/Sturmi77/heatpump-hydraulic-card/issues/252) | Keep in Later. The current roadmap focuses on the heat pump's own supply and consumption. |

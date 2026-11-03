@@ -122,15 +122,15 @@ Prevalence is a qualitative estimate for single-family houses in Central Europe.
 | --- | --- | --- | --- |
 | Separate DHW tank with diverter valve | supported | very common | standard design of split and monobloc units |
 | No buffer, direct circuit | supported | common (new builds with underfloor heating) | manufacturers recommend no buffer for modulating units with floor heating |
-| Parallel buffer | supported | common (existing buildings, radiators, several circuits) | |
-| Series buffer in the return | supported (0.12/main) | common | #97 |
+| Parallel buffer | supported, also without sensors (0.18) | common (existing buildings, radiators, several circuits) | #266 |
+| Series buffer in the return | supported (0.12) | common | #97 |
 | Solar thermal into the DHW tank | supported | uncommon, declining with PV | |
-| Combined / layered storage | phase 1 | uncommon to medium; typical with solar thermal or a stove | #50, a HeishaMon installation |
-| Fresh-water station on buffer or combined storage | with phase 1 (`dhw_type`) | uncommon to medium | |
-| Tank-in-tank | with phase 1 (`dhw_type`) | rare with heat pumps | |
+| Combined / layered storage | supported (0.14) | uncommon to medium; typical with solar thermal or a stove | #50, a HeishaMon installation |
+| Fresh-water station on buffer or combined storage | supported (0.14, `dhw_type`) | uncommon to medium | |
+| Tank-in-tank | supported (0.14, `dhw_type`) | rare with heat pumps | |
 | Stratification valve instead of diverter valve | later | rare | |
 | Wood stove with water jacket into the storage | phase 2 | rare; needs a large buffer (typically 800–1,000 l) and is connected as secondary generator | #36 |
-| Boiler in series after the heat pump (hybrid) | phase 3 | regional: common in retrofit hybrids (for example the Netherlands), less in Germany | #51 (Intergas Xtend) |
+| Boiler in series after the heat pump (hybrid) | supported (0.17, manual entities) | regional: common in retrofit hybrids (for example the Netherlands), less in Germany | #51 (Intergas Xtend) |
 | Boiler in parallel into a buffer (bivalent) | phase 3, later | medium in existing buildings | |
 | Cooling through the heating circuits | supported | medium (mainly air source and underfloor heating) | |
 
@@ -222,7 +222,7 @@ The wood stove appears in 36 of the 88 topologies, which together hold only abou
 
 **Rules:** `storage: combined` with `series_buffer: true` is rejected; cooling runs through the heating zone like through a parallel buffer (a bypass around the tank would need geometry of its own; changed from "bypasses the tank" when the edge cases were tested); hot-water mode, valve text and the DHW heater rod keep their meaning; the buffer heater rod is drawn in the lower zone; tile and badge contracts do not change; a preset never sets `storage: combined` (it cannot know whether one or two tanks exist).
 
-**Open questions** (asked in #50, no answer yet; the defaults above are used until then): storage type, how the heat pump charges it, whether a DHW target entity exists, number and height of the sensors.
+**Open questions** (asked in #50): storage type, how the heat pump charges it, whether a DHW target entity exists, number and height of the sensors. The defaults above shipped in 0.14.0; combined storage has since been confirmed on real installations, among them a Vitocal 200-S with a fresh-water station (#282). A stratification valve has not been reported yet.
 
 **Done when:** both storage modes render in every layout, flows animate along the right zones for heating and hot water, the self-test covers sensor placement, zone flows, the conflict rules, editor fields and the geometry against circuits 2–6, and a demo setup "Combined storage" exists.
 
@@ -283,7 +283,7 @@ Sprints 1 and 2 brought the card from about 73 % to about 85 % of installations 
 
 | | Question | Default | Reason |
 | --- | --- | --- | --- |
-| D1 | How is a combined storage configured, with which sensors and charging? | as in [phase 1](#phase-1--combinedlayered-storage-50): `storage: combined`, the six existing keys as heights top to bottom, the diverter valve charges two heights, no stratification valve | no new keys, presets keep working; asked in #50 without an answer |
+| D1 | How is a combined storage configured, with which sensors and charging? | as in [phase 1](#phase-1--combinedlayered-storage-50): `storage: combined`, the six existing keys as heights top to bottom, the diverter valve charges two heights, no stratification valve | no new keys, presets keep working; asked in #50, confirmed on real installations after 0.14.0 |
 | D2 | Does `dhw_type` also apply to separate storages? | yes: `fresh_water` on a parallel buffer draws no hot-water tank, the station hangs on the buffer | about 12 % of installations with a parallel buffer use a fresh-water station |
 | D3 | `dhw_loss` with combined storage: leave out windows with running circuit pumps, or mark the value approximate? | leave them out | the circuits draw heat from the same tank; a marked value would still mislead |
 | D4 | What flows when a circuit pump runs against a diverter valve on hot water (no parallel buffer)? | the pump turns, no water moves, no overflow valve is drawn | no installation has reported an overflow valve yet |
