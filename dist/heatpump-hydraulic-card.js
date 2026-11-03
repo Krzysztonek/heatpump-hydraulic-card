@@ -1229,7 +1229,7 @@ const HFC_I18N = {
       suction_temp: 'Suction gas', hot_gas: 'Hot gas', liquid_temp: 'Liquid line', low_pressure: 'Low pressure', high_pressure: 'High pressure',
       eev: 'Expansion valve', superheat: 'Superheat', subcooling: 'Subcooling',
     },
-    source_flow: 'Source', target: 'Target', curve_offset: 'curve', curve_shift: 'shift', mixer: 'Mixer', mixer_opening: 'opening', mixer_closing: 'closing', return_short: 'RL', error: 'Error', circulation: 'Circ.', valve_dhw: 'DHW', solar: 'Solar',
+    source_flow: 'Source', target: 'Target', curve_offset: 'curve', curve_shift: 'shift', mixer: 'Mixer', mixer_opening: 'opening', mixer_closing: 'closing', return_short: 'RL', error: 'Error', circulation: 'Circ.', circulation_from: 'from', circulation_until: 'until', valve_dhw: 'DHW', solar: 'Solar',
     brine_pressure: 'Brine pressure', hc_pressure: 'Heating pressure', pressure_normal: 'normal', pressure_warning: 'warning', pressure_critical: 'critical',
     timeline_title: 'Last {h} hours', timeline_gap: 'No data', timeline_aria: 'Operating mode of the last {h} hours. Arrow keys select a period.',
     programs: { eco: 'Eco', night: 'Night', party: 'Party', holiday: 'Holiday' },
@@ -1271,7 +1271,7 @@ const HFC_I18N = {
       suction_temp: 'Sauggas', hot_gas: 'Heißgas', liquid_temp: 'Flüssigkeitsleitung', low_pressure: 'Niederdruck', high_pressure: 'Hochdruck',
       eev: 'Expansionsventil', superheat: 'Überhitzung', subcooling: 'Unterkühlung',
     },
-    source_flow: 'Quelle', target: 'Soll', curve_offset: 'Kurve', curve_shift: 'Verschiebung', mixer: 'Mischer', mixer_opening: 'öffnet', mixer_closing: 'schließt', return_short: 'RL', error: 'Fehler', circulation: 'Zirk.', valve_dhw: 'WW', solar: 'Solar',
+    source_flow: 'Quelle', target: 'Soll', curve_offset: 'Kurve', curve_shift: 'Verschiebung', mixer: 'Mischer', mixer_opening: 'öffnet', mixer_closing: 'schließt', return_short: 'RL', error: 'Fehler', circulation: 'Zirk.', circulation_from: 'ab', circulation_until: 'bis', valve_dhw: 'WW', solar: 'Solar',
     brine_pressure: 'Soledruck', hc_pressure: 'Heizungsdruck', pressure_normal: 'normal', pressure_warning: 'Warnung', pressure_critical: 'kritisch',
     timeline_title: 'Letzte {h} Stunden', timeline_gap: 'Keine Daten', timeline_aria: 'Betriebsart der letzten {h} Stunden. Mit den Pfeiltasten einen Zeitraum wählen.',
     programs: { eco: 'Eco', night: 'Nacht', party: 'Party', holiday: 'Urlaub' },
@@ -1315,7 +1315,7 @@ const HFC_I18N = {
       eev: 'Expanzný ventil', superheat: 'Prehriatie', subcooling: 'Podchladenie',
     },
     boiler: 'Bojler', boiler_off: 'Bojler vypnutý', mixer: 'Zmiešavač', mixer_opening: 'zmiešavač sa otvára', mixer_closing: 'zmiešavač sa zatvára',
-    source_flow: 'Zdroj', target: 'Cieľ', curve_offset: 'krivka', curve_shift: 'posun', return_short: 'RL', error: 'Chyba', circulation: 'Cirk.', valve_dhw: 'TÚV', solar: 'Solár',
+    source_flow: 'Zdroj', target: 'Cieľ', curve_offset: 'krivka', curve_shift: 'posun', return_short: 'RL', error: 'Chyba', circulation: 'Cirk.', circulation_from: 'od', circulation_until: 'do', valve_dhw: 'TÚV', solar: 'Solár',
     brine_pressure: 'Tlak nemrznúcej zmesi', hc_pressure: 'Tlak vykurovania', pressure_normal: 'normálny', pressure_warning: 'varovanie', pressure_critical: 'kritický',
     timeline_title: 'Posledných {h} hodín', timeline_gap: 'Žiadne dáta', timeline_aria: 'Prevádzkový režim za posledných {h} hodín. Šípkami vyberte obdobie.',
     programs: { eco: 'Eko', night: 'Nočný', party: 'Párty', holiday: 'Dovolenka' },
@@ -1358,7 +1358,7 @@ const HFC_I18N = {
       eev: 'Expanzní ventil', superheat: 'Přehřátí', subcooling: 'Podchlazení',
     },
     boiler: 'Bojler', boiler_off: 'Bojler vypnutý', mixer: 'Směšovač', mixer_opening: 'směšovač se otevírá', mixer_closing: 'směšovač se zavírá',
-    source_flow: 'Zdroj', target: 'Cíl', curve_offset: 'křivka', curve_shift: 'posun', return_short: 'RL', error: 'Chyba', circulation: 'Cirk.', valve_dhw: 'TUV', solar: 'Solár',
+    source_flow: 'Zdroj', target: 'Cíl', curve_offset: 'křivka', curve_shift: 'posun', return_short: 'RL', error: 'Chyba', circulation: 'Cirk.', circulation_from: 'od', circulation_until: 'do', valve_dhw: 'TUV', solar: 'Solár',
     brine_pressure: 'Tlak nemrznoucí směsi', hc_pressure: 'Tlak vytápění', pressure_normal: 'normální', pressure_warning: 'varování', pressure_critical: 'kritický',
     timeline_title: 'Posledních {h} hodin', timeline_gap: 'Žádná data', timeline_aria: 'Provozní režim za posledních {h} hodin. Šipkami vyberte období.',
     programs: { eco: 'Eko', night: 'Noční', party: 'Párty', holiday: 'Dovolená' },
@@ -1400,7 +1400,7 @@ const HFC_I18N = {
       suction_temp: 'Zuiggas', hot_gas: 'Heetgas', liquid_temp: 'Vloeistofleiding', low_pressure: 'Lage druk', high_pressure: 'Hoge druk',
       eev: 'Expansieventiel', superheat: 'Oververhitting', subcooling: 'Nakoeling',
     },
-    source_flow: 'Bron', target: 'Doel', curve_offset: 'stooklijn', curve_shift: 'verschuiving', return_short: 'RL', error: 'Storing', circulation: 'Circ.', valve_dhw: 'WW', solar: 'Zon',
+    source_flow: 'Bron', target: 'Doel', curve_offset: 'stooklijn', curve_shift: 'verschuiving', return_short: 'RL', error: 'Storing', circulation: 'Circ.', circulation_from: 'vanaf', circulation_until: 'tot', valve_dhw: 'WW', solar: 'Zon',
     brine_pressure: 'Brondruk', hc_pressure: 'Verwarmingsdruk', pressure_normal: 'normaal', pressure_warning: 'waarschuwing', pressure_critical: 'kritiek',
     timeline_title: 'Laatste {h} uur', timeline_gap: 'Geen gegevens', timeline_aria: 'Bedrijfsstand van de laatste {h} uur. Kies een periode met de pijltjestoetsen.',
     programs: { eco: 'Eco', night: 'Nacht', party: 'Party', holiday: 'Vakantie' },
@@ -1526,7 +1526,7 @@ const HFC_EDITOR = {
     pv_boost: 'PV surplus mode (on, or a power above 0)',
     sg_ready: 'SG-Ready / utility lock state (1–4 or text)',
     dhw_top: 'DHW tank top (°C)', dhw_middle: 'DHW tank middle (°C)', dhw_bottom: 'DHW tank bottom (°C)', dhw_target: 'DHW target (°C)', dhw_mode: 'DHW mode (state text)',
-    circulation: 'Circulation pump running (on/off)', dhw_loss_sensor: 'DHW standby-loss measurement (°C)', buffer_top: 'Buffer top (°C)', buffer_middle: 'Buffer middle (°C)', buffer_bottom: 'Buffer bottom (°C)', buffer_mode: 'Buffer mode (state text)',
+    circulation: 'Circulation pump running (on/off)', circulation_start: 'Circulation window starts', circulation_end: 'Circulation window ends', circulation_schedule: 'Circulation schedule (next change)', dhw_loss_sensor: 'DHW standby-loss measurement (°C)', buffer_top: 'Buffer top (°C)', buffer_middle: 'Buffer middle (°C)', buffer_bottom: 'Buffer bottom (°C)', buffer_mode: 'Buffer mode (state text)',
     hc_flow: 'Circuit flow temperature (°C)', hc_return: 'Circuit return temperature (°C)', hc_setpoint: 'Circuit flow target (°C)',
     hc_mode: 'Circuit mode (state text)', hc_pump: 'Circuit pump running (on/off)', hc_volume: 'Flow rate of the heating circuit (l/h or l/min, circuit pump)', hc_curve_offset: 'Heating curve shift (K)', hc_mixer: 'Mixer position or share (%, shown as reported)', hc_mixer_opening: 'Mixer motor opening (on/off)', hc_mixer_closing: 'Mixer motor closing (on/off)', hc_pressure: 'Heating circuit pressure (bar)', brine_pressure: 'Brine circuit pressure (bar)',
     cutout_high_pressure: 'High-pressure cut-outs (count of events, not a pressure)', cutout_low_pressure: 'Low-pressure cut-outs (count of events, not a pressure)', cutout_temperature: 'Temperature cut-outs (count of events, not a temperature)',
@@ -1618,7 +1618,7 @@ const HFC_EDITOR = {
     pv_boost: 'PV-Überschussbetrieb (ein, oder Leistung über 0)',
     sg_ready: 'SG-Ready / EVU-Sperre (1–4 oder Text)',
     dhw_top: 'WW-Speicher oben (°C)', dhw_middle: 'WW-Speicher Mitte (°C)', dhw_bottom: 'WW-Speicher unten (°C)', dhw_target: 'WW-Soll (°C)', dhw_mode: 'WW-Betriebsart (Statustext)',
-    circulation: 'Zirkulationspumpe läuft (ein/aus)', dhw_loss_sensor: 'Messsensor WW-Standbyverlust (°C)', buffer_top: 'Puffer oben (°C)', buffer_middle: 'Puffer Mitte (°C)', buffer_bottom: 'Puffer unten (°C)', buffer_mode: 'Puffer-Betriebsart (Statustext)',
+    circulation: 'Zirkulationspumpe läuft (ein/aus)', circulation_start: 'Zirkulationsfenster beginnt', circulation_end: 'Zirkulationsfenster endet', circulation_schedule: 'Zirkulations-Zeitplan (nächster Wechsel)', dhw_loss_sensor: 'Messsensor WW-Standbyverlust (°C)', buffer_top: 'Puffer oben (°C)', buffer_middle: 'Puffer Mitte (°C)', buffer_bottom: 'Puffer unten (°C)', buffer_mode: 'Puffer-Betriebsart (Statustext)',
     hc_flow: 'Heizkreis-Vorlauf (°C)', hc_return: 'Heizkreis-Rücklauf (°C)', hc_setpoint: 'Heizkreis-Vorlauf-Soll (°C)',
     hc_mode: 'Heizkreis-Betriebsart (Statustext)', hc_pump: 'Heizkreispumpe läuft (ein/aus)', hc_volume: 'Volumenstrom Heizkreis (l/h oder l/min, Heizkreispumpe)', hc_curve_offset: 'Heizkurven-Verschiebung (K)', hc_mixer: 'Mischer-Stellung oder -Anteil (%, wird angezeigt wie gemeldet)', hc_mixer_opening: 'Mischermotor öffnet (ein/aus)', hc_mixer_closing: 'Mischermotor schließt (ein/aus)', hc_pressure: 'Heizkreis-Druck (bar)', brine_pressure: 'Solekreis-Druck (bar)',
     cutout_high_pressure: 'Hochdruck-Abschaltungen (Anzahl der Ereignisse, kein Druck)', cutout_low_pressure: 'Niederdruck-Abschaltungen (Anzahl der Ereignisse, kein Druck)', cutout_temperature: 'Temperatur-Abschaltungen (Anzahl der Ereignisse, keine Temperatur)',
@@ -1693,7 +1693,7 @@ const HFC_EDITOR = {
     pv_boost: 'Režim prebytku FVE (zapnuté, alebo výkon nad 0)',
     sg_ready: 'SG-Ready / blokovanie siete (1–4 alebo text)',
     dhw_top: 'Nádrž TÚV hore', dhw_middle: 'Nádrž TÚV v strede', dhw_bottom: 'Nádrž TÚV dole', dhw_target: 'Cieľová teplota TÚV', dhw_mode: 'Režim TÚV',
-    circulation: 'Cirkulačné čerpadlo', buffer_top: 'Akumulačný zásobník hore', buffer_middle: 'Akumulačný zásobník v strede', buffer_bottom: 'Akumulačný zásobník dole', buffer_mode: 'Režim akumulačného zásobníka',
+    circulation: 'Cirkulačné čerpadlo', circulation_start: 'Začiatok okna cirkulácie', circulation_end: 'Koniec okna cirkulácie', circulation_schedule: 'Plán cirkulácie (ďalšia zmena)', buffer_top: 'Akumulačný zásobník hore', buffer_middle: 'Akumulačný zásobník v strede', buffer_bottom: 'Akumulačný zásobník dole', buffer_mode: 'Režim akumulačného zásobníka',
     hc_flow: 'Teplota prívodu okruhu', hc_return: 'Teplota spiatočky okruhu', hc_setpoint: 'Cieľová teplota prívodu okruhu',
     hc_mode: 'Režim okruhu', hc_pump: 'Čerpadlo okruhu beží (binárne)', hc_volume: 'Prietok okruhu', hc_curve_offset: 'Posun vykurovacej krivky (K)', hc_pressure: 'Tlak vo vykurovacom okruhu', brine_pressure: 'Tlak v okruhu nemrznúcej zmesi',
     cutout_high_pressure: 'Vysokotlakové vypnutia (počet udalostí, nie tlak)', cutout_low_pressure: 'Nízkotlakové vypnutia (počet udalostí, nie tlak)', cutout_temperature: 'Teplotné vypnutia (počet udalostí, nie teplota)',
@@ -1821,7 +1821,7 @@ const HFC_EDITOR = {
     pv_boost: 'Režim přebytku FVE (zapnuto, nebo výkon nad 0)',
     sg_ready: 'SG-Ready / blokování sítě (1–4 nebo text)',
     dhw_top: 'Nádrž TUV nahoře', dhw_middle: 'Nádrž TUV uprostřed', dhw_bottom: 'Nádrž TUV dole', dhw_target: 'Cílová teplota TUV', dhw_mode: 'Režim TUV',
-    circulation: 'Cirkulační čerpadlo', buffer_top: 'Akumulační zásobník nahoře', buffer_middle: 'Akumulační zásobník uprostřed', buffer_bottom: 'Akumulační zásobník dole', buffer_mode: 'Režim akumulačního zásobníku',
+    circulation: 'Cirkulační čerpadlo', circulation_start: 'Začátek okna cirkulace', circulation_end: 'Konec okna cirkulace', circulation_schedule: 'Plán cirkulace (další změna)', buffer_top: 'Akumulační zásobník nahoře', buffer_middle: 'Akumulační zásobník uprostřed', buffer_bottom: 'Akumulační zásobník dole', buffer_mode: 'Režim akumulačního zásobníku',
     hc_flow: 'Teplota přívodu okruhu', hc_return: 'Teplota zpátečky okruhu', hc_setpoint: 'Cílová teplota přívodu okruhu',
     hc_mode: 'Režim okruhu', hc_pump: 'Čerpadlo okruhu běží (binární)', hc_volume: 'Průtok okruhu', hc_curve_offset: 'Posun topné křivky (K)', hc_pressure: 'Tlak v topném okruhu', brine_pressure: 'Tlak v okruhu nemrznoucí směsi',
     cutout_high_pressure: 'Vysokotlaká vypnutí (počet událostí, nikoli tlak)', cutout_low_pressure: 'Nízkotlaká vypnutí (počet událostí, nikoli tlak)', cutout_temperature: 'Teplotní vypnutí (počet událostí, nikoli teplota)',
@@ -1959,7 +1959,7 @@ const HFC_EDITOR = {
     pv_boost: 'PV-overschotstand (aan, of een vermogen boven 0)',
     sg_ready: 'SG-Ready / netblokkering (1–4 of tekst)',
     dhw_top: 'Warmwatervat boven (°C)', dhw_middle: 'Warmwatervat midden (°C)', dhw_bottom: 'Warmwatervat onder (°C)', dhw_target: 'Warmwaterdoel (°C)', dhw_mode: 'Warmwaterstand (statustekst)',
-    circulation: 'Circulatiepomp actief (aan/uit)', dhw_loss_sensor: 'Meetsensor stilstandsverlies warm water (°C)', buffer_top: 'Buffervat boven (°C)', buffer_middle: 'Buffervat midden (°C)', buffer_bottom: 'Buffervat onder (°C)', buffer_mode: 'Bufferstand (statustekst)',
+    circulation: 'Circulatiepomp actief (aan/uit)', circulation_start: 'Circulatievenster begint', circulation_end: 'Circulatievenster eindigt', circulation_schedule: 'Circulatieschema (volgende wissel)', dhw_loss_sensor: 'Meetsensor stilstandsverlies warm water (°C)', buffer_top: 'Buffervat boven (°C)', buffer_middle: 'Buffervat midden (°C)', buffer_bottom: 'Buffervat onder (°C)', buffer_mode: 'Bufferstand (statustekst)',
     hc_flow: 'Aanvoertemperatuur groep (°C)', hc_return: 'Retourtemperatuur groep (°C)', hc_setpoint: 'Aanvoerdoel groep (°C)',
     hc_mode: 'Stand groep (statustekst)', hc_pump: 'Groepspomp actief (aan/uit)', hc_volume: 'Debiet van de verwarmingsgroep (l/h of l/min, groepspomp)', hc_curve_offset: 'Verschuiving stooklijn (K)', hc_pressure: 'Druk verwarmingsgroep (bar)', brine_pressure: 'Druk broncircuit (bar)',
     cutout_high_pressure: 'Hogedrukuitschakelingen (aantal keer, geen druk)', cutout_low_pressure: 'Lagedrukuitschakelingen (aantal keer, geen druk)', cutout_temperature: 'Temperatuuruitschakelingen (aantal keer, geen temperatuur)',
@@ -1987,7 +1987,7 @@ const hfcHcCount = (config) => Math.min(Math.max(Math.round(+config?.hc_count) |
 const HFC_ENTITY_GROUPS = {
   sec_hp: ['mode', 'status', 'compressor', 'fan_speed', 'defrost', 'power', 'heat', 'flow', 'return', 'volume', 'source_volume', 'source_in', 'source_out', 'brine_pressure', 'outdoor', 'valve', 'heater', 'pv_boost', 'sg_ready'],
   sec_boiler: ['boiler_state', 'boiler_power', 'boiler_flow'],
-  sec_storage: ['dhw_top', 'dhw_middle', 'dhw_bottom', 'dhw_target', 'dhw_mode', 'circulation', 'dhw_loss_sensor', 'dhw_heater', 'dhw_heater_top', 'dhw_heater_middle', 'dhw_heater_bottom', 'buffer_top', 'buffer_middle', 'buffer_bottom', 'buffer_mode', 'buffer_heater', 'buffer_heater_top', 'buffer_heater_middle', 'buffer_heater_bottom', 'bypass_valve', 'solar_collector', 'solar_pump'],
+  sec_storage: ['dhw_top', 'dhw_middle', 'dhw_bottom', 'dhw_target', 'dhw_mode', 'circulation', 'circulation_start', 'circulation_end', 'circulation_schedule', 'dhw_loss_sensor', 'dhw_heater', 'dhw_heater_top', 'dhw_heater_middle', 'dhw_heater_bottom', 'buffer_top', 'buffer_middle', 'buffer_bottom', 'buffer_mode', 'buffer_heater', 'buffer_heater_top', 'buffer_heater_middle', 'buffer_heater_bottom', 'bypass_valve', 'solar_collector', 'solar_pump'],
   sec_hc: ['hc_flow', 'hc_return', 'hc_setpoint', 'hc_mode', 'hc_pump', 'hc_volume', 'hc_curve_offset', 'hc_mixer', 'hc_mixer_opening', 'hc_mixer_closing', 'hc_pressure', 'room', 'room_target', 'room_humidity', 'dew_point', 'program'],
   // The room of circuit 1 uses room/room_target; circuits 2 to 6 use their numbered keys in the shared house overview.
   sec_hc2: ['hc2_flow', 'hc2_return', 'hc2_setpoint', 'hc2_mode', 'hc2_pump', 'hc2_volume', 'hc2_curve_offset', 'hc2_mixer', 'hc2_mixer_opening', 'hc2_mixer_closing', 'hc2_room', 'hc2_room_target', 'hc2_room_humidity', 'hc2_dew_point'],
@@ -2032,6 +2032,8 @@ const HFC_KINDS = {
   onoff_power: { extra: ['w', 'kw', '%'], domains: ['binary_sensor', 'switch', 'input_boolean', 'sensor'], onoff: true },
   valve: { domains: ['binary_sensor', 'switch', 'input_boolean', 'sensor', 'select', 'input_select'], onoff: true },
   text: { domains: ['sensor', 'select', 'input_select', 'binary_sensor', 'switch', 'climate', 'water_heater', 'input_text', 'text'] },
+  time: { domains: ['time', 'input_datetime', 'sensor', 'input_text', 'text'] },
+  schedule: { domains: ['schedule'] },
 };
 // Keys of circuits 2 to 6 use the kind of circuit 1 (hc2_flow → hc_flow, hc2_room → room); keys not listed are not checked.
 const HFC_KEY_KINDS = Object.fromEntries(Object.entries({
@@ -2051,6 +2053,8 @@ const HFC_KEY_KINDS = Object.fromEntries(Object.entries({
   onoff_power: ['heater', 'boiler_state', ...HFC_TANK_HEATERS, 'pv_boost'],
   valve: ['valve'],
   text: ['mode', 'status', 'dhw_mode', 'buffer_mode', 'hc_mode', 'program', 'sg_ready'],
+  time: ['circulation_start', 'circulation_end'],
+  schedule: ['circulation_schedule'],
 }).flatMap(([kind, keys]) => keys.map((key) => [key, kind])));
 const hfcKindOf = (key) => HFC_KEY_KINDS[key] || HFC_KEY_KINDS[String(key).replace(/^hc[2-6]_/, 'hc_')] || HFC_KEY_KINDS[String(key).replace(/^hc[2-6]_/, '')];
 
@@ -2365,7 +2369,8 @@ class HeatpumpFlowCard extends HTMLElement {
       return {
         name: key,
         selector: { entity: { ...(multiple ? { multiple: true } : {}),
-          ...(kind?.onoff ? { domain: kind.domains } : fits ? { include_entities: [...new Set([...fits, ...current])] } : {}) } },
+          ...(kind?.onoff || ['time', 'schedule'].includes(hfcKindOf(key)) ? { domain: kind.domains }
+            : fits ? { include_entities: [...new Set([...fits, ...current])] } : {}) } },
       };
     };
     return {
@@ -3320,6 +3325,28 @@ class HeatpumpFlowCard extends HTMLElement {
     return Number.isFinite(v) ? v.toLocaleString(loc, { minimumFractionDigits: d, maximumFractionDigits: d }) : '–';
   }
   _t(v) { return Number.isFinite(v) ? `${this._fmt(v)} °C` : '– °C'; }
+  _circulationKey() { return ['circulation', 'circulation_schedule', 'circulation_start', 'circulation_end'].find((key) => this._has(key)); }
+  // One explicit daily window, or the next change of a Home Assistant schedule. Plain time states and local date-time states keep
+  // their wall-clock value; timestamped values are formatted in the Home Assistant time zone.
+  _timeText(raw) {
+    const value = String(raw ?? '').trim();
+    if (!value || ['unknown', 'unavailable', 'none'].includes(value.toLowerCase())) return '';
+    const clock = /^(\d{1,2}):(\d{2})(?::\d{2}(?:\.\d+)?)?$/.exec(value);
+    if (clock && +clock[1] < 24 && +clock[2] < 60) return `${clock[1].padStart(2, '0')}:${clock[2]}`;
+    const local = /^\d{4}-\d{2}-\d{2}[ T](\d{2}):(\d{2})(?::\d{2}(?:\.\d+)?)?$/.exec(value);
+    if (local && +local[1] < 24 && +local[2] < 60) return `${local[1]}:${local[2]}`;
+    const ms = Date.parse(value);
+    return Number.isFinite(ms) ? this._timelineTime(ms) : '';
+  }
+  _circulationProgram() {
+    const start = this._timeText(this._s('circulation_start')); const end = this._timeText(this._s('circulation_end'));
+    if (start && end) return `${start}–${end}`;
+    const schedule = this._st('circulation_schedule');
+    const state = String(schedule?.state || '').toLowerCase();
+    const next = this._timeText(schedule?.attributes?.next_event);
+    if (!next || !['on', 'off'].includes(state)) return '';
+    return `${state === 'on' ? this._i.circulation_until : this._i.circulation_from} ${next}`;
+  }
   _modeLabel(m, raw) { return this._i.modes[m] || raw || '–'; }
   _statLabel(key, fallback) { return this._statLabels[key]?.[this._lang] || this._statLabels[key]?.en || fallback; }
   // Colour scales follow hydraulic convention: flow red/orange, return blue, tanks blue (cold) → red (hot).
@@ -3487,7 +3514,7 @@ class HeatpumpFlowCard extends HTMLElement {
       // it shows as its flow), or on the heat pump's flow and return in a direct system.
       hc: this._has('hc_flow') || this._has('hc_mode') || this._has('hc_pump') || buffer || this._has('flow') || this._has('return'),
       house: Array.from({ length: this._hcCount }, (_, n) => ['room', 'room_target', 'room_humidity'].some((key) => this._has(this._roomKey(n + 1, key)))).some(Boolean),
-      circ: this._has('circulation'),
+      circ: ['circulation', 'circulation_start', 'circulation_end', 'circulation_schedule'].some((key) => this._has(key)),
       primaryPump: this._primaryPump(),
       hcPump: this._has('hc_pump'),
       hcType: this._hcType,
@@ -3692,7 +3719,7 @@ class HeatpumpFlowCard extends HTMLElement {
             ${this._has('dhw_middle') ? `<g class="tap" ${de('dhw_middle')}><text class="tank-sub" id="t-dhw-middle" x="580" y="166" text-anchor="middle"></text></g>` : ''}
             <g class="tap" ${de('dhw_bottom')}><text class="tank-sub" id="t-dhw-bottom" x="580" y="222" text-anchor="middle"></text></g>
             ${this._tankHeaters('dhw', P).map((h) => this._heaterSvg(...h)).join('')}
-            ${P.circ ? `<g class="tap" ${de('circulation')}><text class="small circ" id="t-circ" x="650" y="60">↻ ${this._esc(i.circulation)}</text></g>` : ''}` : ''}
+            ${P.circ ? `<g class="tap" ${de(this._circulationKey())}><text class="small circ" id="t-circ" x="650" y="60">↻ ${this._esc(i.circulation)}</text></g>` : ''}` : ''}
 
           ${P.buffer ? `
             <g class="tap" ${de(P.combined ? (['buffer_top', 'buffer_middle', 'buffer_bottom', 'buffer_mode'].find((k) => e[k]) || 'buffer_top') : 'buffer_top')}>
@@ -4259,7 +4286,7 @@ class HeatpumpFlowCard extends HTMLElement {
         <text class="house-temp" id="t-dhw-top" x="580" y="182" text-anchor="middle"></text>
         <text class="small" id="t-dhw-mode" x="580" y="100" text-anchor="middle"></text>
       </g>
-      ${this._parts.circ ? `<g class="tap" ${de('circulation')}><text class="small circ" id="t-circ" x="650" y="60">↻ ${this._esc(i.circulation)}</text></g>` : ''}`;
+      ${this._parts.circ ? `<g class="tap" ${de(this._circulationKey())}><text class="small circ" id="t-circ" x="650" y="60">↻ ${this._esc(i.circulation)}</text></g>` : ''}`;
   }
 
   _seriesSvg() {
@@ -5632,6 +5659,8 @@ class HeatpumpFlowCard extends HTMLElement {
       if (this._has('dhw_mode')) parts.push(this._modeLabel(dhwMode, this._s('dhw_mode')));
       if (Number.isFinite(tgt)) parts.push(`${i.target} ${this._fmt(tgt, 0)} °C`);
       this._txt('t-dhw-mode', parts.join(' · '));
+      const circProgram = this._circulationProgram();
+      this._txt('t-circ', P.circ ? `↻ ${i.circulation}${circProgram ? ` ${circProgram}` : ''}` : '');
       this._cls('t-circ', this._on('circulation'));
     }
     if (P.buffer) {
