@@ -49,7 +49,8 @@
     return out;
   };
   const hassOf = (states, registry = {}, energy, setup = {}) => ({
-    states, entities: registry, locale: { language: 'en' }, language: 'en',
+    // Snapshot timestamps must use the same Home Assistant zone on developer machines and UTC CI runners.
+    states, entities: registry, config: { time_zone: 'Europe/Vienna' }, locale: { language: 'en' }, language: 'en',
     callWS: (m) => (m.type === 'recorder/statistic_during_period' ? statChange(setup, m)
       : m.type === 'history/history_during_period' && setup.states ? historySim(setup, m)
       : m.type === 'energy/get_prefs' && energy ? Promise.resolve(energy) : Promise.reject(new Error('n/a'))),

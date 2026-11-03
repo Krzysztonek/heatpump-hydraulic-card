@@ -1952,6 +1952,49 @@
     check(mapped === 'k-heat,k-dhw', `timeline with valve_map: 1 = heating for 12 h, then 0 = hot water (${mapped})`);
   }
 
+  // 13f2. one circulation-program window or the next change of a Home Assistant schedule (#34)
+  {
+    const states = {
+      'sensor.dhw': ['49', '°C'], 'binary_sensor.circ': 'on', 'time.start': '06:00:00', 'time.end': '22:00:00',
+      'schedule.circ': { state: 'off', attributes: { next_event: '2030-01-01T07:30:00+01:00' } },
+    };
+    const entities = { dhw_top: 'sensor.dhw', circulation: 'binary_sensor.circ', circulation_start: 'time.start', circulation_end: 'time.end', circulation_schedule: 'schedule.circ' };
+    const render = async (extra = {}, mapped = entities) => {
+      const h = hassOf(toStates({ ...states, ...extra })); h.config = { time_zone: 'Europe/Vienna' };
+      const card = mount({ entities: mapped }, h); await wait(25); return card;
+    };
+    let card = await render(); let label = card.shadowRoot.getElementById('t-circ');
+    check(label?.textContent === '↻ Circ. 06:00–22:00' && label.classList.contains('on'), `explicit start/end window is shown beside the running pump (${label?.textContent})`);
+    check(label.closest('[data-entity]')?.dataset.entity === 'binary_sensor.circ', 'the circulation label keeps opening the pump entity');
+    card.remove();
+
+    card = await render({ 'time.start': 'unavailable', 'time.end': '22:00:00' }); label = card.shadowRoot.getElementById('t-circ');
+    check(label?.textContent === '↻ Circ. from 07:30', `an incomplete explicit window falls back to the schedule's next start (${label?.textContent})`); card.remove();
+    card = await render({ 'time.start': 'unavailable', 'time.end': 'unavailable', 'schedule.circ': { state: 'on', attributes: { next_event: '2030-01-01T22:15:00+01:00' } } });
+    label = card.shadowRoot.getElementById('t-circ');
+    check(label?.textContent === '↻ Circ. until 22:15', `an active schedule shows when the window ends (${label?.textContent})`); card.remove();
+
+    card = await render({ 'time.start': '2030-01-01 05:45:00', 'time.end': '2030-01-01 08:15:00' }); label = card.shadowRoot.getElementById('t-circ');
+    check(label?.textContent === '↻ Circ. 05:45–08:15', 'local date-time entity states keep their wall-clock time'); card.remove();
+    card = await render({ 'time.start': 'unknown', 'time.end': 'unavailable', 'schedule.circ': { state: 'unavailable', attributes: { next_event: null } } });
+    label = card.shadowRoot.getElementById('t-circ');
+    check(label?.textContent === '↻ Circ.', 'missing program values leave only the existing pump label'); card.remove();
+
+    const scheduleOnly = { dhw_top: 'sensor.dhw', circulation_schedule: 'schedule.circ' };
+    card = await render({}, scheduleOnly); label = card.shadowRoot.getElementById('t-circ');
+    check(label?.textContent === '↻ Circ. from 07:30' && label.closest('[data-entity]')?.dataset.entity === 'schedule.circ',
+      'a schedule helper can show the program without a separate pump-state entity'); card.remove();
+
+    const flat = C._formSchema({}).schema.flatMap(function keys(n) { return n.schema ? n.schema.flatMap(keys) : [n]; });
+    const byName = (name) => flat.find((x) => x.name === name);
+    check(['circulation_start', 'circulation_end', 'circulation_schedule'].every((key) => byName(key)), 'the visual editor offers all circulation-program entities');
+    check(byName('circulation_schedule').selector.entity.domain.join() === 'schedule'
+      && byName('circulation_start').selector.entity.domain.includes('time'), 'editor pickers constrain schedule and time entities');
+    const report = C._diagnosticReport({ entities }, hassOf(toStates(states)));
+    check(/- circulation_start: time\.start\b/.test(report) && /- circulation_schedule: schedule\.circ\b/.test(report),
+      'diagnostic report includes the circulation-program entities');
+  }
+
   // 13h. heating circuit 1 with a buffer and no circuit entity of its own (#118)
   {
     const st = toStates({ 'sensor.f': ['35', '°C'], 'sensor.r': ['30', '°C'], 'sensor.buf': ['33', '°C'], 'sensor.dhw': ['48', '°C'], 'binary_sensor.comp': 'on' });
