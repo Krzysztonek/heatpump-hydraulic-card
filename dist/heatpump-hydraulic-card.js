@@ -573,7 +573,8 @@ const HFC_PRESETS = {
         hc_pump: [`binary_sensor.${x}mixer_${hc}_pumpstatus`, `sensor.${x}mixer_${hc}_pumpstatus`,
           ...(i.hc === 1 ? [`binary_sensor.${x}boiler_heating_pump`] : []),
           ...(tc1 && i.hc === 1 ? b('pc1on', 'pc1').concat(s('boiler_pc1rate', 'boiler_pc1_rate')) : [])],
-        hc_volume: tc1 && i.hc === 1 ? s('boiler_pc1flow', 'boiler_flow_pc1') : undefined,
+        // Only a reported PC1 flow: a candidate id without an entity would draw an empty flow-rate label at the circuit.
+        hc_volume: tc1 && i.hc === 1 ? s('boiler_pc1flow', 'boiler_flow_pc1').find((id) => ctx?.state(id) !== undefined) : undefined,
         hc_flow: s(`mixer_${hc}_flowtemphc`).concat(tc1 && i.hc === 1 ? s('boiler_curflowtemp', 'boiler_current_flow_temperature') : []),
         hc_setpoint: s(`thermostat_${hc}_targetflowtemp`, `thermostat_${hc}_target_flow_temperature`),
         room: s(`thermostat_${hc}_currtemp`, `thermostat_${hc}_current_room_temperature`),

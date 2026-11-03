@@ -570,6 +570,17 @@
     check(withOn.hc_pump === 'binary_sensor.boiler_pc1on', `EMS-ESP: the PC1 on/off state comes before its rate (${withOn.hc_pump})`);
     const two = C._resolve({ preset: 'emsesp', hc_count: 2 }, hassOf(states, registry)).entities;
     check(!states[two.hc2_pump] && !states[two.hc2_volume], 'EMS-ESP: PC1 belongs only to the first circuit');
+    const { 'sensor.boiler_pc1flow': _pc1flow, ...noFlow } = states;
+    const nf = C._resolve({ preset: 'emsesp' }, hassOf(noFlow, registry)).entities;
+    check(nf.hc_volume === undefined, `EMS-ESP: without a PC1 flow entity no circuit flow rate is mapped, so no empty label is drawn (${nf.hc_volume})`);
+    // Review of #297: the PC1 rate in % turns the circuit pump; behind a parallel buffer it alone moves the circuit.
+    const buf = { 'sensor.buf': ['35', '°C'] };
+    const card = mount({ preset: 'emsesp', entities: { buffer_top: 'sensor.buf' } }, hassOf({ ...states, ...toStates(buf) }, registry)); await wait(20);
+    const flows = () => !!card.shadowRoot.getElementById('p-hc-vl')?.classList.contains('on');
+    const at38 = flows();
+    card.hass = hassOf({ ...states, ...toStates({ ...buf, 'sensor.boiler_pc1rate': ['0', '%'] }) }, registry); await wait(5);
+    check(at38 && !flows(), `EMS-ESP: PC1 at 38 % runs the circuit, at 0 % it stands still (${at38} / ${flows()})`);
+    card.remove();
   }
   check(!detects('vicare', { 'sensor.vitodens_outside_temperature': '5', 'sensor.vitodens_boiler_temperature': '60' },
     { 'sensor.vitodens_outside_temperature': { platform: 'vicare', translation_key: 'outside_temperature' } }), 'ViCare gas boiler is not a heat pump');
