@@ -1,0 +1,23 @@
+{
+  "preset": "espaltherma",
+  "reviewed": {
+    "date": "2026-11-03",
+    "version": null
+  },
+  "unmapped": {
+    "hc_flow": "ESPAltherma reports the leaving water of the heat pump, no flow per circuit.",
+    "hc_return": "ESPAltherma reports the inlet water of the heat pump, no return per circuit."
+  },
+  "sources": [
+    {
+      "repo": "raomin/ESPAltherma",
+      "branch": "beta",
+      "releases": false,
+      "paths": [
+        "src/homeassistant.cpp",
+        "include/converters.h",
+        "definitions"
+      ]
+    }
+  ]
+}

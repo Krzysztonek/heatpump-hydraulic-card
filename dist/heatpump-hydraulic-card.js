@@ -1210,6 +1210,73 @@ const HFC_PRESETS = {
       };
     },
   },
+
+  // Daikin Altherma / ROTEX through ESPAltherma (ESP32 on the X10A port, MQTT device discovery, beta branch, #254). Every value of
+  // the model definition becomes <prefix>_<label>: the label lowercased, letters and digits only, spaces as underscores. The labels
+  // stay English in every language and are the same in the Altherma 3, LT, EPRA, ERGA and EBLA definitions. The prefix is the
+  // base topic ("espaltherma"). Only the values a user uncomments in the definition exist, so every key is optional.
+  espaltherma: {
+    name: 'Daikin Altherma (ESPAltherma)',
+    // The water pump of the indoor unit (or monobloc) also runs for hot water.
+    primary_pump: true,
+    auto_circuits: false,
+    // Leaving water after the backup heater together with the inverter frequency: both belong to every Altherma definition.
+    detect: (ctx) => {
+      const re = /^sensor\.(.+)_leaving_water_temp_after_buh_r2t$/;
+      const id = ctx.match(re, 'mqtt');
+      const p = id && id.match(re)[1];
+      return p && ctx.ids.includes(`sensor.${p}_inv_frequency_rps`) ? p : undefined;
+    },
+    entities: (p, i) => {
+      const s = (...ks) => ks.map((k) => `sensor.${p}_${k}`);
+      const b = (...ks) => ks.map((k) => `binary_sensor.${p}_${k}`);
+      // No mode: "I/U operation mode" names the demand (Heating, DHW …) and may stay on it while the compressor pauses. The
+      // compressor frequency tells running, the 3-way valve hot water. Only circuit 1: the main zone's leaving-water target.
+      return {
+        compressor: s('inv_frequency_rps'),
+        compressor_speed: s('inv_frequency_rps'),
+        defrost: b('defrost_operation'),
+        valve: b('3way_valveondhwoffspace'),
+        // Backup heater in the flow (two steps) and booster heater in the tank.
+        heater: b('buh_step1'),
+        dhw_heater: b('bsh'),
+        // ESPAltherma's own statistics: electrical input estimated from the inverter current, heat from flow rate and spread.
+        power: s('stats_electrical_input_estimated_kw'),
+        heat: s('stats_heat_output_kw'),
+        flow: s('leaving_water_temp_after_buh_r2t', 'leaving_water_temp_before_buh_r1t'),
+        return: s('inlet_water_tempr4t'),
+        volume: s('flow_sensor_lmin'),
+        outdoor: s('r1toutdoor_air_temp'),
+        fan_speed: s('fan_1_step'),
+        dhw_top: s('dhw_tank_temp_r5t'),
+        dhw_target: [`number.${p}_hot_water_target`, `sensor.${p}_dhw_setpoint`],
+        circulation: b('circulation_pump_operation'),
+        hc_setpoint: i.hc === 1 ? s('lw_setpoint_main') : undefined,
+        hc_pressure: i.hc === 1 ? s('water_pressure') : undefined,
+        room: i.hc === 1 ? s('indoor_ambient_temp_r1t') : undefined,
+        room_target: i.hc === 1 ? s('rt_setpoint') : undefined,
+        starts_today: s('stats_compressor_starts_today'),
+        cop_heating_today: s('stats_cop_today_heating'),
+        cop_dhw_today: s('stats_cop_today_hot_water'),
+        hot_gas: s('discharge_pipe_tempr2t'),
+        suction_temp: s('suction_pipe_tempr3t'),
+        evap_temp: s('heat_exchanger_midtempr5t'),
+        liquid_temp: s('liquid_pipe_tempr6t', 'liquid_pipe_temp'),
+      };
+    },
+    // Error codes: " 0" (a number after trimming) is no error, a code such as "U4" or "A1" is one.
+    errors: (p) => [`sensor.${p}_iu_error_code`, `sensor.${p}_ou_error_code`],
+    error_ok: ['0'],
+    // The statistics count from midnight; week and month come from their long-term statistics.
+    tiles: (p) => {
+      const s = (...ks) => ks.map((k) => `sensor.${p}_stats_${k}`);
+      return {
+        energy_heating: { today: s('electricity_today_heating_kwh') }, energy_dhw: { today: s('electricity_today_hot_water_kwh') },
+        energy_cooling: { today: s('electricity_today_cooling_kwh') },
+        heat_heating: { today: s('heat_today_heating_kwh') }, heat_dhw: { today: s('heat_today_hot_water_kwh') }, heat_cooling: { today: s('heat_today_cooling_kwh') },
+      };
+    },
+  },
 };
 
 /* ------------------------------------------------------------------ */

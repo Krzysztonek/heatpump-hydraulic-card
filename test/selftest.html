@@ -587,6 +587,50 @@
   check(!detects('lambda', { 'sensor.other_hp1_operating_state': 'x' }, { 'sensor.other_hp1_operating_state': { platform: 'something_else' } }), 'foreign hp1_operating_state is not Lambda');
   check(!detects('samsung', { 'sensor.boiler_3_way_valve': 'Room' }, { 'sensor.boiler_3_way_valve': { platform: 'esphome' } }), 'a 3-way valve without the Samsung error code is not Samsung');
   {
+    // #254: Daikin Altherma EPRA12EAV3 with ESPAltherma (beta, MQTT device discovery), the ids and values of elRadix's installation.
+    const v = (state, unit) => (unit ? [state, unit] : state);
+    const states = toStates(Object.fromEntries(Object.entries({
+      'sensor.espaltherma_leaving_water_temp_after_buh_r2t': v('30.3', '°C'), 'sensor.espaltherma_leaving_water_temp_before_buh_r1t': v('30.3', '°C'),
+      'sensor.espaltherma_inlet_water_tempr4t': v('27', '°C'), 'sensor.espaltherma_flow_sensor_lmin': v('17', 'L/min'),
+      'sensor.espaltherma_inv_frequency_rps': v('22', 'rps'), 'binary_sensor.espaltherma_defrost_operation': 'off',
+      'binary_sensor.espaltherma_3way_valveondhwoffspace': 'off', 'binary_sensor.espaltherma_buh_step1': 'off', 'binary_sensor.espaltherma_bsh': 'off',
+      'sensor.espaltherma_stats_electrical_input_estimated_kw': v('0.58', 'kW'), 'sensor.espaltherma_stats_heat_output_kw': v('3.91', 'kW'),
+      'sensor.espaltherma_r1toutdoor_air_temp': v('8.5', '°C'), 'sensor.espaltherma_fan_1_step': '8', 'sensor.espaltherma_dhw_tank_temp_r5t': v('20.4', '°C'),
+      'number.espaltherma_hot_water_target': v('54', '°C'), 'sensor.espaltherma_dhw_setpoint': v('54', '°C'),
+      'binary_sensor.espaltherma_circulation_pump_operation': 'off', 'sensor.espaltherma_lw_setpoint_main': v('30', '°C'),
+      'sensor.espaltherma_water_pressure': v('1.5', 'bar'), 'sensor.espaltherma_indoor_ambient_temp_r1t': v('20', '°C'), 'sensor.espaltherma_rt_setpoint': v('20', '°C'),
+      'sensor.espaltherma_stats_compressor_starts_today': '3', 'sensor.espaltherma_stats_cop_today_heating': '5.57',
+      'sensor.espaltherma_discharge_pipe_tempr2t': v('41.3', '°C'), 'sensor.espaltherma_suction_pipe_tempr3t': v('5.7', '°C'),
+      'sensor.espaltherma_heat_exchanger_midtempr5t': v('5.7', '°C'), 'sensor.espaltherma_liquid_pipe_tempr6t': v('26.5', '°C'),
+      'sensor.espaltherma_iu_error_code': ' 0', 'sensor.espaltherma_ou_error_code': ' 0', 'sensor.althermasensors': 'Online',
+    })));
+    const registry = Object.fromEntries(Object.keys(states).map((id) => [id, { platform: 'mqtt' }]));
+    const hass = hassOf(states, registry);
+    check(C.getStubConfig(hass).preset === 'espaltherma', `ESPAltherma is detected (${JSON.stringify(C.getStubConfig(hass))})`);
+    const r = C._resolve({ preset: 'espaltherma' }, hass); const e = r.entities;
+    check(r.ready && r.prefix === 'espaltherma' && e.flow === 'sensor.espaltherma_leaving_water_temp_after_buh_r2t' && e.return === 'sensor.espaltherma_inlet_water_tempr4t'
+      && e.volume === 'sensor.espaltherma_flow_sensor_lmin' && e.compressor === 'sensor.espaltherma_inv_frequency_rps' && e.valve === 'binary_sensor.espaltherma_3way_valveondhwoffspace'
+      && e.defrost === 'binary_sensor.espaltherma_defrost_operation' && e.outdoor === 'sensor.espaltherma_r1toutdoor_air_temp' && !e.mode,
+    `ESPAltherma core: R2T, R4T, l/min, inverter, 3-way valve, defrost, outdoor, no mode (${r.prefix} / ${e.flow} / ${e.compressor})`);
+    check(e.power === 'sensor.espaltherma_stats_electrical_input_estimated_kw' && e.heat === 'sensor.espaltherma_stats_heat_output_kw'
+      && e.dhw_top === 'sensor.espaltherma_dhw_tank_temp_r5t' && e.dhw_target === 'number.espaltherma_hot_water_target' && e.dhw_heater === 'binary_sensor.espaltherma_bsh'
+      && e.hc_setpoint === 'sensor.espaltherma_lw_setpoint_main' && e.hc_pressure === 'sensor.espaltherma_water_pressure' && e.room === 'sensor.espaltherma_indoor_ambient_temp_r1t',
+    'ESPAltherma: statistics power and heat, tank, booster heater, circuit 1 target, pressure and room');
+    const findings = C._checks({ preset: 'espaltherma' }, hass, r).map((f) => `${f.key}:${f.code}`);
+    check(!findings.length, `ESPAltherma: the mapping passes the plausibility checks (${findings.join(', ')})`);
+    const card = mount({ preset: 'espaltherma' }, hass); await wait(20);
+    const F = card._flowModel();
+    check(F.running && F.hp === 'heating' && !card.shadowRoot.getElementById('chip-err')?.classList.contains('on'),
+      `ESPAltherma: heating while the inverter runs, " 0" is no error (${F.hp})`);
+    card.hass = hassOf({ ...states, ...toStates({ 'binary_sensor.espaltherma_3way_valveondhwoffspace': 'on', 'sensor.espaltherma_iu_error_code': 'U4' }) }, registry); await wait(5);
+    const dhw = card._flowModel();
+    const errOn = card.shadowRoot.getElementById('chip-err').classList.contains('on');
+    check(dhw.hp === 'dhw' && errOn, `ESPAltherma: the 3-way valve on means hot water, the code U4 is an error (${dhw.hp} / ${errOn})`);
+    card.remove();
+    // The attribute sensor of older versions alone is no installation the preset can read.
+    check(!detects('espaltherma', { 'sensor.althermasensors': 'Online' }, { 'sensor.althermasensors': { platform: 'mqtt' } }), 'ESPAltherma: the attribute sensor alone is not detected');
+  }
+  {
     const states = {}; const registry = {};
     const add = (domain, key, state) => {
       const id = `${domain}.vitocal_${key}`;
@@ -2233,7 +2277,7 @@
     check(o.samsung === 1 && o.ring === 0 && o.fans === 1 && o.ok, `Samsung preset draws the EHS Mono unit (${JSON.stringify(o)})`);
     // Automatic drawing per preset, as listed in the README table "Outdoor-unit style coverage" (#151). A new preset needs an entry here.
     const unitOf = { lambda: 'lambda', vicare: 'viessmann', open3e: 'viessmann', vaillant: 'vaillant', ebusd: 'vaillant', emsesp: 'bosch', bosch_buderus_heating: 'bosch',
-      heishamon: 'panasonic', samsung: 'samsung', wolf: 'wolf', kronoterm: 'kronoterm', luxtronik: 'alpha_innotec', stiebel_isg: 'stiebel' };
+      heishamon: 'panasonic', samsung: 'samsung', wolf: 'wolf', kronoterm: 'kronoterm', luxtronik: 'alpha_innotec', stiebel_isg: 'stiebel', espaltherma: 'generic' };
     const unitWrong = Object.keys(HFC_PRESETS).filter((p) => (HFC_PRESETS[p].unit_style || 'generic') !== unitOf[p]);
     check(!unitWrong.length, `every preset selects the outdoor-unit drawing the README lists (${unitWrong.join(', ') || 'all match'})`);
     check(Object.values(unitOf).every((s) => HFC_UNIT_STYLES.includes(s)), 'the expected drawings are valid unit_style values');
@@ -3331,7 +3375,7 @@
     card = await mountSetup('Kronoterm ADAPT');
     check(!!q(card, 'circle.pump[cx="720"]'), 'Kronoterm: the loop pump stays in the circuit next to the primary pump');
     card.remove();
-    check(Object.entries(HFC_PRESETS).filter(([, p]) => p.primary_pump).map(([k]) => k).sort().join() === 'heishamon,kronoterm,samsung', 'presets with a primary pump: HeishaMon, Kronoterm, Samsung');
+    check(Object.entries(HFC_PRESETS).filter(([, p]) => p.primary_pump).map(([k]) => k).sort().join() === 'espaltherma,heishamon,kronoterm,samsung', 'presets with a primary pump: ESPAltherma, HeishaMon, Kronoterm, Samsung');
   }
 
   // 18p. hot-water standby loss (#32): cool-down in K/h only in verified standby windows, charging and draw-off excluded
