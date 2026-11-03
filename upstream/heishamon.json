@@ -1,8 +1,11 @@
 {
   "preset": "heishamon",
   "reviewed": {
-    "date": "2026-11-01",
-    "version": "2.12.1"
+    "date": "2026-11-02",
+    "version": "2.12.2"
+  },
+  "unmapped": {
+    "hc_return": "HeishaMon reports per zone the water temperature and its target, no return."
   },
   "sources": [
     {
