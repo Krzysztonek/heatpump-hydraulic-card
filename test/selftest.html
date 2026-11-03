@@ -481,6 +481,26 @@
     const plain = C._resolve({ preset: 'emsesp' }, hassOf(noTc1, registry)).entities;
     check(plain.flow === 'sensor.boiler_current_flow_temperature' && !noTc1[plain.hc_flow],
       `EMS-ESP without TC1: the current flow temperature is the heat pump flow, not the circuit flow (${plain.flow} / ${plain.hc_flow})`);
+    check(!noTc1[plain.hc_volume] && !noTc1[plain.hc_pump], `EMS-ESP without TC1: no PC1 circuit pump or flow rate (${plain.hc_volume} / ${plain.hc_pump})`);
+  }
+  {
+    // #224: Buderus WLW186i with EMS-ESP short names: PC0 is the heat pump circuit, PC1 the pump of the first heating circuit.
+    const states = toStates({
+      'sensor.boiler_hpactivity': 'heating', 'sensor.boiler_hptc1': ['31.5', '°C'], 'sensor.boiler_hptc0': ['27', '°C'],
+      'sensor.boiler_curflowtemp': ['30.2', '°C'], 'sensor.boiler_hpcircspd': ['45', '%'], 'sensor.boiler_pc0flow': ['0', 'l/h'],
+      'sensor.boiler_pc1rate': ['38', '%'], 'sensor.boiler_pc1flow': ['612', 'l/h'],
+    });
+    const registry = Object.fromEntries(Object.keys(states).map((id) => [id, { platform: 'mqtt' }]));
+    const e = C._resolve({ preset: 'emsesp' }, hassOf(states, registry)).entities;
+    check(e.flow === 'sensor.boiler_hptc1' && e.return === 'sensor.boiler_hptc0' && e.hc_flow === 'sensor.boiler_curflowtemp' && e.volume === 'sensor.boiler_pc0flow',
+      `EMS-ESP short names on a WLW: TC1/TC0, T0 as circuit flow, PC0 flow rate (${e.flow} / ${e.return} / ${e.hc_flow} / ${e.volume})`);
+    check(e.hc_pump === 'sensor.boiler_pc1rate' && e.hc_volume === 'sensor.boiler_pc1flow',
+      `EMS-ESP short names on a WLW: PC1 rate as the circuit pump, PC1 flow as the circuit flow rate (${e.hc_pump} / ${e.hc_volume})`);
+    const withOn = C._resolve({ preset: 'emsesp' }, hassOf({ ...states, ...toStates({ 'binary_sensor.boiler_pc1on': 'on' }) },
+      { ...registry, 'binary_sensor.boiler_pc1on': { platform: 'mqtt' } })).entities;
+    check(withOn.hc_pump === 'binary_sensor.boiler_pc1on', `EMS-ESP: the PC1 on/off state comes before its rate (${withOn.hc_pump})`);
+    const two = C._resolve({ preset: 'emsesp', hc_count: 2 }, hassOf(states, registry)).entities;
+    check(!states[two.hc2_pump] && !states[two.hc2_volume], 'EMS-ESP: PC1 belongs only to the first circuit');
   }
   check(!detects('vicare', { 'sensor.vitodens_outside_temperature': '5', 'sensor.vitodens_boiler_temperature': '60' },
     { 'sensor.vitodens_outside_temperature': { platform: 'vicare', translation_key: 'outside_temperature' } }), 'ViCare gas boiler is not a heat pump');
