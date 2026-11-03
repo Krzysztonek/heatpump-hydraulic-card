@@ -3438,6 +3438,16 @@
     card = mount({ entities: { ...ents, buffer_top: 'sensor.bt' }, hc_type: 'radiator' }, hassOf(st())); await wait(20);
     check(on(card, 'p-hc-vl') && !on(card, 'p-vl') && !on(card, 'p-vl-buf') && on(card, 'waves'), 'parallel buffer: the circuit runs from the buffer alone');
     card.remove();
+    // Pump states that are not on/off (#295): the ebusd enum names what the pump runs for, other integrations report a speed.
+    const states = [['heat', true], ['cool', true], ['exthwc', true], ['off', false], ['35', true], ['0', false], ['unavailable', false]];
+    card = mount({ entities: { ...ents, hc_pump: 'sensor.p', buffer_top: 'sensor.bt' } }, hassOf(st({ 'sensor.p': 'off' }))); await wait(20);
+    const wrong = [];
+    for (const [s, run] of states) {
+      card.hass = hassOf(st({ 'sensor.p': s })); await wait(5);
+      if (on(card, 'p-hc-vl') !== run) wrong.push(s);
+    }
+    check(!wrong.length, `circuit pump: heat, cool, exthwc and a speed above 0 run, off, 0 and unavailable stand still (${wrong.join(', ') || 'all as expected'})`);
+    card.remove();
   }
 
   // 18r. combined storage (storage: combined, #50): one tank, hot-water zone on top, the six storage keys as heights
