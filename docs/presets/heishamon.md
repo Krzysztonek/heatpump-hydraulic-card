@@ -43,7 +43,7 @@ entities:
     - sensor.panasonic_heat_pump_s0_watt_2
 ```
 
-HeishaMon has no "current activity" value: the card shows heating while the compressor runs, hot water when the valve is on "Tank", and defrost from the defrost state. If you use HeishaMon with your own MQTT YAML instead of the integration, map the entities manually (see below).
+HeishaMon has no "current activity" value: the card shows heating while the compressor runs, hot water when the valve is on "Tank", and defrost from the defrost state. Leave `mode` empty: `select.<prefix>_main_operating_mode_state` ("Heat only", "Heat+DHW" …) is the chosen mode, not what the unit does now, and keeps the card idle (#276); the plausibility check reports it. If you use HeishaMon with your own MQTT YAML instead of the integration, map the entities manually (see below).
 
 ## Mapped
 

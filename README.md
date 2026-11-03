@@ -233,6 +233,7 @@ Everything can be set in the **UI editor**. With a preset, the editor shows whet
 | `hc_count` | Number of heating circuits, 1 (default) to 6. Presets fill the further circuits with the next circuit numbers. The schematic grows by one row per circuit. |
 | `hc2_type` to `hc6_type` | Emitter of circuits 2 to 6 (default `underfloor`). |
 | `hc_name`, `hc2_name` to `hc6_name` | Circuit titles (default "Heating circuit 1", "Heating circuit 2", …). |
+| `hc_flow_label` | Show the flow temperature at each heating circuit (default `true`). A circuit without its own `hc_flow` sensor and without a buffer shows the heat pump's flow, which rises during a hot-water charge; `false` hides the value and keeps the circuit target. A dew-point warning still shows its flow value. |
 | `hc_return_label` | Show the return temperature of each heating circuit under its return pipe, from `hc_return`, `hc2_return` … (default `false`). Only the circuit's own return sensor is shown; narrow cards hide the label. The prefix `RL` is the text `return_short`. |
 | `narrow_values` | Keep configured buffer and hot-water tank middle/bottom values, the hot-water target line and circuit-return labels visible below 500 px (default `false`). Other secondary labels stay hidden to preserve the responsive layout. |
 | `buffer_values` | `default`: large top buffer temperature with smaller middle/bottom values. `equal`: all configured buffer temperatures use the same size and are distributed evenly over the tank. |
