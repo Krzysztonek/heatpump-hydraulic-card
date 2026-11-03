@@ -4171,6 +4171,13 @@
     check(codes({ entities: { ...ents, energy_today: 'sensor.e' } }, { ...base, 'sensor.e': ['200000', 'Wh'] }) === 'energy_today:today'
       && codes({ entities: { ...ents, energy_today: 'sensor.e' } }, { ...base, 'sensor.e': ['5000', 'Wh'] }) === '', 'energy today converts Wh before comparing with one day');
     check(codes({ entities: { ...ents, mode: 'sensor.mode_temp' } }, { ...base, 'sensor.mode_temp': ['21', '°C'] }) === 'mode:unit', 'a temperature as the operating mode');
+    // #276: the chosen operating mode (a select) as the current one keeps the card idle.
+    const chosen = { ...base, 'select.hp_operating_mode_state': { state: 'Heat only', attributes: { options: ['Heat only', 'Cool only', 'Heat+DHW'] } } };
+    check(codes({ entities: { ...ents, mode: 'select.hp_operating_mode_state' } }, chosen) === 'mode:setting'
+      && codes({ entities: { ...ents, mode: 'input_select.hp_mode' } }, { ...base, 'input_select.hp_mode': 'Auto' }) === 'mode:setting'
+      && codes({ entities: { ...ents, mode: 'sensor.hp_activity' } }, { ...base, 'sensor.hp_activity': 'heating' }) === '', '#276: a select as the operating mode is a setting, a sensor is not');
+    const setting = C._checks({ entities: { ...ents, mode: 'select.hp_operating_mode_state' } }, hassOf(toStates(chosen)))[0];
+    check(C._checkText(setting, HFC_EDITOR.de).startsWith('mode: select.hp_operating_mode_state ist eine Einstellung (select)'), `#276: the finding text (${C._checkText(setting, HFC_EDITOR.de)})`);
     // Mappings that look alike but are right
     check(codes({ entities: { ...ents, valve: 'binary_sensor.v', heater: 'sensor.rod', compressor: 'sensor.hz', hc_volume: 'sensor.vol', volume: 'sensor.vol', room: 'climate.house',
       room_target: 'climate.house', dhw_top: 'water_heater.dhw', dhw_target: 'water_heater.dhw', outdoor: 'sensor.out', source_in: 'sensor.out', hc_curve_offset: 'number.shift' } },
