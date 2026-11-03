@@ -5,6 +5,10 @@
     "version": "2026.9",
     "note": "main 32e8a67 (unreleased refactor) checked: no translation key removed; *_thz select/number variants mapped as fallbacks for program and quick controls."
   },
+  "unmapped": {
+    "heat": "The ISG reports produced heat only as daily and total counters, no live heat output; the card estimates it from flow rate and spread.",
+    "hc_return": "The ISG reports per circuit the actual and target temperature, no return."
+  },
   "sources": [
     {
       "repo": "pail23/stiebel_eltron_isg_component",

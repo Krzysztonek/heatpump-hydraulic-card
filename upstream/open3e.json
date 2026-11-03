@@ -4,6 +4,9 @@
     "date": "2026-11-01",
     "version": "v1.0.19"
   },
+  "unmapped": {
+    "hc_return": "Open3E reads one return temperature, of the heat pump; the circuits report flow temperatures only."
+  },
   "sources": [
     {
       "repo": "MojoOli/open3e-ha",

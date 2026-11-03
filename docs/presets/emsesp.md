@@ -15,15 +15,22 @@ For heat pumps on the EMS bus via the [EMS-ESP](https://github.com/emsesp/EMS-ES
 What you get:
 - compressor activity (heating, hot water, cooling, defrost) as the mode
 - compressor running, 3-way valve, current electrical compressor power
+- heat output ("compressor power output", `hppower` / `boiler_compressor_power_output`, kW)
+- fan speed (long names: `boiler_fan_speed`)
 - heat carrier flow and return (TC1/TC0, falling back to the boiler flow and return)
 - flow rate PC0
 - air inlet (TL2), or brine inlet and outlet for ground source heat pumps (`source_type: brine`)
 - auxiliary heater status as the backup heater
 - outdoor temperature
 - DHW temperature, target and circulation
-- mixer circuit 1 flow and pump
+- circuit 1 flow: the mixer module flow, or with TC1 the boiler's current flow temperature (T0, flow to the heating side)
+- circuit target flow from the thermostat (`hc_setpoint`), circuit pump
 - thermostat room temperature and target
-- details: compressor operating time and starts, total energy consumed and supplied, compressor speed, refrigerant temperatures (PL1, PH1, TR3, TR5, TR6)
+- details: compressor operating time and starts, total energy consumed and supplied, compressor speed, refrigerant temperatures (PL1 or evaporator inlet TR4, PH1, TR3, TR5, TR6), expansion valve (VR1)
+
+**Compressor:** with long names the compressor speed comes before `binary_sensor.boiler_hp_compressor`, which read off while the compressor ran on a WLW166i with EMS-ESP 3.9.0-dev (#287).
+
+**Heating circuit:** the thermostat's flow temperature is a target, so it is the circuit target, not its flow. On WLW indoor units TC1 is the flow from the outdoor unit and T0 (`boiler_current_flow_temperature`) the flow to the heating side; there is no return sensor of the heating circuit (#224). The heater stages `el_heater_step_1` … `_3` are stages of the electric flow heater, not tank heater rods at three heights.
 
 Without a heat output sensor, the heat output is estimated from flow rate × spread. With `hc_count: 2` (up to 6) the mixer and thermostat entities of the further circuits are added; `index: {hc: 2}` starts at circuit 2 instead.
 

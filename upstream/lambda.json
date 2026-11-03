@@ -5,6 +5,9 @@
     "version": "V3.6.1",
     "note": "Entity names now live in lambda_modbus/*.py (const_base/const_sensor/const_mapping removed upstream in July); watched paths updated, all preset names still present."
   },
+  "unmapped": {
+    "hc_pump": "The heating-circuit registers of the Lambda Modbus interface (5000 + 100n) have no pump state."
+  },
   "sources": [
     {
       "repo": "GuidoJeuken-6512/lambda_heat_pumps",

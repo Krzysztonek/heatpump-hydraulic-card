@@ -5,6 +5,9 @@
     "version": null,
     "note": "Baseline: changes before this date were not tracked."
   },
+  "unmapped": {
+    "hc_return": "The controller reports a desired return temperature per circuit, no measured one; VR 70 / VR 71 sensors depend on the hydraulic scheme."
+  },
   "sources": [
     {
       "repo": "john30/ebusd-configuration",
