@@ -1495,6 +1495,7 @@ const HFC_EDITOR = {
     check_counter: '{field}: {entity} is a counter (it only grows), expected {expected}.',
     check_same: '{field}: {entity} is also used for {other}; the two fields measure different things.',
     check_air: '{field}: {entity} is set, but the heat source is air. The card draws no brine or well loop; clear the field or set the heat source.',
+    check_setting: '{field}: {entity} is a setting ({domain}), not what the heat pump is doing now. A chosen mode such as "Heat only" reads as idle; leave the field empty or use a sensor of the current operation.',
     check_today: '{field}: {entity} reports {value}, more than one day can bring. Is it the total counter?',
     kind_temperature: 'a temperature (°C)', kind_offset: 'a temperature difference (K)', kind_power: 'a power (W or kW)', kind_energy: 'an energy (kWh)',
     kind_pressure: 'a pressure (bar)', kind_flowrate: 'a flow rate (l/h, l/min or m³/h)', kind_hours: 'a duration (h)', kind_percent: 'a percentage (%)',
@@ -1587,6 +1588,7 @@ const HFC_EDITOR = {
     check_counter: '{field}: {entity} ist ein Zähler (er wächst nur), erwartet: {expected}.',
     check_same: '{field}: {entity} steht auch bei {other}; die beiden Felder messen Verschiedenes.',
     check_air: '{field}: {entity} ist eingetragen, die Wärmequelle ist aber Luft. Die Karte zeichnet keinen Sole- oder Brunnenkreis; Feld leeren oder Wärmequelle einstellen.',
+    check_setting: '{field}: {entity} ist eine Einstellung ({domain}), nicht das, was die Wärmepumpe gerade tut. Eine gewählte Betriebsart wie „Nur Heizen“ gilt als Bereitschaft; Feld leer lassen oder einen Sensor des aktuellen Betriebs wählen.',
     check_today: '{field}: {entity} meldet {value}, mehr als ein Tag bringen kann. Ist es der Gesamtzähler?',
     kind_temperature: 'eine Temperatur (°C)', kind_offset: 'eine Temperaturdifferenz (K)', kind_power: 'eine Leistung (W oder kW)', kind_energy: 'eine Energie (kWh)',
     kind_pressure: 'ein Druck (bar)', kind_flowrate: 'ein Volumenstrom (l/h, l/min oder m³/h)', kind_hours: 'eine Dauer (h)', kind_percent: 'ein Prozentwert (%)',
@@ -1745,6 +1747,7 @@ const HFC_EDITOR = {
     check_counter: '{field}: {entity} je počítadlo (hodnota iba rastie), očakáva sa {expected}.',
     check_same: '{field}: {entity} sa používa aj pre {other}; tieto dve polia však merajú odlišné veličiny.',
     check_air: '{field}: {entity} je nastavené, ale zdrojom tepla je vzduch. Karta nekreslí okruh nemrznúcej zmesi ani studne; vymažte toto pole alebo zmeňte zdroj tepla.',
+    check_setting: '{field}: {entity} je nastavenie ({domain}), nie to, čo tepelné čerpadlo práve robí. Zvolený režim ako „Len kúrenie“ sa číta ako pohotovosť; nechajte pole prázdne alebo zvoľte senzor aktuálnej prevádzky.',
     check_today: '{field}: {entity} hlási hodnotu {value}, čo je viac, než dokáže priniesť jeden deň. Ide o celkové počítadlo?',
     kind_temperature: 'teplota (°C)',
     kind_offset: 'teplotný rozdiel (K)',
@@ -1873,6 +1876,7 @@ const HFC_EDITOR = {
     check_counter: '{field}: {entity} je počítadlo (hodnota pouze roste), očekává se {expected}.',
     check_same: '{field}: {entity} se používá také pro {other}; tato dvě pole však měří odlišné veličiny.',
     check_air: '{field}: {entity} je nastaveno, ale zdrojem tepla je vzduch. Karta nekreslí okruh nemrznoucí směsi ani studny; vymažte toto pole nebo změňte zdroj tepla.',
+    check_setting: '{field}: {entity} je nastavení ({domain}), ne to, co tepelné čerpadlo právě dělá. Zvolený režim jako „Jen topení“ se čte jako pohotovost; nechte pole prázdné nebo zvolte senzor aktuálního provozu.',
     check_today: '{field}: {entity} hlásí hodnotu {value}, což je více, než dokáže přinést jeden den. Jedná se o celkové počítadlo?',
     kind_temperature: 'teplota (°C)',
     kind_offset: 'teplotní rozdíl (K)',
@@ -1935,6 +1939,7 @@ const HFC_EDITOR = {
     check_counter: '{field}: {entity} is een teller (loopt alleen op), verwacht {expected}.',
     check_same: '{field}: {entity} wordt ook gebruikt voor {other}; de twee velden meten verschillende dingen.',
     check_air: '{field}: {entity} is ingesteld, maar de warmtebron is lucht. De kaart tekent geen bron- of putcircuit; maak het veld leeg of stel de warmtebron in.',
+    check_setting: '{field}: {entity} is een instelling ({domain}), niet wat de warmtepomp nu doet. Een gekozen stand zoals „Alleen verwarmen“ geldt als stand-by; laat het veld leeg of kies een sensor van de huidige werking.',
     check_today: '{field}: {entity} meldt {value}, meer dan één dag kan opleveren. Is het de totaalteller?',
     kind_temperature: 'een temperatuur (°C)', kind_offset: 'een temperatuurverschil (K)', kind_power: 'een vermogen (W of kW)', kind_energy: 'een energie (kWh)',
     kind_pressure: 'een druk (bar)', kind_flowrate: 'een debiet (l/h, l/min of m³/h)', kind_hours: 'een duur (h)', kind_percent: 'een percentage (%)',
@@ -2867,6 +2872,12 @@ class HeatpumpFlowCard extends HTMLElement {
         if (own && own !== 'none') out.push({ key, id: Array.isArray(own) ? own.join(', ') : own, code: 'air' });
       });
     }
+    // The operating mode is what the heat pump does now. A select is a mode someone chose ("Heat only"), which the card cannot read as
+    // running, so heating and hot water stay idle (#276).
+    ids('mode').forEach((id) => {
+      const domain = id.split('.')[0];
+      if (['select', 'input_select'].includes(domain)) out.push({ key: 'mode', id, code: 'setting', domain });
+    });
     // Daily values no home installation reaches: the total counter in a daily field (#189). state_class cannot tell, daily
     // utility meters are total_increasing as well. A preset that names the value itself (ViCare shows its start counter as
     // "Compressor starts" through stat_labels) means it.
