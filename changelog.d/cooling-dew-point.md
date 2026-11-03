@@ -1,0 +1,1 @@
+- Add per-circuit room humidity and dew-point monitoring for cooling. The card can calculate the dew point from room temperature and relative humidity, highlights a configurable condensation-risk margin, and keeps missing data hidden.

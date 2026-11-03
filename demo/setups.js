@@ -889,6 +889,27 @@ setups.push({
   },
 });
 
+// Vendor-neutral cooling safety (#251): measured dew point wins; otherwise the card calculates it from room temperature and RH.
+const coolingDewStates = (s) => ({
+  'sensor.cool_mode': 'cooling', 'binary_sensor.cool_compressor': 'on',
+  'sensor.cool_flow': [{ heat: '18', dhw: '18', defrost: '17', idle: '18' }[s], '°C'],
+  'sensor.cool_return': ['20', '°C'], 'sensor.cool_room': ['22', '°C'],
+  'sensor.cool_humidity': [{ heat: '50', dhw: '50', defrost: '75', idle: 'unavailable' }[s], '%'],
+  'sensor.cool_dew_point': [{ heat: 'unknown', dhw: '17', defrost: 'unknown', idle: 'unknown' }[s], '°C'],
+});
+setups.push({
+  name: 'Cooling dew-point safety', sub: 'manual entities: room humidity, calculated or measured dew point and condensation warning',
+  scenarioLabels: { heat: 'Safe · calculated', dhw: 'Warning · measured', defrost: 'High humidity', idle: 'Missing humidity' },
+  states: coolingDewStates,
+  config: {
+    title: 'Cooling and dew point',
+    entities: {
+      mode: 'sensor.cool_mode', compressor: 'binary_sensor.cool_compressor', flow: 'sensor.cool_flow', return: 'sensor.cool_return',
+      room: 'sensor.cool_room', room_humidity: 'sensor.cool_humidity', dew_point: 'sensor.cool_dew_point',
+    },
+  },
+});
+
 // Generic circulation program (#34): explicit start/end entities win; a schedule helper supplies the next change otherwise.
 const circulationWindowStates = (s) => ({
   'sensor.cw_mode': 'Standby', 'sensor.cw_dhw': ['49', '°C'],
