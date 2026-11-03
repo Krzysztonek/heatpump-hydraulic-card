@@ -910,4 +910,28 @@ setups.push({
   },
 });
 
+// Generic circulation program (#34): explicit start/end entities win; a schedule helper supplies the next change otherwise.
+const circulationWindowStates = (s) => ({
+  'sensor.cw_mode': 'Standby', 'sensor.cw_dhw': ['49', '°C'],
+  'binary_sensor.cw_pump': ['heat', 'defrost'].includes(s) ? 'on' : 'off',
+  'time.cw_start': { heat: '06:00:00', dhw: 'unavailable', defrost: 'unavailable', idle: 'unknown' }[s],
+  'time.cw_end': { heat: '22:00:00', dhw: 'unavailable', defrost: 'unavailable', idle: 'unknown' }[s],
+  'schedule.cw': {
+    state: s === 'defrost' ? 'on' : s === 'dhw' ? 'off' : 'unavailable',
+    attributes: { next_event: s === 'dhw' ? '2030-01-01T06:00:00+01:00' : s === 'defrost' ? '2030-01-01T22:00:00+01:00' : null },
+  },
+});
+setups.push({
+  name: 'Circulation program window', sub: 'manual entities: one explicit window or the next change of a schedule helper',
+  scenarioLabels: { heat: '06:00–22:00', dhw: 'Schedule · from', defrost: 'Schedule · until', idle: 'Missing times' },
+  states: circulationWindowStates,
+  config: {
+    title: 'Circulation program',
+    entities: {
+      mode: 'sensor.cw_mode', dhw_top: 'sensor.cw_dhw', circulation: 'binary_sensor.cw_pump',
+      circulation_start: 'time.cw_start', circulation_end: 'time.cw_end', circulation_schedule: 'schedule.cw',
+    },
+  },
+});
+
 const scenarios = [['heat', 'Heating'], ['dhw', 'Hot water'], ['defrost', 'Defrost'], ['idle', 'Standby + error']];

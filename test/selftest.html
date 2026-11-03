@@ -393,6 +393,75 @@
     check(report.includes('Tile sources (own):') && report.includes('energy_heating total: sensor.ol_el_hc') && report.includes('heat_dhw: none'),
       'tile_sources: listed in the diagnostic report');
   }
+
+  // #196: ViCare Vitocal 250 without domestic_hot_water_charging, compressor_phase stays "ready" while the compressor runs (#186)
+  {
+    const registry = Object.fromEntries(Object.entries({
+      'sensor.v250_phase': 'compressor_phase', 'binary_sensor.v250_compressor': 'compressor',
+      'sensor.v250_flow': 'secondary_circuit_supply_temperature', 'sensor.v250_return': 'secondary_circuit_return_temperature',
+      'sensor.v250_dhw': 'dhw_storage_temperature', 'binary_sensor.v250_hc_pump': 'circulation_pump',
+    }).map(([id, tk]) => [id, { platform: 'vicare', translation_key: tk }]));
+    const state = (phase, comp, flow, extra = {}) => toStates({
+      'sensor.v250_phase': phase, 'binary_sensor.v250_compressor': comp, 'sensor.v250_flow': [flow, '°C'], 'sensor.v250_return': ['27', '°C'],
+      'sensor.v250_dhw': ['45', '°C'], 'binary_sensor.v250_hc_pump': 'on', ...extra,
+    });
+    const model = async (states, reg = registry) => {
+      const card = mount({ preset: 'vicare' }, hassOf(states, reg)); await wait(20);
+      const m = card._flowModel(); card.remove(); return m;
+    };
+    const heat = await model(state('ready', 'on', '29'));
+    check(heat.hp === 'heating' && !heat.valveDhw && heat.toHeat && !heat.toDhw, `ViCare: a running compressor with phase "ready" heats (${heat.hp})`);
+    const dhw = await model(state('ready', 'on', '48'));
+    check(dhw.hp === 'dhw' && dhw.valveDhw && dhw.toDhw && !dhw.toHeat, `ViCare: flow above the tank with a running compressor is a hot-water charge (${dhw.hp})`);
+    const off = await model(state('ready', 'off', '48'));
+    check(off.hp === 'idle' && !off.valveDhw && !off.toDhw, `ViCare: warm flow after the compressor stopped is no charge (${off.hp})`);
+    const phaseHeat = await model(state('heating', 'on', '48'));
+    check(phaseHeat.hp === 'heating' && phaseHeat.toDhw, 'ViCare: with a reported phase the flow rule still decides the valve');
+    const chargeReg = { ...registry, 'binary_sensor.v250_charging': { platform: 'vicare', translation_key: 'domestic_hot_water_charging' } };
+    const charging = await model(state('ready', 'on', '48', { 'binary_sensor.v250_charging': 'off' }), chargeReg);
+    check(charging.hp === 'heating' && !charging.valveDhw, 'ViCare: a reported hot-water charging entity wins over the flow rule');
+    // The timeline follows the same rule: phase "ready" all day, compressor and flow decide.
+    const card = mount({ preset: 'vicare' }, hassOf(state('ready', 'off', '30'), registry)); await wait(20);
+    const ids = card._timelineIds();
+    check(ids.mode === 'sensor.v250_phase' && ids.comp === 'binary_sensor.v250_compressor' && ids.vflow === 'sensor.v250_flow' && ids.vtank === 'sensor.v250_dhw',
+      `ViCare timeline reads phase, compressor, flow and tank (${JSON.stringify(ids)})`);
+    const M = 60000;
+    const hist = {
+      'sensor.v250_phase': [{ t: 0, s: 'ready' }],
+      'binary_sensor.v250_compressor': [{ t: 0, s: 'off' }, { t: 10 * M, s: 'on' }, { t: 70 * M, s: 'off' }],
+      'sensor.v250_flow': [{ t: 0, s: '30' }, { t: 40 * M, s: '47' }, { t: 80 * M, s: '35' }],
+      'sensor.v250_dhw': [{ t: 0, s: '45' }],
+    };
+    const segs = card._timelineSegments(hist, ids, 0, 90 * M).map((s) => `${s.kind}:${s.from / M}-${s.to / M}`).join(' ');
+    check(segs === 'idle:0-10 heat:10-40 dhw:40-70 idle:70-90', `ViCare timeline: heating, then hot water while the flow is above the tank (${segs})`);
+    const heatingPhase = card._timelineSegments({
+      'sensor.v250_phase': [{ t: 0, s: 'heating' }], 'binary_sensor.v250_compressor': [{ t: 0, s: 'on' }],
+      'sensor.v250_flow': [{ t: 0, s: '48' }], 'sensor.v250_dhw': [{ t: 0, s: '45' }],
+    }, ids, 0, 90 * M).map((s) => s.kind).join();
+    check(heatingPhase === 'dhw', `ViCare timeline: flow-derived hot-water routing overrides a stale heating phase (${heatingPhase})`);
+    delete card._hass.states['binary_sensor.v250_compressor'];
+    const phaseOnlyIds = card._timelineIds();
+    const phaseOnly = card._timelineSegments({
+      'sensor.v250_phase': [{ t: 0, s: 'heating' }], 'sensor.v250_flow': [{ t: 0, s: '48' }], 'sensor.v250_dhw': [{ t: 0, s: '45' }],
+    }, phaseOnlyIds, 0, 90 * M).map((s) => s.kind).join();
+    check(!phaseOnlyIds.comp && phaseOnlyIds.vflow === 'sensor.v250_flow' && phaseOnly === 'dhw',
+      `ViCare timeline: an active phase routes by flow without a separate compressor entity (${phaseOnly})`);
+    const heater = 'water_heater.v250_dhw'; card._e.dhw_top = heater;
+    const attributeIds = { ...phaseOnlyIds, vtank: heater };
+    const raw = {
+      'sensor.v250_phase': [{ state: 'heating', last_updated: '2030-01-01T00:00:00Z' }],
+      'sensor.v250_flow': [{ state: '48', last_updated: '2030-01-01T00:00:00Z' }],
+      [heater]: [{ state: 'eco', attributes: { current_temperature: 45 }, last_updated: '2030-01-01T00:00:00Z' }],
+    };
+    const parsed = card._timelineHistory(raw, Object.values(attributeIds).filter(Boolean));
+    const attributeRoute = card._timelineSegments(parsed, attributeIds, Date.parse('2030-01-01T00:00:00Z'), Date.parse('2030-01-01T01:00:00Z'))
+      .map((s) => s.kind).join();
+    check(card._timelineNeedsAttributes(attributeIds) && parsed[heater][0].s === '45' && attributeRoute === 'dhw',
+      `ViCare timeline: water-heater current_temperature is preserved and routes hot water (${parsed[heater][0].s} / ${attributeRoute})`);
+    const report = C._diagnosticReport({ preset: 'vicare' }, hassOf(state('ready', 'on', '29'), registry));
+    check(report.includes('Hot water without a valve entity: while the heat pump runs and flow is above dhw_top'), 'ViCare: the report names the hot-water rule');
+    card.remove();
+  }
   {
     // #257: the complete "long names" entity list of a Nefit EnviLine (EMS-ESP 3.8.6).
     const states = toStates({
@@ -1881,6 +1950,49 @@
     const plain = await hist({})(); const mapped = await hist(map)();
     check(plain === 'k-heat' || plain === 'k-heat,k-heat', `timeline without a map: only "on" and Tank count as hot water (${plain})`);
     check(mapped === 'k-heat,k-dhw', `timeline with valve_map: 1 = heating for 12 h, then 0 = hot water (${mapped})`);
+  }
+
+  // 13f2. one circulation-program window or the next change of a Home Assistant schedule (#34)
+  {
+    const states = {
+      'sensor.dhw': ['49', '°C'], 'binary_sensor.circ': 'on', 'time.start': '06:00:00', 'time.end': '22:00:00',
+      'schedule.circ': { state: 'off', attributes: { next_event: '2030-01-01T07:30:00+01:00' } },
+    };
+    const entities = { dhw_top: 'sensor.dhw', circulation: 'binary_sensor.circ', circulation_start: 'time.start', circulation_end: 'time.end', circulation_schedule: 'schedule.circ' };
+    const render = async (extra = {}, mapped = entities) => {
+      const h = hassOf(toStates({ ...states, ...extra })); h.config = { time_zone: 'Europe/Vienna' };
+      const card = mount({ entities: mapped }, h); await wait(25); return card;
+    };
+    let card = await render(); let label = card.shadowRoot.getElementById('t-circ');
+    check(label?.textContent === '↻ Circ. 06:00–22:00' && label.classList.contains('on'), `explicit start/end window is shown beside the running pump (${label?.textContent})`);
+    check(label.closest('[data-entity]')?.dataset.entity === 'binary_sensor.circ', 'the circulation label keeps opening the pump entity');
+    card.remove();
+
+    card = await render({ 'time.start': 'unavailable', 'time.end': '22:00:00' }); label = card.shadowRoot.getElementById('t-circ');
+    check(label?.textContent === '↻ Circ. from 07:30', `an incomplete explicit window falls back to the schedule's next start (${label?.textContent})`); card.remove();
+    card = await render({ 'time.start': 'unavailable', 'time.end': 'unavailable', 'schedule.circ': { state: 'on', attributes: { next_event: '2030-01-01T22:15:00+01:00' } } });
+    label = card.shadowRoot.getElementById('t-circ');
+    check(label?.textContent === '↻ Circ. until 22:15', `an active schedule shows when the window ends (${label?.textContent})`); card.remove();
+
+    card = await render({ 'time.start': '2030-01-01 05:45:00', 'time.end': '2030-01-01 08:15:00' }); label = card.shadowRoot.getElementById('t-circ');
+    check(label?.textContent === '↻ Circ. 05:45–08:15', 'local date-time entity states keep their wall-clock time'); card.remove();
+    card = await render({ 'time.start': 'unknown', 'time.end': 'unavailable', 'schedule.circ': { state: 'unavailable', attributes: { next_event: null } } });
+    label = card.shadowRoot.getElementById('t-circ');
+    check(label?.textContent === '↻ Circ.', 'missing program values leave only the existing pump label'); card.remove();
+
+    const scheduleOnly = { dhw_top: 'sensor.dhw', circulation_schedule: 'schedule.circ' };
+    card = await render({}, scheduleOnly); label = card.shadowRoot.getElementById('t-circ');
+    check(label?.textContent === '↻ Circ. from 07:30' && label.closest('[data-entity]')?.dataset.entity === 'schedule.circ',
+      'a schedule helper can show the program without a separate pump-state entity'); card.remove();
+
+    const flat = C._formSchema({}).schema.flatMap(function keys(n) { return n.schema ? n.schema.flatMap(keys) : [n]; });
+    const byName = (name) => flat.find((x) => x.name === name);
+    check(['circulation_start', 'circulation_end', 'circulation_schedule'].every((key) => byName(key)), 'the visual editor offers all circulation-program entities');
+    check(byName('circulation_schedule').selector.entity.domain.join() === 'schedule'
+      && byName('circulation_start').selector.entity.domain.includes('time'), 'editor pickers constrain schedule and time entities');
+    const report = C._diagnosticReport({ entities }, hassOf(toStates(states)));
+    check(/- circulation_start: time\.start\b/.test(report) && /- circulation_schedule: schedule\.circ\b/.test(report),
+      'diagnostic report includes the circulation-program entities');
   }
 
   // 13h. heating circuit 1 with a buffer and no circuit entity of its own (#118)
