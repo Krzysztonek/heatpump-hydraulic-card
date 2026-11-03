@@ -90,7 +90,7 @@
     { program_map: [] }, { program_map: 'eco' }, { sg_ready_map: [] }, { sg_ready_map: { on: 'maybe' } }, { compressor_speed_max: 0 }, { compressor_speed_max: 'fast' },
     { errors: 'sensor.error' }, { error_ok: 'No Error' }, { error_ok: ['No Error', 0] },
     { timeline: 'yes' }, { timeline_hours: 0 }, { timeline_marks: 'yes' }, { timeline_marks: [{ label: 'x' }] }, { timeline_marks: [7] }, { wall_timeout: -1 }, { wall_timeout: 'soon' }, { unit_style: 'tesla' }, { unit_size: 'huge' },
-    { animations: 'sometimes' }, { flow_speed: 0 }, { flow_speed: 3.1 }, { source_spread: 'yes' }, { buffer: 'yes' }, { series_buffer: 'yes' }, { primary_pump: 'yes' }, { theme: 'sepia' }, { fullscreen: 'yes' },
+    { animations: 'sometimes' }, { flow_speed: 0 }, { flow_speed: 3.1 }, { source_spread: 'yes' }, { dew_point_margin: -0.1 }, { dew_point_margin: 11 }, { dew_point_margin: 'near' }, { buffer: 'yes' }, { series_buffer: 'yes' }, { primary_pump: 'yes' }, { theme: 'sepia' }, { fullscreen: 'yes' },
     { texts: [] }, { texts: { NL: { title: 'x' } } }, { texts: { nl: { title: 7 } } }, { texts: { nl: { missing_key: 'x' } } },
     { brine_pressure_min: -0.1 }, { hc_pressure_crit: 1.2, hc_pressure_min: 1.0 }, { hc_pressure_min: 3, hc_pressure_max: 2 },
     { tile_sources: ['sensor.x'] }, { tile_sources: { nope: 'sensor.x' } }, { tile_sources: { cost: 'sensor.x' } }, { tile_sources: { spread: 'sensor.x' } },
@@ -2640,6 +2640,78 @@
     check(/- hc2_room: sensor\.attic\b/.test(report) && /- hc3_room_target: sensor\.c3_target\b/.test(report), 'diagnostic report lists the room overview entities');
     const lam = C._resolve({ preset: 'lambda', hc_count: 6 }, hassOf(toStates(setups[0].states('heat')), setups[0].registry || {}));
     check(!Object.keys(lam.entities).some((k) => /^hc[2-6]_room/.test(k)), 'presets leave the rooms of circuits 2 to 6 to the configuration');
+  }
+
+  // 18c2. cooling safety: room humidity, calculated or measured dew point, and a configurable condensation margin (#251)
+  {
+    const base = {
+      'sensor.mode': 'cooling', 'binary_sensor.compressor': 'on', 'sensor.flow': ['18', '°C'], 'sensor.return': ['20', '°C'],
+      'sensor.room': ['22', '°C'], 'sensor.humidity': ['50', '%'], 'sensor.dew': ['17', '°C'],
+      'sensor.room2': ['23', '°C'], 'sensor.humidity2': ['60', '%'], 'sensor.flow2': ['19', '°C'], 'binary_sensor.pump2': 'on',
+    };
+    const entities = { mode: 'sensor.mode', compressor: 'binary_sensor.compressor', flow: 'sensor.flow', return: 'sensor.return',
+      room: 'sensor.room', room_humidity: 'sensor.humidity' };
+    const q = (card, id) => card.shadowRoot.getElementById(id);
+    let card = mount({ entities }, hassOf(toStates(base))); await wait(25);
+    const calculated = card._dewPoint(1);
+    check(calculated > 11 && calculated < 12, `dew point is calculated from 22 °C and 50 % RH (${calculated})`);
+    check(/Flow 18\.0 °C · Dew point 11\./.test(q(card, 't-hc').textContent) && !q(card, 't-hc').classList.contains('dew-warning'),
+      `cooling label shows flow and the calculated dew point without a false warning (${q(card, 't-hc').textContent})`);
+    check(q(card, 't-room-target').textContent === 'Humidity 50 %', `single-room overview shows humidity (${q(card, 't-room-target').textContent})`);
+    card.remove();
+
+    card = mount({ entities: { ...entities, dew_point: 'sensor.dew' } }, hassOf(toStates(base))); await wait(25);
+    check(card._dewPoint(1) === 17 && /Dew point 17\.0 °C/.test(q(card, 't-hc').textContent) && q(card, 't-hc').classList.contains('dew-warning'),
+      'an explicit dew-point sensor wins and a 1 K margin is highlighted');
+    check(/Dew-point margin 1\.0 K, condensation risk/.test(q(card, 't-hc').dataset.a11y || ''), 'the warning exposes the margin and risk to assistive technology');
+    card._a11y(true);
+    check(/Dew-point margin 1\.0 K, condensation risk/.test(q(card, 't-hc').closest('[data-entity]').getAttribute('aria-label') || ''),
+      'the clickable flow entity exposes the condensation warning to assistive technology');
+    card.setConfig({ entities: { ...entities, dew_point: 'sensor.dew' }, dew_point_margin: null }); card.hass = hassOf(toStates(base)); await wait(20);
+    check(q(card, 't-hc').classList.contains('dew-warning'), 'a null dew-point margin uses the 2 K default');
+    card.setConfig({ entities: { ...entities, dew_point: 'sensor.dew' }, dew_point_margin: 0 }); card.hass = hassOf(toStates(base)); await wait(20);
+    check(!q(card, 't-hc').classList.contains('dew-warning'), 'a numeric zero dew-point margin remains a valid explicit override');
+    const heating = { ...base, 'sensor.mode': 'heating' }; card.hass = hassOf(toStates(heating)); await wait(10);
+    check(!/Dew point/.test(q(card, 't-hc').textContent) && !q(card, 't-hc').classList.contains('dew-warning'), 'dew-point warning and label stay out of heating mode');
+    card.remove();
+
+    const unavailableFlow = { ...base, 'sensor.circuit_flow': 'unavailable', 'sensor.buffer': ['25', '°C'] };
+    card = mount({ entities: { ...entities, hc_flow: 'sensor.circuit_flow', buffer_top: 'sensor.buffer', dew_point: 'sensor.dew' } }, hassOf(toStates(unavailableFlow))); await wait(25);
+    check(!/Dew point/.test(q(card, 't-hc').textContent) && !q(card, 't-hc').classList.contains('dew-warning'),
+      'an unavailable configured circuit flow does not assess condensation from the buffer fallback');
+    card.remove();
+
+    const fahrenheit = { ...base, 'sensor.flow': ['57.2', '°F'], 'sensor.room': ['71.6', '°F'] };
+    card = mount({ entities }, hassOf(toStates(fahrenheit))); await wait(25);
+    check(card._dewPoint(1) > 11 && card._dewPoint(1) < 12 && /Flow 14\.0 °C/.test(q(card, 't-hc').textContent)
+      && !q(card, 't-hc').classList.contains('dew-warning'), 'Fahrenheit temperatures are normalized before calculating dew point and margin');
+    card.remove();
+
+    const kelvin = { ...base, 'sensor.flow': ['291.15', 'K'], 'sensor.dew': ['290.15', 'K'] };
+    card = mount({ entities: { ...entities, dew_point: 'sensor.dew' } }, hassOf(toStates(kelvin))); await wait(25);
+    check(card._dewPoint(1) === 17 && /Flow 18\.0 °C/.test(q(card, 't-hc').textContent) && q(card, 't-hc').classList.contains('dew-warning'),
+      'Kelvin flow and measured dew point are normalized before comparing the margin');
+    card.remove();
+
+    const multiEntities = { ...entities, dew_point: 'sensor.dew', hc2_flow: 'sensor.flow2', hc2_pump: 'binary_sensor.pump2',
+      hc2_room: 'sensor.room2', hc2_room_humidity: 'sensor.humidity2' };
+    card = mount({ hc_count: 2, entities: multiEntities }, hassOf(toStates(base))); await wait(25);
+    check(q(card, 't-house-room').textContent === '22.0 °C · 50 %' && q(card, 't-house-room2').textContent === '23.0 °C · 60 %',
+      'multi-circuit room overview shows each circuit humidity next to its temperature');
+    check(Number.isFinite(card._dewPoint(2)) && /Dew point/.test(q(card, 't-hc2').textContent), 'the second circuit calculates and shows its own dew point');
+    const schema = C._formSchema({ hc_count: 2 }).schema.flatMap(function names(n) { return n.schema ? n.schema.flatMap(names) : [n.name]; });
+    check(['room_humidity', 'dew_point', 'hc2_room_humidity', 'hc2_dew_point', 'dew_point_margin'].every((key) => schema.includes(key)),
+      'the visual editor offers humidity, dew point and margin for the configured circuits');
+    const report = C._diagnosticReport({ hc_count: 2, entities: multiEntities }, hassOf(toStates(base)));
+    check(/- room_humidity: sensor\.humidity\b/.test(report) && /- hc2_room_humidity: sensor\.humidity2\b/.test(report),
+      'diagnostic report includes the cooling-safety entities');
+    card.remove();
+
+    const unavailable = { ...base, 'sensor.humidity': ['unavailable', '%'] };
+    card = mount({ entities }, hassOf(toStates(unavailable))); await wait(20);
+    check(!/Humidity/.test(q(card, 't-room-target').textContent) && !/Dew point/.test(q(card, 't-hc').textContent),
+      'unknown humidity yields neither a displayed value nor a guessed dew-point warning');
+    card.remove();
   }
 
   // 18d. HeishaMon with heishamon-homeassistant 2.11.4 (#56): Energy spellings, totals, zone target, holiday switch
