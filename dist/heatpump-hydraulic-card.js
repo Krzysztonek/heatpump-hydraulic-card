@@ -28,6 +28,7 @@ const HFC_SCRIPT_URL = (() => {
 //   dynamic                    → true when entities() maps parts by their readings (ctx.state): the card resolves again every
 //                                minute and rebuilds when a mapping appears, so parts that report late are not lost
 //   *_mode_map                 → raw state → normalized mode
+//   sg_ready_map               → raw state → normal | blocked | boost | forced
 //   valve_map                  → raw state of the `valve` entity → dhw | heating (default: on, Tank, DHW … mean hot water)
 // ctx.key(platform, domain, translation_key) finds entities via the entity registry (language-independent),
 // ctx.match(regex, platform) finds the first entity id matching a pattern, ctx.state(entity_id) reads a current state.
@@ -1232,6 +1233,7 @@ const HFC_I18N = {
     brine_pressure: 'Brine pressure', hc_pressure: 'Heating pressure', pressure_normal: 'normal', pressure_warning: 'warning', pressure_critical: 'critical',
     timeline_title: 'Last {h} hours', timeline_gap: 'No data', timeline_aria: 'Operating mode of the last {h} hours. Arrow keys select a period.',
     programs: { eco: 'Eco', night: 'Night', party: 'Party', holiday: 'Holiday' },
+    sg_ready: { normal: 'SG normal', blocked: 'Utility lock', boost: 'SG boost', forced: 'SG forced on' },
     valve_heating: 'Heating', valve_cooling: 'Cooling', bypass: 'Bypass', pv: 'PV', pv_boost: 'PV surplus', battery: 'Battery', grid: 'Grid',
     stat_cop_heating: 'COP heating today', stat_cop_dhw: 'COP DHW today', stat_energy: 'Energy today',
     stat_starts: 'Starts today', stat_spread: 'Spread', stat_volume: 'Flow rate', stat_heat: 'Heat output', pv_share: 'PV',
@@ -1273,6 +1275,7 @@ const HFC_I18N = {
     brine_pressure: 'Soledruck', hc_pressure: 'Heizungsdruck', pressure_normal: 'normal', pressure_warning: 'Warnung', pressure_critical: 'kritisch',
     timeline_title: 'Letzte {h} Stunden', timeline_gap: 'Keine Daten', timeline_aria: 'Betriebsart der letzten {h} Stunden. Mit den Pfeiltasten einen Zeitraum wählen.',
     programs: { eco: 'Eco', night: 'Nacht', party: 'Party', holiday: 'Urlaub' },
+    sg_ready: { normal: 'SG normal', blocked: 'EVU-Sperre', boost: 'SG-Anhebung', forced: 'SG-Zwangsbetrieb' },
     valve_heating: 'Heizen', valve_cooling: 'Kühlen', bypass: 'Bypass', pv: 'PV', pv_boost: 'PV-Überschuss', battery: 'Akku', grid: 'Netz',
     stat_cop_heating: 'COP Heizen heute', stat_cop_dhw: 'COP WW heute', stat_energy: 'Verbrauch heute',
     stat_starts: 'Starts heute', stat_spread: 'Spreizung', stat_volume: 'Volumenstrom', stat_heat: 'Wärmeleistung', pv_share: 'PV',
@@ -1316,6 +1319,7 @@ const HFC_I18N = {
     brine_pressure: 'Tlak nemrznúcej zmesi', hc_pressure: 'Tlak vykurovania', pressure_normal: 'normálny', pressure_warning: 'varovanie', pressure_critical: 'kritický',
     timeline_title: 'Posledných {h} hodín', timeline_gap: 'Žiadne dáta', timeline_aria: 'Prevádzkový režim za posledných {h} hodín. Šípkami vyberte obdobie.',
     programs: { eco: 'Eko', night: 'Nočný', party: 'Párty', holiday: 'Dovolenka' },
+    sg_ready: { normal: 'SG normálna prevádzka', blocked: 'Blokovanie distribučnou sieťou', boost: 'SG zvýšená prevádzka', forced: 'SG vynútená prevádzka' },
     valve_heating: 'Vykurovanie', valve_cooling: 'Chladenie', bypass: 'Obtok (Bypass)', pv: 'FVE', pv_boost: 'Prebytok FVE', battery: 'Batéria', grid: 'Sieť',
     stat_cop_heating: 'COP vykurovania dnes', stat_cop_dhw: 'COP TÚV dnes', stat_energy: 'Energia dnes',
     stat_starts: 'Štarty dnes', stat_spread: 'Rozpätie', stat_volume: 'Prietok', stat_heat: 'Tepelný výkon', pv_share: 'FVE',
@@ -1358,6 +1362,7 @@ const HFC_I18N = {
     brine_pressure: 'Tlak nemrznoucí směsi', hc_pressure: 'Tlak vytápění', pressure_normal: 'normální', pressure_warning: 'varování', pressure_critical: 'kritický',
     timeline_title: 'Posledních {h} hodin', timeline_gap: 'Žádná data', timeline_aria: 'Provozní režim za posledních {h} hodin. Šipkami vyberte období.',
     programs: { eco: 'Eko', night: 'Noční', party: 'Párty', holiday: 'Dovolená' },
+    sg_ready: { normal: 'SG normální provoz', blocked: 'Blokování distribuční sítí', boost: 'SG zvýšený provoz', forced: 'SG vynucený provoz' },
     valve_heating: 'Vytápění', valve_cooling: 'Chlazení', bypass: 'Obtok (Bypass)', pv: 'FVE', pv_boost: 'Přebytek FVE', battery: 'Baterie', grid: 'Síť',
     stat_cop_heating: 'COP vytápění dnes', stat_cop_dhw: 'COP TUV dnes', stat_energy: 'Energie dnes',
     stat_starts: 'Starty dnes', stat_spread: 'Rozpětí', stat_volume: 'Průtok', stat_heat: 'Tepelný výkon', pv_share: 'FVE',
@@ -1399,6 +1404,7 @@ const HFC_I18N = {
     brine_pressure: 'Brondruk', hc_pressure: 'Verwarmingsdruk', pressure_normal: 'normaal', pressure_warning: 'waarschuwing', pressure_critical: 'kritiek',
     timeline_title: 'Laatste {h} uur', timeline_gap: 'Geen gegevens', timeline_aria: 'Bedrijfsstand van de laatste {h} uur. Kies een periode met de pijltjestoetsen.',
     programs: { eco: 'Eco', night: 'Nacht', party: 'Party', holiday: 'Vakantie' },
+    sg_ready: { normal: 'SG normaal', blocked: 'Netblokkering', boost: 'SG-verhoging', forced: 'SG gedwongen aan' },
     valve_heating: 'Verwarmen', valve_cooling: 'Koelen', bypass: 'Bypass', pv: 'PV', pv_boost: 'PV-overschot', battery: 'Accu', grid: 'Net',
     stat_cop_heating: 'COP verwarmen vandaag', stat_cop_dhw: 'COP warm water vandaag', stat_energy: 'Energie vandaag',
     stat_starts: 'Starts vandaag', stat_spread: 'ΔT', stat_volume: 'Debiet', stat_heat: 'Warmtevermogen', pv_share: 'PV',
@@ -1518,6 +1524,7 @@ const HFC_EDITOR = {
     source_volume: 'Flow rate of the brine or well loop (l/h or l/min, not for air)', source_in: 'Source inlet temperature (°C: air, brine or well water in)', outdoor: 'Outdoor temperature (°C)',
     valve: 'Diverter valve towards hot water (on/off, or a state like Tank/Room)', bypass_valve: 'Series buffer bypass valve (on = bypass; default: defrost)',
     pv_boost: 'PV surplus mode (on, or a power above 0)',
+    sg_ready: 'SG-Ready / utility lock state (1–4 or text)',
     dhw_top: 'DHW tank top (°C)', dhw_middle: 'DHW tank middle (°C)', dhw_bottom: 'DHW tank bottom (°C)', dhw_target: 'DHW target (°C)', dhw_mode: 'DHW mode (state text)',
     circulation: 'Circulation pump running (on/off)', dhw_loss_sensor: 'DHW standby-loss measurement (°C)', buffer_top: 'Buffer top (°C)', buffer_middle: 'Buffer middle (°C)', buffer_bottom: 'Buffer bottom (°C)', buffer_mode: 'Buffer mode (state text)',
     hc_flow: 'Circuit flow temperature (°C)', hc_return: 'Circuit return temperature (°C)', hc_setpoint: 'Circuit flow target (°C)',
@@ -1609,6 +1616,7 @@ const HFC_EDITOR = {
     source_volume: 'Volumenstrom Sole- oder Brunnenkreis (l/h oder l/min, nicht bei Luft)', source_in: 'Quelle Eintritt (°C: Luft, Sole oder Brunnenwasser rein)', outdoor: 'Außentemperatur (°C)',
     valve: 'Umschaltventil auf Warmwasser (ein/aus, oder Zustand wie Tank/Room)', bypass_valve: 'Bypass-Ventil Reihenpuffer (ein = Bypass; Standard: Abtauen)',
     pv_boost: 'PV-Überschussbetrieb (ein, oder Leistung über 0)',
+    sg_ready: 'SG-Ready / EVU-Sperre (1–4 oder Text)',
     dhw_top: 'WW-Speicher oben (°C)', dhw_middle: 'WW-Speicher Mitte (°C)', dhw_bottom: 'WW-Speicher unten (°C)', dhw_target: 'WW-Soll (°C)', dhw_mode: 'WW-Betriebsart (Statustext)',
     circulation: 'Zirkulationspumpe läuft (ein/aus)', dhw_loss_sensor: 'Messsensor WW-Standbyverlust (°C)', buffer_top: 'Puffer oben (°C)', buffer_middle: 'Puffer Mitte (°C)', buffer_bottom: 'Puffer unten (°C)', buffer_mode: 'Puffer-Betriebsart (Statustext)',
     hc_flow: 'Heizkreis-Vorlauf (°C)', hc_return: 'Heizkreis-Rücklauf (°C)', hc_setpoint: 'Heizkreis-Vorlauf-Soll (°C)',
@@ -1683,6 +1691,7 @@ const HFC_EDITOR = {
     source_volume: 'Prietok na strane zdroja', source_in: 'Teplota zdroja / prívodu vzduchu', outdoor: 'Vonkajšia teplota',
     valve: 'Prepínací ventil na TÚV (binárne alebo Nádrž/Miestnosť)', bypass_valve: 'Obtokový ventil sériového akumulačného zásobníka (zapnuté = obtok; predvolené: odmrazovanie)',
     pv_boost: 'Režim prebytku FVE (zapnuté, alebo výkon nad 0)',
+    sg_ready: 'SG-Ready / blokovanie siete (1–4 alebo text)',
     dhw_top: 'Nádrž TÚV hore', dhw_middle: 'Nádrž TÚV v strede', dhw_bottom: 'Nádrž TÚV dole', dhw_target: 'Cieľová teplota TÚV', dhw_mode: 'Režim TÚV',
     circulation: 'Cirkulačné čerpadlo', buffer_top: 'Akumulačný zásobník hore', buffer_middle: 'Akumulačný zásobník v strede', buffer_bottom: 'Akumulačný zásobník dole', buffer_mode: 'Režim akumulačného zásobníka',
     hc_flow: 'Teplota prívodu okruhu', hc_return: 'Teplota spiatočky okruhu', hc_setpoint: 'Cieľová teplota prívodu okruhu',
@@ -1810,6 +1819,7 @@ const HFC_EDITOR = {
     source_volume: 'Průtok na strane zdroje', source_in: 'Teplota zdroje / přívodu vzduchu', outdoor: 'Venkovní teplota',
     valve: 'Přepínací ventil na TUV (binární nebo Nádrž/Místnost)', bypass_valve: 'Obtokový ventil sériového akumulačního zásobníku (zapnuto = obtok; výchozí: odmrazování)',
     pv_boost: 'Režim přebytku FVE (zapnuto, nebo výkon nad 0)',
+    sg_ready: 'SG-Ready / blokování sítě (1–4 nebo text)',
     dhw_top: 'Nádrž TUV nahoře', dhw_middle: 'Nádrž TUV uprostřed', dhw_bottom: 'Nádrž TUV dole', dhw_target: 'Cílová teplota TUV', dhw_mode: 'Režim TUV',
     circulation: 'Cirkulační čerpadlo', buffer_top: 'Akumulační zásobník nahoře', buffer_middle: 'Akumulační zásobník uprostřed', buffer_bottom: 'Akumulační zásobník dole', buffer_mode: 'Režim akumulačního zásobníku',
     hc_flow: 'Teplota přívodu okruhu', hc_return: 'Teplota zpátečky okruhu', hc_setpoint: 'Cílová teplota přívodu okruhu',
@@ -1947,6 +1957,7 @@ const HFC_EDITOR = {
     source_volume: 'Debiet van het bron- of putcircuit (l/h of l/min, niet voor lucht)', source_in: 'Inlaattemperatuur bron (°C: lucht, brine of putwater in)', outdoor: 'Buitentemperatuur (°C)',
     valve: 'Driewegklep naar warm water (aan/uit, of een stand zoals Tank/Room)', bypass_valve: 'Bypassklep seriebuffer (aan = bypass; standaard: ontdooien)',
     pv_boost: 'PV-overschotstand (aan, of een vermogen boven 0)',
+    sg_ready: 'SG-Ready / netblokkering (1–4 of tekst)',
     dhw_top: 'Warmwatervat boven (°C)', dhw_middle: 'Warmwatervat midden (°C)', dhw_bottom: 'Warmwatervat onder (°C)', dhw_target: 'Warmwaterdoel (°C)', dhw_mode: 'Warmwaterstand (statustekst)',
     circulation: 'Circulatiepomp actief (aan/uit)', dhw_loss_sensor: 'Meetsensor stilstandsverlies warm water (°C)', buffer_top: 'Buffervat boven (°C)', buffer_middle: 'Buffervat midden (°C)', buffer_bottom: 'Buffervat onder (°C)', buffer_mode: 'Bufferstand (statustekst)',
     hc_flow: 'Aanvoertemperatuur groep (°C)', hc_return: 'Retourtemperatuur groep (°C)', hc_setpoint: 'Aanvoerdoel groep (°C)',
@@ -1974,7 +1985,7 @@ const HFC_CORE_KEYS = ['mode', 'compressor', 'power', 'flow', 'return', 'dhw_top
 const hfcHcCount = (config) => Math.min(Math.max(Math.round(+config?.hc_count) || 1, 1), HFC_MAX_HC);
 
 const HFC_ENTITY_GROUPS = {
-  sec_hp: ['mode', 'status', 'compressor', 'fan_speed', 'defrost', 'power', 'heat', 'flow', 'return', 'volume', 'source_volume', 'source_in', 'source_out', 'brine_pressure', 'outdoor', 'valve', 'heater', 'pv_boost'],
+  sec_hp: ['mode', 'status', 'compressor', 'fan_speed', 'defrost', 'power', 'heat', 'flow', 'return', 'volume', 'source_volume', 'source_in', 'source_out', 'brine_pressure', 'outdoor', 'valve', 'heater', 'pv_boost', 'sg_ready'],
   sec_boiler: ['boiler_state', 'boiler_power', 'boiler_flow'],
   sec_storage: ['dhw_top', 'dhw_middle', 'dhw_bottom', 'dhw_target', 'dhw_mode', 'circulation', 'dhw_loss_sensor', 'dhw_heater', 'dhw_heater_top', 'dhw_heater_middle', 'dhw_heater_bottom', 'buffer_top', 'buffer_middle', 'buffer_bottom', 'buffer_mode', 'buffer_heater', 'buffer_heater_top', 'buffer_heater_middle', 'buffer_heater_bottom', 'bypass_valve', 'solar_collector', 'solar_pump'],
   sec_hc: ['hc_flow', 'hc_return', 'hc_setpoint', 'hc_mode', 'hc_pump', 'hc_volume', 'hc_curve_offset', 'hc_mixer', 'hc_mixer_opening', 'hc_mixer_closing', 'hc_pressure', 'room', 'room_target', 'room_humidity', 'dew_point', 'program'],
@@ -2039,7 +2050,7 @@ const HFC_KEY_KINDS = Object.fromEntries(Object.entries({
   onoff: ['defrost', 'circulation', 'hc_pump', 'hc_mixer_opening', 'hc_mixer_closing', 'solar_pump', 'bypass_valve'],
   onoff_power: ['heater', 'boiler_state', ...HFC_TANK_HEATERS, 'pv_boost'],
   valve: ['valve'],
-  text: ['mode', 'status', 'dhw_mode', 'buffer_mode', 'hc_mode', 'program'],
+  text: ['mode', 'status', 'dhw_mode', 'buffer_mode', 'hc_mode', 'program', 'sg_ready'],
 }).flatMap(([kind, keys]) => keys.map((key) => [key, kind])));
 const hfcKindOf = (key) => HFC_KEY_KINDS[key] || HFC_KEY_KINDS[String(key).replace(/^hc[2-6]_/, 'hc_')] || HFC_KEY_KINDS[String(key).replace(/^hc[2-6]_/, '')];
 
@@ -2091,7 +2102,7 @@ const HFC_STORAGES = ['separate', 'combined'];
 const HFC_VALVE_SIDES = { dhw: 'dhw', 'hot water': 'dhw', hot_water: 'dhw', hotwater: 'dhw', heating: 'heating', heat: 'heating' };
 const hfcValveSide = (v) => HFC_VALVE_SIDES[String(v ?? '').trim().toLowerCase()];
 // Value maps of a preset or the configuration, listed in the diagnostic report.
-const HFC_MAP_KEYS = ['valve_map', 'mode_map', 'dhw_mode_map', 'buffer_mode_map', 'hc_mode_map', 'program_map'];
+const HFC_MAP_KEYS = ['valve_map', 'mode_map', 'dhw_mode_map', 'buffer_mode_map', 'hc_mode_map', 'program_map', 'sg_ready_map'];
 // How the tap water is heated: a coil in the tank, a fresh-water station on the storage, or a tank in the combined storage.
 const HFC_DHW_TYPES = ['coil', 'fresh_water', 'tank_in_tank'];
 // Drawing of the outdoor unit: `auto` takes the style of the preset; `unit_size` picks the Vaillant aroTHERM plus class.
@@ -2115,6 +2126,15 @@ const HFC_PROGRAM_PATTERNS = [
   ['night', /night|nacht|setback|absenk|reduced|reduziert|lowered/],
   ['eco', /(^|[^a-z])eco|spar|economy/],
 ];
+// SG-Ready state 1 blocks the heat pump, 2 is normal operation, 3 raises targets and 4 forces operation. Text and binary
+// entities use sg_ready_map; only the standardized numbers and normalized names are interpreted without a map.
+const HFC_SG_READY_STATES = ['normal', 'blocked', 'boost', 'forced'];
+const HFC_SG_READY_MAP = { 1: 'blocked', 2: 'normal', 3: 'boost', 4: 'forced', normal: 'normal', blocked: 'blocked', boost: 'boost', forced: 'forced' };
+const HFC_SG_READY_ICONS = {
+  blocked: '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>',
+  boost: '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20V5M6 11l6-6 6 6"/></svg>',
+  forced: '<svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2 5 13h6l-1 9 8-12h-6z"/></svg>',
+};
 // Colours the card draws with. Every role can be restyled from a theme or card-mod with --hfc-<role>; the values here are the defaults.
 const HFC_COLORS = {
   heat: '#f97316', hot: '#dc2626', cool: '#38bdf8', 'cool-strong': '#0ea5e9', defrost: '#7dd3fc',
@@ -2607,6 +2627,12 @@ class HeatpumpFlowCard extends HTMLElement {
     if (config.program_map !== undefined && config.program_map !== null && (typeof config.program_map !== 'object' || Array.isArray(config.program_map))) {
       throw new Error(`program_map must map raw states to ${HFC_PROGRAMS.join(', ')} or none`);
     }
+    if (config.sg_ready_map !== undefined && config.sg_ready_map !== null) {
+      if (typeof config.sg_ready_map !== 'object' || Array.isArray(config.sg_ready_map)
+        || Object.values(config.sg_ready_map).some((v) => !HFC_SG_READY_STATES.includes(String(v).toLowerCase()))) {
+        throw new Error(`sg_ready_map must map raw states to ${HFC_SG_READY_STATES.join(', ')}`);
+      }
+    }
     if (config.errors !== undefined && (!Array.isArray(config.errors) || config.errors.some((id) => typeof id !== 'string'))) {
       throw new Error('errors must be a list of entity ids');
     }
@@ -2639,6 +2665,7 @@ class HeatpumpFlowCard extends HTMLElement {
       dhw: { ...(preset?.dhw_mode_map || {}), ...(config.dhw_mode_map || {}) },
       buffer: { ...(preset?.buffer_mode_map || {}), ...(config.buffer_mode_map || {}) },
       hc: { ...(preset?.hc_mode_map || {}), ...(config.hc_mode_map || {}) },
+      sg: { ...HFC_SG_READY_MAP, ...(preset?.sg_ready_map || {}), ...(config.sg_ready_map || {}) },
       // The keys are lower case, so a state matches whatever case the key was written in; the values are dhw or heating.
       valve: Object.fromEntries(Object.entries({ ...(preset?.valve_map || {}), ...(config.valve_map || {}) }).map(([k, v]) => [String(k).toLowerCase(), hfcValveSide(v)])),
     };
@@ -3244,6 +3271,11 @@ class HeatpumpFlowCard extends HTMLElement {
   // PV surplus mode: a binary entity that is on, or a power (e.g. the setpoint of an energy manager) above 0.
   _pvOn(state) { const s = String(state).toLowerCase(); return ['on', 'true', 'open', 'ein'].includes(s) || parseFloat(s) > 0; }
   _pvBoost() { return this._has('pv_boost') && this._pvOn(this._s('pv_boost')); }
+  _sgReadyState(raw = this._s('sg_ready')) {
+    if (raw === undefined || ['unknown', 'unavailable'].includes(String(raw).toLowerCase())) return '';
+    const state = String(this._norm(this._maps.sg, raw)).toLowerCase();
+    return HFC_SG_READY_STATES.includes(state) ? state : '';
+  }
   // Defrost and cooling run the refrigerant circuit backwards: the outdoor heat exchanger is the condenser then.
   _reversedCycle() {
     return ['defrost', 'cooling'].includes(this._norm(this._maps.mode, this._s('mode')))
@@ -3562,6 +3594,7 @@ class HeatpumpFlowCard extends HTMLElement {
               <span class="chip" id="chip-mode" ${de('mode')}></span>
               <span class="chip program" id="chip-program"></span>
               <span class="chip pvboost" id="chip-pv" ${de('pv_boost')}><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 3v2.5M12 18.5V21M3 12h2.5M18.5 12H21M5.6 5.6l1.8 1.8M16.6 16.6l1.8 1.8M18.4 5.6l-1.8 1.8M7.4 16.6l-1.8 1.8" stroke-linecap="round"/></svg>${this._esc(i.pv_boost)}</span>
+              <span class="chip sg-ready" id="chip-sg" ${de('sg_ready')}></span>
               ${this._badges.map((b, n) => `<span class="chip badge" id="chip-b${n}" data-badge="${n}" data-entity="${this._esc(b.entity)}">${this._esc(b.label || b.entity)}</span>`).join('')}
               <span class="chip err" id="chip-err"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5 2.5 20.5h19z" stroke-linejoin="round"/><path d="M12 10v4.5M12 17.5v.01" stroke-linecap="round"/></svg>${this._esc(i.error)}</span>
             </div>
@@ -4653,7 +4686,10 @@ class HeatpumpFlowCard extends HTMLElement {
     const measured = configured && this._has('dhw_loss_sensor') && String(configured).startsWith('sensor.') ? configured : null;
     const tankTemps = sensors.map((k) => this._e[k]);
     const temps = measured ? [measured, ...tankTemps.filter((id) => id !== measured)] : tankTemps;
-    const run = this._timelineIds();
+    const timeline = this._timelineIds();
+    // Grid instructions only annotate the public operating timeline. They must not replace a real DHW or gap segment while
+    // deciding whether a tank cool-down happened in verified standby (for example SG forced-on during a DHW charge).
+    const run = timeline ? { ...timeline, sg: null } : null;
     if (!temps.length || (configured ? !measured : sensors[0] !== keys[0]) || !run) return null;
     // A fresh-water station on the buffer has no tank of its own. In a combined storage the circuits draw heat from the same
     // tank, so the pump of every circuit must be known and every window with a running circuit pump is left out (docs/TOPOLOGY.md,
@@ -4753,11 +4789,11 @@ class HeatpumpFlowCard extends HTMLElement {
 
   /* ---------- timeline of the operating mode ---------- */
   // Entities whose history tells what the heat pump did: the operating mode, else the compressor (and the valve for hot water).
-  // A `pv_boost` entity adds its history: the heating periods in PV surplus mode become their own kind.
+  // PV surplus and SG-Ready add their histories and split the base operating periods into their own kinds.
   _timelineIds() {
     const base = this._has('mode') ? { mode: this._e.mode }
       : this._has('compressor') ? { comp: this._e.compressor, valve: this._has('valve') ? this._e.valve : null } : null;
-    return base && this._has('pv_boost') ? { ...base, pv: this._e.pv_boost } : base;
+    return base ? { ...base, ...(this._has('pv_boost') ? { pv: this._e.pv_boost } : {}), ...(this._has('sg_ready') ? { sg: this._e.sg_ready } : {}) } : null;
   }
 
   // The parts of the heating periods in which the PV surplus entity was on become periods of the kind `pv`.
@@ -4788,19 +4824,49 @@ class HeatpumpFlowCard extends HTMLElement {
     return out;
   }
 
+  // SG-Ready overrides the displayed operating kind while a grid instruction is active. Normal operation and states that are not
+  // in sg_ready_map leave the operating timeline unchanged; unknown history therefore never looks like a lock or forced run.
+  _timelineSg(segs, list, start, end) {
+    const active = [];
+    list.forEach((e, n) => {
+      const state = this._sgReadyState(e.s);
+      if (!['blocked', 'boost', 'forced'].includes(state)) return;
+      const from = Math.max(e.t, start); const to = Math.min(list[n + 1] ? list[n + 1].t : end, end);
+      if (to > from) active.push({ from, to, kind: `sg-${state}`, raw: e.s });
+    });
+    if (!active.length) return segs;
+    const out = [];
+    const add = (kind, raw, from, to) => {
+      const last = out[out.length - 1];
+      if (last && last.kind === kind && last.to === from) last.to = to; else out.push({ kind, raw, from, to });
+    };
+    segs.forEach((seg) => {
+      let at = seg.from;
+      active.forEach((sg) => {
+        const from = Math.max(sg.from, at); const to = Math.min(sg.to, seg.to);
+        if (to <= from) return;
+        if (from > at) add(seg.kind, seg.raw, at, from);
+        add(sg.kind, sg.raw, from, to); at = to;
+      });
+      if (at < seg.to) add(seg.kind, seg.raw, at, seg.to);
+    });
+    return out;
+  }
+
   // Share of the heating time in PV surplus mode (percent) for today, yesterday or the week, from the recorder history
   // (kept for about ten days). NaN while the history loads or when it is not available.
   _pvShare(period) {
     const ids = this._timelineIds(); const range = this._periodRange(period);
     if (!ids?.pv || !range) return NaN;
-    const idList = Object.values(ids).filter(Boolean);
+    const shareIds = { ...ids, sg: null };
+    const idList = Object.values(shareIds).filter(Boolean);
     const hist = this._wsCached(`pvshare|${idList.join(',')}|${period}`, {
       type: 'history/history_during_period', start_time: range[0], ...(range[1] ? { end_time: range[1] } : {}), entity_ids: idList,
       minimal_response: true, no_attributes: true, significant_changes_only: false,
     }, (res) => this._timelineHistory(res, idList));
     if (!hist) return NaN;
     const from = Date.parse(range[0]); const to = range[1] ? Date.parse(range[1]) : Date.now();
-    const segs = this._timelineSegments(hist, ids, from, to);
+    const segs = this._timelineSegments(hist, shareIds, from, to);
     // Only the time in which the PV entity has a known state counts: before its first state (not recorded, added later) and
     // while it is unknown or unavailable nothing is known about it, which must not read as "not in PV surplus mode".
     const list = hist[ids.pv] || [];
@@ -4827,7 +4893,7 @@ class HeatpumpFlowCard extends HTMLElement {
     return out;
   }
 
-  // Segments { kind, raw, from, to } between start and end: heat, dhw, defrost, cool, blocked, idle or gap (no data).
+  // Segments { kind, raw, from, to } between start and end: operating modes plus PV/SG overlays or gap (no data).
   _timelineSegments(hist, ids, start, end) {
     const kindOfMode = (raw) => {
       if (['unknown', 'unavailable', 'None'].includes(raw)) return 'gap';
@@ -4855,7 +4921,9 @@ class HeatpumpFlowCard extends HTMLElement {
       const last = segs[segs.length - 1];
       if (last && last.kind === p.kind && last.to === from) last.to = to; else segs.push({ kind: p.kind, raw: p.raw, from, to });
     });
-    return ids.pv ? this._timelinePv(segs, hist[ids.pv] || [], start, end) : segs;
+    let out = ids.pv ? this._timelinePv(segs, hist[ids.pv] || [], start, end) : segs;
+    if (ids.sg) out = this._timelineSg(out, hist[ids.sg] || [], start, end);
+    return out;
   }
 
   // Entities shown as extra lanes under the bar: timeline_marks true = the badges, or a list of entities / { entity, label }.
@@ -4895,7 +4963,8 @@ class HeatpumpFlowCard extends HTMLElement {
   _timelineLabel(seg) {
     const i = this._i;
     if (seg.kind === 'gap') return i.timeline_gap;
-    return { heat: i.modes.heating, pv: `${i.modes.heating} · ${i.pv_boost}`, dhw: i.modes.dhw, defrost: i.modes.defrost, cool: i.modes.cooling, blocked: i.modes.blocked, idle: i.modes.idle }[seg.kind];
+    return { heat: i.modes.heating, pv: `${i.modes.heating} · ${i.pv_boost}`, dhw: i.modes.dhw, defrost: i.modes.defrost, cool: i.modes.cooling,
+      blocked: i.modes.blocked, 'sg-blocked': i.sg_ready.blocked, 'sg-boost': i.sg_ready.boost, 'sg-forced': i.sg_ready.forced, idle: i.modes.idle }[seg.kind];
   }
 
   _timelineDetail(seg) {
@@ -5654,6 +5723,15 @@ class HeatpumpFlowCard extends HTMLElement {
     }
     if (progKind) pc.dataset.entity = prog.entity;
     this._cls('chip-pv', this._pvBoost());
+    const sg = this._has('sg_ready') ? this._sgReadyState() : '';
+    const sgChip = this._$('chip-sg');
+    const sgKind = sg && sg !== 'normal' ? sg : '';
+    if (sgChip._kind !== sgKind) {
+      sgChip._kind = sgKind;
+      sgChip.className = `chip sg-ready${sgKind ? ` on ${sgKind}` : ''}`;
+      sgChip.innerHTML = sgKind ? `${HFC_SG_READY_ICONS[sgKind]}${this._esc(i.sg_ready[sgKind])}` : '';
+    }
+    if (sgKind) sgChip.dataset.entity = this._e.sg_ready; else delete sgChip.dataset.entity;
     const err = this._$('chip-err');
     err.classList.toggle('on', errs.length > 0);
     if (errs.length) err.dataset.entity = errs[0];
@@ -5746,9 +5824,13 @@ HeatpumpFlowCard.styles = `
   .chip.mode-heat { background: ${hfcTint('heat', 18)}; color: ${hfcInk('heat')}; }
   .chip.mode-dhw { background: ${hfcTint('hot', 16)}; color: ${hfcInk('hot')}; }
   .chip.mode-defrost, .chip.mode-cool { background: ${hfcTint('cool', 20)}; color: ${hfcInk('cool')}; }
-  .chip.badge, .chip.err, .chip.program, .chip.pvboost { display: none; }
+  .chip.badge, .chip.err, .chip.program, .chip.pvboost, .chip.sg-ready { display: none; }
   .chip.program.on { display: inline-block; }
   .chip.pvboost.on { display: inline-block; background: ${hfcTint('pv', 20)}; color: ${hfcInk('pv')}; }
+  .chip.sg-ready.on { display: inline-block; }
+  .chip.sg-ready.blocked { background: ${hfcTint('hot', 20)}; color: ${hfcInk('hot')}; }
+  .chip.sg-ready.boost { background: ${hfcTint('pv', 20)}; color: ${hfcInk('pv')}; }
+  .chip.sg-ready.forced { background: ${hfcTint('heat', 20)}; color: ${hfcInk('heat')}; }
   .chip.program.eco { background: ${hfcTint('good', 18)}; color: ${hfcInk('good')}; }
   .chip.program.night { background: ${hfcTint('cool-strong', 18)}; color: ${hfcInk('cool-strong')}; }
   .chip.program.party { background: ${hfcTint('pv', 20)}; color: ${hfcInk('pv')}; }
@@ -5984,11 +6066,13 @@ HeatpumpFlowCard.styles = `
   .tl-bar .seg { position: absolute; top: 0; bottom: 0; min-width: 3px; cursor: pointer; }
   .seg.k-heat, .tl-legend i.k-heat { background: ${hfcVar('heat')}; }
   .seg.k-pv, .tl-legend i.k-pv { background: repeating-linear-gradient(135deg, ${hfcVar('pv')} 0 3px, ${hfcVar('heat')} 3px 6px); }
+  .seg.k-sg-boost, .tl-legend i.k-sg-boost { background: repeating-linear-gradient(135deg, ${hfcVar('pv')} 0 4px, color-mix(in srgb, ${hfcVar('pv')} 45%, transparent) 4px 7px); }
+  .seg.k-sg-forced, .tl-legend i.k-sg-forced { background: repeating-linear-gradient(135deg, ${hfcVar('heat')} 0 4px, ${hfcVar('hot')} 4px 7px); }
   .seg.k-dhw, .tl-legend i.k-dhw { background: ${hfcVar('hot')}; }
   .seg.k-defrost, .tl-legend i.k-defrost { background: ${hfcVar('cool-strong')}; }
   .seg.k-cool, .tl-legend i.k-cool { background: ${hfcVar('cool')}; }
   .seg.k-idle { background: transparent; }
-  .seg.k-blocked, .tl-legend i.k-blocked { background: repeating-linear-gradient(135deg, color-mix(in srgb, var(--hfc-muted) 55%, transparent) 0 3px, transparent 3px 6px); }
+  .seg.k-blocked, .tl-legend i.k-blocked, .seg.k-sg-blocked, .tl-legend i.k-sg-blocked { background: repeating-linear-gradient(135deg, color-mix(in srgb, var(--hfc-muted) 55%, transparent) 0 3px, transparent 3px 6px); }
   .seg.k-gap, .tl-legend i.k-gap { background: repeating-linear-gradient(135deg, transparent 0 3px, color-mix(in srgb, var(--hfc-muted) 30%, transparent) 3px 4px); }
   .seg.sel { box-shadow: inset 0 0 0 2px var(--primary-text-color); }
   .tl-mark { position: relative; height: 7px; margin-top: 4px; border-radius: 4px; background: color-mix(in srgb, var(--hfc-muted) 10%, transparent); }

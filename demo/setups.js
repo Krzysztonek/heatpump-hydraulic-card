@@ -868,6 +868,27 @@ setups.push({
   },
 });
 
+// Vendor-neutral SG-Ready / utility-lock contract (#249), deliberately manual until a real preset mapping is verified.
+const sgReadyStates = (s) => ({
+  'sensor.sg_mode': { heat: 'heating', dhw: 'dhw', defrost: 'blocked', idle: 'idle' }[s],
+  'binary_sensor.sg_compressor': ['heat', 'dhw'].includes(s) ? 'on' : 'off',
+  'sensor.sg_flow': [{ heat: '36', dhw: '51', defrost: '28', idle: '29' }[s], '°C'],
+  'sensor.sg_return': [{ heat: '30', dhw: '44', defrost: '28', idle: '28' }[s], '°C'],
+  'sensor.sg_state': { heat: '3', dhw: '4', defrost: '1', idle: '2' }[s],
+  'sensor.sg_dhw': ['48', '°C'], 'binary_sensor.sg_hc_pump': s === 'heat' ? 'on' : 'off',
+});
+setups.push({
+  name: 'SG-Ready and utility lock', sub: 'manual mapping: raised targets, forced operation, utility lock and normal operation',
+  states: sgReadyStates,
+  config: {
+    title: 'SG-Ready heat pump', timeline: true,
+    entities: {
+      mode: 'sensor.sg_mode', compressor: 'binary_sensor.sg_compressor', flow: 'sensor.sg_flow', return: 'sensor.sg_return',
+      sg_ready: 'sensor.sg_state', dhw_top: 'sensor.sg_dhw', hc_pump: 'binary_sensor.sg_hc_pump',
+    },
+  },
+});
+
 // Vendor-neutral cooling safety (#251): measured dew point wins; otherwise the card calculates it from room temperature and RH.
 const coolingDewStates = (s) => ({
   'sensor.cool_mode': 'cooling', 'binary_sensor.cool_compressor': 'on',
