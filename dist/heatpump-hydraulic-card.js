@@ -3263,6 +3263,12 @@ class HeatpumpFlowCard extends HTMLElement {
     return ['on', 'true', 'open', 'ein', 'active', 'running', 'heating', 'heat', 'burner', 'firing'].includes(s)
       || parseFloat(s) > 0;
   }
+  // A circuit pump: binary, a speed above 0 (%), or the ebusd pump state, which names what the pump runs for:
+  // off, heat, cool or exthwc (#295).
+  _pumpOn(key) {
+    const s = String(this._s(key)).trim().toLowerCase();
+    return this._on(key) || ['heat', 'cool', 'exthwc'].includes(s) || parseFloat(s) > 0;
+  }
   // Diverter valve state through `valve_map`: true = hot water, false = heating, undefined = the state is not in the map.
   _valveMapped(raw) {
     const mapped = this._norm(this._maps.valve, raw);
@@ -5346,7 +5352,7 @@ class HeatpumpFlowCard extends HTMLElement {
     const demand = showHc ? Array.from({ length: this._hcCount }, (_, x) => {
       const k = (key) => this._hk(x + 1, key);
       const mode = this._norm(this._maps.hc, this._s(k('mode')));
-      return { mode, own: this._has(k('pump')) ? this._on(k('pump')) : (this._has(k('mode')) ? ['heating', 'cooling'].includes(mode) : null) };
+      return { mode, own: this._has(k('pump')) ? this._pumpOn(k('pump')) : (this._has(k('mode')) ? ['heating', 'cooling'].includes(mode) : null) };
     }) : [];
     // Without a parallel buffer the circuits and the heat pump are one water loop (#124). A running circuit pump moves the water
     // through the heat pump as well, unless the diverter valve stands on hot water and closes the heating side (also after a
