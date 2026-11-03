@@ -4070,6 +4070,30 @@
     check(C._formSchema({}).schema.flatMap(function keysOf(n) { return n.schema ? n.schema.flatMap(keysOf) : [n.name]; }).includes('hc_return_label'), 'editor offers the circuit return label');
   }
 
+  // 20a2. hc_flow_label: false hides the flow temperature at the circuits, the target stays (#291)
+  {
+    const st = toStates({ 'sensor.f': ['48', '°C'], 'sensor.r': ['40', '°C'], 'sensor.c': ['40', 'Hz'], 'sensor.hcf': ['33', '°C'], 'sensor.set': ['34', '°C'], 'sensor.off': ['2', 'K'] });
+    const ents = { flow: 'sensor.f', return: 'sensor.r', compressor: 'sensor.c', hc_setpoint: 'sensor.set' };
+    const txt = (c, id) => c.shadowRoot.getElementById(id)?.textContent ?? '(missing)';
+    // Direct circuit without its own sensor: it shows the heat pump flow by default.
+    let c = mount({ entities: ents }, hassOf(st)); await wait(20);
+    const shown = txt(c, 't-hc');
+    c.remove();
+    c = mount({ entities: ents, hc_flow_label: false }, hassOf(st)); await wait(20);
+    check(shown === '48.0 °C · Target 34.0' && txt(c, 't-hc') === 'Target 34.0', `hc_flow_label: false leaves only the target at the circuit (${shown} / ${txt(c, 't-hc')})`);
+    c.remove();
+    // With a heating curve shift the flow stands below the pump; it goes as well, the target text stays.
+    c = mount({ entities: { ...ents, hc_flow: 'sensor.hcf', hc_curve_offset: 'sensor.off' }, hc_flow_label: false }, hassOf(st)); await wait(20);
+    check(txt(c, 't-hc-now') === '' && txt(c, 't-hc').startsWith('Target 34'), `hc_flow_label: false with a curve shift (${txt(c, 't-hc-now')} / ${txt(c, 't-hc')})`);
+    c.remove();
+    let error = '';
+    try { new C().setConfig({ hc_flow_label: 'no' }); } catch (e) { error = e.message; }
+    check(error === 'hc_flow_label must be true or false', `hc_flow_label must be a boolean (${error})`);
+    check(C._formSchema({}).schema.flatMap(function keysOf(n) { return n.schema ? n.schema.flatMap(keysOf) : [n.name]; }).includes('hc_flow_label'), 'editor offers the circuit flow label');
+    const report = C._diagnosticReport({ hc_flow_label: false, entities: ents }, hassOf(st));
+    check(report.includes('Circuit labels: flow hidden · return hidden'), 'the report names the circuit label options');
+  }
+
   // 20b. DHW tank with only a sensor near the bottom (HeishaMon has one tank sensor; its position depends on the tank)
   {
     const states = toStates({ 'sensor.flow': ['35', '°C'], 'sensor.return': ['30', '°C'], 'sensor.dhw': ['37', '°C'] });
