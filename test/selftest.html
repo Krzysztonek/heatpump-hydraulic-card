@@ -87,7 +87,7 @@
     { price: { v: 1 } }, { tiles: [{ key: 'spread', tap_action: 'navigate' }] }, { stats: [{ entity: 'sensor.x', hold_action: true }] },
     { layout: 'huge' }, { actions: [] }, { actions: { mode: 'navigate' } }, { actions: { mode: { tap_action: 'navigate' } } },
     { badges: [{ entity: 'sensor.x', hold_action: 'toggle' }] },
-    { program_map: [] }, { program_map: 'eco' }, { compressor_speed_max: 0 }, { compressor_speed_max: 'fast' },
+    { program_map: [] }, { program_map: 'eco' }, { sg_ready_map: [] }, { sg_ready_map: { on: 'maybe' } }, { compressor_speed_max: 0 }, { compressor_speed_max: 'fast' },
     { errors: 'sensor.error' }, { error_ok: 'No Error' }, { error_ok: ['No Error', 0] },
     { timeline: 'yes' }, { timeline_hours: 0 }, { timeline_marks: 'yes' }, { timeline_marks: [{ label: 'x' }] }, { timeline_marks: [7] }, { wall_timeout: -1 }, { wall_timeout: 'soon' }, { unit_style: 'tesla' }, { unit_size: 'huge' },
     { animations: 'sometimes' }, { flow_speed: 0 }, { flow_speed: 3.1 }, { source_spread: 'yes' }, { buffer: 'yes' }, { series_buffer: 'yes' }, { primary_pump: 'yes' }, { theme: 'sepia' }, { fullscreen: 'yes' },
@@ -1811,7 +1811,47 @@
     check(!C._tileOptions(vi.config, C._resolve(vi.config, hv), hv).options.some((x) => x.value.startsWith('pv_boost_share')), 'no share tile without a PV surplus entity');
   }
 
-  // 13f. valve_map: raw valve states that do not follow "on = hot water" (a zone valve with 1 = heating, 0 = hot water, #109)
+  // 13f. SG-Ready and utility lock (#249): normalized chip and operating-timeline periods, without guessed binary semantics
+  {
+    const ids = { mode: 'sensor.sg_mode', compressor: 'binary_sensor.sg_comp', sg_ready: 'sensor.sg_state' };
+    const state = (sg) => hassOf(toStates({ 'sensor.sg_mode': 'heating', 'binary_sensor.sg_comp': 'on', 'sensor.sg_state': sg }));
+    const chip = async (sg, extra = {}) => {
+      const card = mount({ entities: ids, ...extra }, state(sg)); await wait(20);
+      const el = card.shadowRoot.getElementById('chip-sg'); const out = { on: el.classList.contains('on'), kind: el.className, text: el.textContent, entity: el.dataset.entity };
+      card.remove(); return out;
+    };
+    let o = await chip('1'); check(o.on && /blocked/.test(o.kind) && /Utility lock/.test(o.text) && o.entity === 'sensor.sg_state', `SG state 1 shows the utility-lock chip (${JSON.stringify(o)})`);
+    o = await chip('2'); check(!o.on, 'SG state 2 is normal operation and shows no chip');
+    o = await chip('3'); check(o.on && /boost/.test(o.kind) && /SG boost/.test(o.text), `SG state 3 shows raised operation (${JSON.stringify(o)})`);
+    o = await chip('4'); check(o.on && /forced/.test(o.kind) && /forced on/.test(o.text), `SG state 4 shows forced operation (${JSON.stringify(o)})`);
+    check(!(await chip('on')).on && !(await chip('unknown')).on, 'binary and unknown SG states are not guessed');
+    o = await chip('on', { sg_ready_map: { on: 'blocked', off: 'normal' } });
+    check(o.on && /blocked/.test(o.kind), 'sg_ready_map gives a binary utility-lock entity explicit semantics');
+    const cfg = { entities: ids, sg_ready_map: { EVU: 'blocked', Normal: 'normal', Raise: 'boost', Force: 'forced' } };
+    const report = C._diagnosticReport(cfg, state('EVU'));
+    check(/- sg_ready_map: EVU=blocked, Normal=normal, Raise=boost, Force=forced \(configuration\)/.test(report), 'diagnostic report lists the SG-Ready map');
+    const schemaKeys = C._formSchema(cfg).schema.flatMap(function all(n) { return n.schema ? n.schema.flatMap(all) : [n.name]; });
+    check(schemaKeys.includes('sg_ready'), 'the visual editor offers the SG-Ready entity');
+
+    const iso = (ms) => new Date(ms).toISOString();
+    const history = (h) => ({ ...h, callWS: (m) => {
+      if (m.type !== 'history/history_during_period') return h.callWS(m);
+      const start = Date.parse(m.start_time); const end = Date.now(); const q = (end - start) / 4;
+      return Promise.resolve({
+        'sensor.sg_mode': [{ state: 'heating', last_updated: iso(start) }],
+        'sensor.sg_state': [{ state: '2', last_updated: iso(start) }, { state: '1', last_updated: iso(start + q) },
+          { state: '3', last_updated: iso(start + 2 * q) }, { state: '4', last_updated: iso(start + 3 * q) }],
+      });
+    } });
+    let card = mount({ entities: ids, timeline: true, timeline_marks: false }, history(state('4'))); await wait(80);
+    const kinds = [...card.shadowRoot.querySelectorAll('#timeline .seg')].map((x) => [...x.classList].find((k) => k.startsWith('k-')));
+    check(kinds.join() === 'k-heat,k-sg-blocked,k-sg-boost,k-sg-forced', `SG instructions split the operating timeline (${kinds})`);
+    const legend = card.shadowRoot.querySelector('#timeline .tl-legend').textContent;
+    check(/Utility lock/.test(legend) && /SG boost/.test(legend) && /SG forced on/.test(legend), `the timeline legend names every SG instruction (${legend})`);
+    card.remove();
+  }
+
+  // 13g. valve_map: raw valve states that do not follow "on = hot water" (a zone valve with 1 = heating, 0 = hot water, #109)
   {
     const s = setups[5]; const reg = s.registry || {};
     const valveId = 'sensor.panasonic_heat_pump_main_threeway_valve_state';
@@ -3164,6 +3204,13 @@
     const often = []; for (let h = 48; h > 0; h -= 2.5) often.push([h, 'on'], [h - 0.3, 'off']);
     r = loss({ 'binary_sensor.comp': often, 'binary_sensor.valve': often });
     check(r === null, `without a standby window of three hours there is no value (${JSON.stringify(r)})`);
+    const sgCard = mount({ entities: { flow: 'sensor.f', compressor: 'binary_sensor.comp', valve: 'binary_sensor.valve', dhw_top: 'sensor.top', sg_ready: 'sensor.sg' } },
+      hassOf(toStates({ 'sensor.f': ['35', '°C'], 'binary_sensor.comp': 'on', 'binary_sensor.valve': 'on', 'sensor.top': ['40', '°C'], 'sensor.sg': '4' }))); await wait(20);
+    const sgIds = sgCard._lossIds();
+    const sgCharge = sgCard._dhwLoss(hist({ 'binary_sensor.comp': [[48, 'on']], 'binary_sensor.valve': [[48, 'on']],
+      'sensor.sg': [[48, '4']], 'sensor.top': cool(48, 0, 52, 0.4) }), sgIds, start, end);
+    check(sgIds && !sgIds.run.sg && sgCharge === null, 'an SG-Ready overlay cannot turn continuous hot-water charging into a standby-loss window');
+    sgCard.remove();
     // History that starts late: the time before the first state is unknown.
     r = loss({ 'binary_sensor.comp': [[10, 'off']], 'binary_sensor.valve': [[10, 'off']] });
     check(r && Math.abs(r.hours - 10) < 0.01, `time before the first known state is not used (${JSON.stringify(r)})`);

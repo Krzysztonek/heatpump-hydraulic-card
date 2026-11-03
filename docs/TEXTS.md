@@ -127,6 +127,15 @@ party
 holiday
 ```
 
+## `sg_ready`
+
+```text
+normal
+blocked
+boost
+forced
+```
+
 ## `tiles`
 
 ```text
