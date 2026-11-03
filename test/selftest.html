@@ -90,7 +90,7 @@
     { program_map: [] }, { program_map: 'eco' }, { compressor_speed_max: 0 }, { compressor_speed_max: 'fast' },
     { errors: 'sensor.error' }, { error_ok: 'No Error' }, { error_ok: ['No Error', 0] },
     { timeline: 'yes' }, { timeline_hours: 0 }, { timeline_marks: 'yes' }, { timeline_marks: [{ label: 'x' }] }, { timeline_marks: [7] }, { wall_timeout: -1 }, { wall_timeout: 'soon' }, { unit_style: 'tesla' }, { unit_size: 'huge' },
-    { animations: 'sometimes' }, { flow_speed: 0 }, { flow_speed: 3.1 }, { source_spread: 'yes' }, { series_buffer: 'yes' }, { primary_pump: 'yes' }, { theme: 'sepia' }, { fullscreen: 'yes' },
+    { animations: 'sometimes' }, { flow_speed: 0 }, { flow_speed: 3.1 }, { source_spread: 'yes' }, { buffer: 'yes' }, { series_buffer: 'yes' }, { primary_pump: 'yes' }, { theme: 'sepia' }, { fullscreen: 'yes' },
     { texts: [] }, { texts: { NL: { title: 'x' } } }, { texts: { nl: { title: 7 } } }, { texts: { nl: { missing_key: 'x' } } },
     { brine_pressure_min: -0.1 }, { hc_pressure_crit: 1.2, hc_pressure_min: 1.0 }, { hc_pressure_min: 3, hc_pressure_max: 2 },
     { tile_sources: ['sensor.x'] }, { tile_sources: { nope: 'sensor.x' } }, { tile_sources: { cost: 'sensor.x' } }, { tile_sources: { spread: 'sensor.x' } },
@@ -368,7 +368,7 @@
     check(twoCircuits.entities.hc_pump === 'binary_sensor.boiler_heating_pump'
       && twoCircuits.entities.hc2_pump !== 'binary_sensor.boiler_heating_pump' && !hass.states[twoCircuits.entities.hc2_pump],
       'the EMS-ESP boiler pump belongs only to the direct first circuit');
-    check(r.entities.heat === undefined, 'EMS-ESP compressor current power is electrical input, not heat output');
+    check(r.entities.heat !== 'sensor.boiler_compressor_current_power' && !hass.states[r.entities.heat], 'EMS-ESP compressor current power is electrical input, not heat output');
     check(!detects('emsesp', { 'sensor.boiler_current_flow_temperature': '45', 'sensor.boiler_outside_temperature': '5' }, registry),
       'descriptive EMS-ESP flow and outdoor names alone still do not detect a gas boiler');
   }
@@ -412,8 +412,10 @@
     const registry = Object.fromEntries(Object.keys(states).map((id) => [id, { platform: 'mqtt' }]));
     const e = C._resolve({ preset: 'emsesp' }, hassOf(states, registry)).entities;
     check(e.flow === 'sensor.boiler_heat_carrier_forward_tc1' && e.return === 'sensor.boiler_heat_carrier_return_tc0'
-      && e.compressor === 'binary_sensor.boiler_hp_compressor' && e.valve === 'binary_sensor.boiler_dhw_3_way_valve_active'
-      && e.source_in === 'sensor.boiler_air_inlet_temperature_tl2', `EMS-ESP long names: heat pump flow/return (TC1/TC0), compressor, valve, air inlet (${e.flow} / ${e.valve})`);
+      && e.compressor === 'sensor.boiler_compressor_speed' && e.valve === 'binary_sensor.boiler_dhw_3_way_valve_active'
+      && e.source_in === 'sensor.boiler_air_inlet_temperature_tl2', `EMS-ESP long names: heat pump flow/return (TC1/TC0), compressor speed, valve, air inlet (${e.flow} / ${e.compressor})`);
+    check(e.hc_flow === 'sensor.boiler_current_flow_temperature' && e.hc_setpoint === 'sensor.thermostat_hc1_target_flow_temperature',
+      `EMS-ESP long names: circuit flow is T0, the thermostat flow temperature is the target (${e.hc_flow} / ${e.hc_setpoint})`);
     check(e.dhw_top === 'sensor.boiler_dhw_current_intern_temperature' && e.dhw_bottom === 'sensor.boiler_dhw_current_extern_temperature'
       && e.dhw_target === 'number.boiler_dhw_selected_temperature' && e.room_target === 'number.thermostat_hc1_selected_room_temperature',
     `EMS-ESP long names: tank top/bottom from the internal/external sensor, hot-water and room targets (${e.dhw_top} / ${e.dhw_bottom})`);
@@ -442,6 +444,43 @@
     const legacy = C._resolve({ preset: 'emsesp' }, hassOf(noSwitch, circReg)).entities;
     check(pending.circulation === undefined && legacy.circulation === 'switch.boiler_dhw_circulation_active',
       `EMS-ESP: an unavailable "pump fitted" switch maps no circulation yet, a missing one keeps it (${pending.circulation} / ${legacy.circulation})`);
+  }
+  {
+    // #287: Buderus WLW166i with EMS-ESP 3.9.0-dev (long names, #225): the binary compressor reads off while the compressor runs.
+    const states = toStates({
+      'sensor.boiler_compressor_activity': 'Heizen', 'binary_sensor.boiler_hp_compressor': 'off', 'sensor.boiler_compressor_speed': ['31', '%'],
+      'sensor.boiler_compressor_current_power': ['1379', 'W'], 'sensor.boiler_compressor_power_output': ['7.7', 'kW'], 'sensor.boiler_fan_speed': ['100', '%'],
+      'sensor.boiler_heat_carrier_forward_tc1': ['36.3', '°C'], 'sensor.boiler_heat_carrier_return_tc0': ['30.1', '°C'],
+      'sensor.boiler_current_flow_temperature': ['32.9', '°C'], 'sensor.boiler_return_temperature': ['30', '°C'],
+      'sensor.thermostat_hc1_target_flow_temperature': ['30', '°C'], 'sensor.boiler_outside_temperature': ['6', '°C'],
+      'sensor.boiler_heatpump_total_uptime': ['1122401', 'min'], 'sensor.boiler_total_energy_supplied': ['66061', 'kWh'],
+      'sensor.boiler_total_energy_consumption': ['15513', 'kWh'], 'sensor.boiler_evaporator_inlet_temperature_tr4': ['2.9', '°C'],
+      'sensor.boiler_expansion_valve_vr1': ['20', '%'],
+    });
+    const registry = Object.fromEntries(Object.keys(states).map((id) => [id, { platform: 'mqtt' }]));
+    const hass = hassOf(states, registry);
+    const r = C._resolve({ preset: 'emsesp' }, hass);
+    const e = r.entities;
+    check(e.compressor === 'sensor.boiler_compressor_speed' && e.heat === 'sensor.boiler_compressor_power_output' && e.fan_speed === 'sensor.boiler_fan_speed',
+      `EMS-ESP 3.9 long names: compressor speed, heat output and fan (${e.compressor} / ${e.heat} / ${e.fan_speed})`);
+    check(e.hc_flow === 'sensor.boiler_current_flow_temperature' && e.hc_setpoint === 'sensor.thermostat_hc1_target_flow_temperature'
+      && e.hc_return === undefined, `EMS-ESP 3.9 long names: circuit flow T0, target as setpoint, no circuit return (${e.hc_flow} / ${e.hc_setpoint} / ${e.hc_return})`);
+    check(e.hours === 'sensor.boiler_heatpump_total_uptime' && e.heat_total === 'sensor.boiler_total_energy_supplied'
+      && e.evap_temp === 'sensor.boiler_evaporator_inlet_temperature_tr4' && e.eev === 'sensor.boiler_expansion_valve_vr1',
+    `EMS-ESP 3.9 long names: hours, heat counter, evaporator inlet and expansion valve (${e.hours} / ${e.heat_total} / ${e.evap_temp} / ${e.eev})`);
+    check(r.tiles.heat?.total === 'sensor.boiler_total_energy_supplied' && r.tiles.energy?.total === 'sensor.boiler_total_energy_consumption'
+      && r.tiles.hours?.total === 'sensor.boiler_heatpump_total_uptime', `EMS-ESP 3.9 long names: catalog tiles from the totals (${JSON.stringify(r.tiles.heat)})`);
+    const findings = C._checks({ preset: 'emsesp' }, hass, r).map((f) => f.key);
+    check(!['compressor', 'heat', 'fan_speed', 'hours', 'heat_total', 'evap_temp', 'eev', 'hc_flow', 'hc_setpoint'].some((k) => findings.includes(k)),
+      `EMS-ESP 3.9 long names: the new mappings pass the plausibility checks (${findings.join(', ')})`);
+    const card = mount({ preset: 'emsesp' }, hass); await wait(20);
+    check(card._flowModel().running && card._kw('heat') === 7.7, `EMS-ESP 3.9 long names: running from the compressor speed, heat output 7.7 kW (${card._kw('heat')})`);
+    card.remove();
+    // Without TC1 the current flow temperature is the heat pump flow and no circuit flow.
+    const { 'sensor.boiler_heat_carrier_forward_tc1': _tc1, ...noTc1 } = states;
+    const plain = C._resolve({ preset: 'emsesp' }, hassOf(noTc1, registry)).entities;
+    check(plain.flow === 'sensor.boiler_current_flow_temperature' && !noTc1[plain.hc_flow],
+      `EMS-ESP without TC1: the current flow temperature is the heat pump flow, not the circuit flow (${plain.flow} / ${plain.hc_flow})`);
   }
   check(!detects('vicare', { 'sensor.vitodens_outside_temperature': '5', 'sensor.vitodens_boiler_temperature': '60' },
     { 'sensor.vitodens_outside_temperature': { platform: 'vicare', translation_key: 'outside_temperature' } }), 'ViCare gas boiler is not a heat pump');
@@ -1099,7 +1138,7 @@
     const more = (await tilesOf(s, ['heat_heating', 'cop_total', 'energy_aux', { key: 'cost', period: 'today', price: 0.3 }, { entity: 'sensor.heating_curve_flow', name: 'Curve' },
       { key: 'energy', entity: 'sensor.heatpump_energy_today', name: 'Mine' }, 'spread', 'outdoor', { key: 'cop_heating', period: 'month', name: 'Monthly', decimals: 1 }])).t;
     check(more['Heat heating · today'] === '20.4 kWh', 'Lambda heat tile');
-    check(more['COP total · total'] === '≈4.55', `cop_total computed from totals (${more['COP total · total']})`);
+    check(more['COP total'] === '≈4.55', `cop_total computed from totals (${more['COP total']})`);
     check(!Object.keys(more).some((k) => k.startsWith('Electricity heater')), 'unavailable tile hidden');
     check(/1\.53/.test(more['Cost · today'] || ''), `cost tile (${more['Cost · today']})`);
     check(more.Curve === '33.5 °C' && more.Mine === '5.1 kWh', `free entity tiles (${more.Curve} / ${more.Mine})`);
@@ -1126,7 +1165,7 @@
     const { t } = await tilesOf(s, ['energy', 'env_energy', 'env_energy:month', 'env_energy:total', 'cop_total', 'cop_total:month', 'cop_total:total']);
     check(t['Electricity · today'] === '6.1 kWh' && t['Environmental energy · today'] === '24.3 kWh', `environmental energy next to electricity (${JSON.stringify(t)})`);
     check(t['Environmental energy · month'] === '690 kWh' && t['Environmental energy · total'] === '8,200 kWh', `environmental energy periods (${JSON.stringify(t)})`);
-    check(t['COP total · today'] === '≈4.98' && t['COP total · month'] === '≈4.83' && t['COP total · total'] === '≈4.15', `COP from environmental energy (${JSON.stringify(t)})`);
+    check(t['COP total · today'] === '≈4.98' && t['COP total · month'] === '≈4.83' && t['COP total'] === '≈4.15', `COP from environmental energy (${JSON.stringify(t)})`);
     const hass = hassOf(toStates(s.states('heat')), s.registry || {}, s.energy, s);
     const values = C._tileOptions(s.config, C._resolve(s.config, hass), hass).options.map((x) => x.value);
     check(values.includes('env_energy:today') && values.includes('env_energy:month') && values.includes('cop_total:month'), `editor offers environmental energy periods (${values.filter((v) => v.includes('env_energy') || v.includes('cop_total')).join(',')})`);
@@ -1138,6 +1177,12 @@
     check(wolf['Heat heating · today'] === '38.6 kWh' && wolf['Heat · yesterday'] === '51.0 kWh' && wolf['Heat · month'] === '732 kWh' && wolf['Compressor hours · total'] === '7,500 h', `Wolf heat tiles (${JSON.stringify(wolf)})`);
     const vi = (await tilesOf(setups[2], ['cop_heating', 'starts', 'energy'])).t;
     check(vi['COP heating · total'] === '3.90' && vi['Compressor starts · total'] === '4,123' && vi['Electricity · today'] === '8.4 kWh', `ViCare periods (${JSON.stringify(vi)})`);
+    // #288: a tile name that already ends in the period word does not repeat it ("COP gesamt · gesamt" on ViCare).
+    const label = (key, period, lang) => C.prototype._tileLabel.call({}, key, period, hfcBuiltin(HFC_I18N, lang));
+    const labels = [label('cop_total', 'total', 'de'), label('cop_total', 'today', 'de'), label('cop_total', 'total', 'en'), label('cop_total', 'total', 'nl'),
+      label('cop_heating', 'total', 'de'), label('starts', 'today', 'de')];
+    check(labels.join(' | ') === 'COP gesamt | COP gesamt · heute | COP total | COP totaal | COP Heizen · gesamt | Verdichterstarts · heute',
+      `tile labels do not repeat the period (${labels.join(' | ')})`);
     const card = mount({ ...setups[0].config, tiles: [] }, hassOf(toStates(setups[0].states('heat'))));
     check(card.shadowRoot.getElementById('stats').style.display === 'none', 'tiles: [] hides the row');
     card.remove();
@@ -2643,7 +2688,7 @@
     // tiles: electricity per use today, the month from the total counter, COP total from the SCOP, starts as totals
     const { t } = await tilesOf(s, ['energy', 'energy_heating', 'energy:month', 'cop_total', 'cycles_heating', 'cycles_dhw', 'cop_heating']);
     check(t['Electricity · today'] === '27.4 kWh' && t['Electricity heating · today'] === '21.6 kWh' && t['Electricity · month'] === '513 kWh', `Kronoterm electricity tiles (${JSON.stringify(t)})`);
-    check(t['COP total · total'] === '3.43' && t['Heating cycles · total'] === '12,245' && t['DHW cycles · total'] === '641' && !Object.keys(t).some((k) => k.startsWith('COP heating')), `Kronoterm COP and cycle tiles (${JSON.stringify(t)})`);
+    check(t['COP total'] === '3.43' && t['Heating cycles · total'] === '12,245' && t['DHW cycles · total'] === '641' && !Object.keys(t).some((k) => k.startsWith('COP heating')), `Kronoterm COP and cycle tiles (${JSON.stringify(t)})`);
     // the hot water heat pumps of the Kronoterm DHW cloud and the same keys of another integration are not detected
     check(!detects('kronoterm', { 'sensor.kronoterm_dhw_current_temperature': '48', 'sensor.kronoterm_dhw_compressor_status': 'running' },
       { 'sensor.kronoterm_dhw_current_temperature': { platform: 'kronoterm', translation_key: 'dhw_current_temperature' }, 'sensor.kronoterm_dhw_compressor_status': { platform: 'kronoterm', translation_key: 'dhw_compressor_status' } }), 'a Kronoterm hot water heat pump is not taken for a heating heat pump');
@@ -3299,6 +3344,8 @@
     const err = (config) => { try { document.createElement('heatpump-flow-card').setConfig(config); return ''; } catch (e) { return e.message; } };
     check(/dhw_type must be one of: coil, fresh_water, tank_in_tank/.test(err({ dhw_type: 'plate' })), 'dhw_type accepts coil, fresh_water or tank_in_tank');
     check(/tank_in_tank needs storage: combined/.test(err({ dhw_type: 'tank_in_tank' })) && err({ dhw_type: 'tank_in_tank', storage: 'combined' }) === '', 'tank in tank needs a combined storage');
+    check(/buffer cannot be used with series_buffer/.test(err({ buffer: true, series_buffer: true })), 'parallel and series buffer are mutually exclusive');
+    check(/storage: combined cannot be used with buffer/.test(err({ buffer: true, storage: 'combined' })), 'a separate parallel buffer cannot be combined with a combined storage');
     const opts = (config) => C._formSchema(config).schema.flatMap(function all(n) { return n.schema ? n.schema.flatMap(all) : [n]; }).find((n) => n.name === 'dhw_type').selector.select.options.map((o) => o.value).join();
     check(opts({}) === 'coil,fresh_water' && opts({ storage: 'combined' }) === 'coil,fresh_water,tank_in_tank', 'editor offers tank in tank only for a combined storage');
     // Standby loss with a combined storage: the circuit pumps must be known, windows with a running circuit pump are left out.
@@ -3341,10 +3388,34 @@
     card.hass = hassOf(st()); await wait(20);
     check(before === 2 && !!q(card, 'g-cs-buffer_bottom') && /color-mix/.test(q(card, 'g-cs-buffer_bottom').getAttribute('stop-color')), `a late combined-storage sensor gets its gradient stop (${before} stops before)`);
     card.remove();
+    // An explicitly selected parallel buffer needs no sensor. Its tank and circuit side stay neutral; a later sensor keeps the
+    // existing automatic behaviour and supplies the temperature without changing the configuration.
+    card = mount({ buffer: true, entities: { flow: 'sensor.f', return: 'sensor.r', compressor: 'sensor.c', hc_pump: 'binary_sensor.p' } }, hassOf(st())); await wait(20);
+    check(card._parts.buffer && card._parts.configuredBuffer && q(card, 'g-buf-top').getAttribute('stop-color').includes('disabled-text-color')
+      && q(card, 't-buf-top').textContent === '' && !q(card, 'sb-tank'), 'buffer: true draws an empty neutral parallel buffer instead of a series buffer');
+    check(!q(card, 'p-hc-vl').style.getPropertyValue('--pc').includes('flow-hot') && !q(card, 'p-hc-rl').style.getPropertyValue('--pc').includes('return-hot'),
+      'an unmeasured buffer does not copy heat-pump temperatures to the circuit side');
+    check(/parallel buffer: yes, configured/.test(C._diagnosticReport(card._config, card._hass)), 'diagnostic report names the explicitly configured parallel buffer');
+    card.remove();
+    card = mount({ buffer: true, dhw_type: 'fresh_water', entities: { flow: 'sensor.f', return: 'sensor.r', compressor: 'sensor.c', hc_pump: 'binary_sensor.p' } }, hassOf(st())); await wait(20);
+    const stationShape = { station: card._parts.station, fws: !!q(card, 'fws'), valve: !!q(card, 'valve-arrow'), tank: !!card.shadowRoot.querySelector('rect.tank[x="520"][y="40"][height="200"]') };
+    check(stationShape.station && stationShape.fws && !stationShape.valve && !stationShape.tank,
+      `a fresh-water station is placed on an explicitly configured sensorless buffer (${JSON.stringify(stationShape)})`);
+    check(card._lossIds() === null, 'a fresh-water station on a sensorless buffer is excluded from the hot-water standby-loss fit');
+    card.remove();
+    card = mount({ entities: { flow: 'sensor.f', buffer_top: 'sensor.t4' } }, hassOf(st())); await wait(20);
+    check(card._parts.buffer && !card._parts.configuredBuffer && q(card, 't-buf-top').textContent.includes('40'), 'a mapped buffer sensor still draws and colours the parallel buffer automatically');
+    card.remove();
     // Editor: clears options that do not go with the chosen storage, and keeps the storage defaults out of the configuration.
     const ed = document.createElement('heatpump-flow-card-editor');
     let out;
     ed.addEventListener('config-changed', (ev) => { out = ev.detail.config; });
+    ed.setConfig({ entities: ents, series_buffer: true, series_bypass: false }); ed.hass = hassOf(st());
+    ed._changed({ ...ed._form.data, buffer: true });
+    check(out.buffer === true && !('series_buffer' in out) && !('series_bypass' in out), `choosing the parallel buffer clears the series buffer (${JSON.stringify(out)})`);
+    ed.setConfig({ entities: ents, buffer: true }); ed.hass = hassOf(st());
+    ed._changed({ ...ed._form.data, series_buffer: true });
+    check(out.series_buffer === true && !('buffer' in out), `choosing the series buffer clears the parallel buffer (${JSON.stringify(out)})`);
     ed.setConfig({ entities: ents, series_buffer: true, series_bypass: false }); ed.hass = hassOf(st());
     ed._changed({ ...ed._form.data, storage: 'combined' });
     let bad = ''; try { document.createElement('heatpump-flow-card').setConfig(out); } catch (e) { bad = e.message; }
@@ -3542,11 +3613,11 @@
     check(out.config.series_buffer === true && out.config.series_bypass === false, 'series_bypass: false next to a series buffer is kept');
     ed._changed({ ...ed._form.data, series_bypass: true });
     check(out.config.series_buffer === true && !('series_bypass' in out.config), 'switching the bypass valve back on removes the option (default)');
-    // Report: storage, hot-water preparation, series buffer and primary pump in one line.
+    // Report: storage, hot-water preparation, parallel/series buffer and primary pump in one line.
     const line = (cfg) => (/\nStorage: [^\n]+/.exec(C._diagnosticReport(cfg, hass)) || [''])[0].trim();
-    check(line({ entities: ents }) === 'Storage: separate · hot water: coil · series buffer: no · primary pump: no', `report names the default hydraulics (${line({ entities: ents })})`);
-    check(line({ entities: ents, storage: 'combined', dhw_type: 'fresh_water', primary_pump: true }) === 'Storage: combined · hot water: fresh_water · series buffer: no · primary pump: yes', 'report names a combined storage with a fresh-water station');
-    check(line({ entities: ents, series_buffer: true, series_bypass: false }) === 'Storage: separate · hot water: coil · series buffer: yes, no bypass valve · primary pump: no', 'report names a series buffer without bypass valve');
+    check(line({ entities: ents }) === 'Storage: separate · hot water: coil · parallel buffer: no · series buffer: no · primary pump: no', `report names the default hydraulics (${line({ entities: ents })})`);
+    check(line({ entities: ents, storage: 'combined', dhw_type: 'fresh_water', primary_pump: true }) === 'Storage: combined · hot water: fresh_water · parallel buffer: combined storage · series buffer: no · primary pump: yes', 'report names a combined storage with a fresh-water station');
+    check(line({ entities: ents, series_buffer: true, series_bypass: false }) === 'Storage: separate · hot water: coil · parallel buffer: no · series buffer: yes, no bypass valve · primary pump: no', 'report names a series buffer without bypass valve');
     check(/primary pump: yes$/.test(line({ preset: 'heishamon' })), 'report takes the primary pump from the preset');
     // Editor: a value map under entities is named as ignored, and saving keeps it where it is.
     [ed, out] = editor({ entities: { ...ents, valve_map: { 1: 'heating' } } });

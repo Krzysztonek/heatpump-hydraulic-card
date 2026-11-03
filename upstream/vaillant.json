@@ -5,6 +5,13 @@
     "version": null,
     "note": "Baseline: changes before this date were not tracked."
   },
+  "unmapped": {
+    "heat": "The myPyllant API reports generated heat only as energy counters, no live heat output.",
+    "return": "The myPyllant API has no return temperature.",
+    "volume": "The myPyllant API has no flow rate.",
+    "hc_return": "The myPyllant API reports per circuit the flow temperature, its setpoint, the state and the heating curve, no return.",
+    "hc_pump": "The myPyllant API has no pump state per circuit."
+  },
   "sources": [
     {
       "repo": "signalkraft/mypyllant-component",
