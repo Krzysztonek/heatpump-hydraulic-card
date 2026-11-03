@@ -439,6 +439,25 @@
       'sensor.v250_flow': [{ t: 0, s: '48' }], 'sensor.v250_dhw': [{ t: 0, s: '45' }],
     }, ids, 0, 90 * M).map((s) => s.kind).join();
     check(heatingPhase === 'dhw', `ViCare timeline: flow-derived hot-water routing overrides a stale heating phase (${heatingPhase})`);
+    delete card._hass.states['binary_sensor.v250_compressor'];
+    const phaseOnlyIds = card._timelineIds();
+    const phaseOnly = card._timelineSegments({
+      'sensor.v250_phase': [{ t: 0, s: 'heating' }], 'sensor.v250_flow': [{ t: 0, s: '48' }], 'sensor.v250_dhw': [{ t: 0, s: '45' }],
+    }, phaseOnlyIds, 0, 90 * M).map((s) => s.kind).join();
+    check(!phaseOnlyIds.comp && phaseOnlyIds.vflow === 'sensor.v250_flow' && phaseOnly === 'dhw',
+      `ViCare timeline: an active phase routes by flow without a separate compressor entity (${phaseOnly})`);
+    const heater = 'water_heater.v250_dhw'; card._e.dhw_top = heater;
+    const attributeIds = { ...phaseOnlyIds, vtank: heater };
+    const raw = {
+      'sensor.v250_phase': [{ state: 'heating', last_updated: '2030-01-01T00:00:00Z' }],
+      'sensor.v250_flow': [{ state: '48', last_updated: '2030-01-01T00:00:00Z' }],
+      [heater]: [{ state: 'eco', attributes: { current_temperature: 45 }, last_updated: '2030-01-01T00:00:00Z' }],
+    };
+    const parsed = card._timelineHistory(raw, Object.values(attributeIds).filter(Boolean));
+    const attributeRoute = card._timelineSegments(parsed, attributeIds, Date.parse('2030-01-01T00:00:00Z'), Date.parse('2030-01-01T01:00:00Z'))
+      .map((s) => s.kind).join();
+    check(card._timelineNeedsAttributes(attributeIds) && parsed[heater][0].s === '45' && attributeRoute === 'dhw',
+      `ViCare timeline: water-heater current_temperature is preserved and routes hot water (${parsed[heater][0].s} / ${attributeRoute})`);
     const report = C._diagnosticReport({ preset: 'vicare' }, hassOf(state('ready', 'on', '29'), registry));
     check(report.includes('Hot water without a valve entity: while the heat pump runs and flow is above dhw_top'), 'ViCare: the report names the hot-water rule');
     card.remove();

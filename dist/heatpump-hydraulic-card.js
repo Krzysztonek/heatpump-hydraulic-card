@@ -4767,8 +4767,8 @@ class HeatpumpFlowCard extends HTMLElement {
   // running compressor win over an idle mode; without a valve, `valve_rule` adds flow and tank temperature.
   _timelineIds() {
     const comp = this._has('compressor') ? { comp: this._e.compressor, valve: this._has('valve') ? this._e.valve : null } : null;
-    const byFlow = comp && this._valveByFlow() ? { vflow: this._e.flow, vtank: this._e.dhw_top } : {};
-    const base = this._has('mode') ? { mode: this._e.mode, ...(comp && this._preset?.compressor_over_idle ? { ...comp, ...byFlow } : {}) }
+    const byFlow = this._valveByFlow() ? { vflow: this._e.flow, vtank: this._e.dhw_top } : {};
+    const base = this._has('mode') ? { mode: this._e.mode, ...byFlow, ...(comp && this._preset?.compressor_over_idle ? comp : {}) }
       : comp ? { ...comp, ...byFlow } : null;
     return base ? { ...base, ...(this._has('pv_boost') ? { pv: this._e.pv_boost } : {}), ...(this._has('sg_ready') ? { sg: this._e.sg_ready } : {}) } : null;
   }
@@ -4846,7 +4846,7 @@ class HeatpumpFlowCard extends HTMLElement {
     const idList = Object.values(shareIds).filter(Boolean);
     const hist = this._wsCached(`pvshare|${idList.join(',')}|${period}`, {
       type: 'history/history_during_period', start_time: range[0], ...(range[1] ? { end_time: range[1] } : {}), entity_ids: idList,
-      minimal_response: true, no_attributes: true, significant_changes_only: false,
+      minimal_response: true, ...(!this._timelineNeedsAttributes(shareIds) ? { no_attributes: true } : {}), significant_changes_only: false,
     }, (res) => this._timelineHistory(res, idList));
     if (!hist) return NaN;
     const from = Date.parse(range[0]); const to = range[1] ? Date.parse(range[1]) : Date.now();
@@ -4872,10 +4872,15 @@ class HeatpumpFlowCard extends HTMLElement {
     const out = {};
     ids.forEach((id) => {
       const list = (res && res[id]) || [];
-      out[id] = list.map((e) => ({ t: time(e), s: String(e.s ?? e.state) })).filter((e) => Number.isFinite(e.t)).sort((a, b) => a.t - b.t);
+      const key = id === this._e?.flow ? 'flow' : id === this._e?.dhw_top ? 'dhw_top' : '';
+      const attr = hfcTempAttr(id, key);
+      out[id] = list.map((e) => ({ t: time(e), s: String((attr ? e.attributes?.[attr] ?? e.a?.[attr] : undefined) ?? e.s ?? e.state) }))
+        .filter((e) => Number.isFinite(e.t)).sort((a, b) => a.t - b.t);
     });
     return out;
   }
+
+  _timelineNeedsAttributes(ids) { return !![ids?.vflow, ids?.vtank].find((id) => hfcTempAttr(id, id === ids?.vflow ? 'flow' : 'dhw_top')); }
 
   // Segments { kind, raw, from, to } between start and end: operating modes plus PV/SG overlays or gap (no data).
   _timelineSegments(hist, ids, start, end) {
@@ -4885,7 +4890,7 @@ class HeatpumpFlowCard extends HTMLElement {
       return { heating: 'heat', dhw: 'dhw', defrost: 'defrost', cooling: 'cool', blocked: 'blocked' }[m] || 'idle';
     };
     const points = [];
-    if (ids.mode && !ids.comp) hist[ids.mode].forEach((e) => points.push({ t: e.t, kind: kindOfMode(e.s), raw: e.s }));
+    if (ids.mode && !ids.comp && !ids.vflow) hist[ids.mode].forEach((e) => points.push({ t: e.t, kind: kindOfMode(e.s), raw: e.s }));
     else {
       // Compressor on = heating, with the valve on hot water = dhw. With a mode as well, the compressor only decides while the
       // mode is idle. The times are walked in order, so each list keeps a pointer to the state held at that time.
@@ -4903,7 +4908,8 @@ class HeatpumpFlowCard extends HTMLElement {
           if (ms === undefined) return;
           const kind = kindOfMode(ms);
           // ViCare may keep reporting either ready/idle or heating while the inferred hydraulic route already charges DHW.
-          const routed = on(cs) && ['idle', 'heat'].includes(kind) ? (toDhw ? 'dhw' : 'heat') : kind;
+          const running = ids.comp ? on(cs) : ['heat', 'dhw', 'cool'].includes(kind);
+          const routed = running && ['idle', 'heat'].includes(kind) ? (toDhw ? 'dhw' : 'heat') : kind;
           points.push({ t, kind: routed, raw: ms });
         } else if (['unknown', 'unavailable'].includes(cs)) points.push({ t, kind: 'gap', raw: cs });
         else points.push({ t, kind: on(cs) ? (toDhw ? 'dhw' : 'heat') : 'idle', raw: on(cs) ? 'on' : 'off' });
@@ -4978,7 +4984,7 @@ class HeatpumpFlowCard extends HTMLElement {
     const allIds = [...new Set([...idList, ...marks.map((m) => m.entity)])];
     const hist = this._wsCached(`timeline|${allIds.join(',')}|${hours}`, {
       type: 'history/history_during_period', start_time: new Date(start).toISOString(), entity_ids: allIds,
-      minimal_response: true, no_attributes: true, significant_changes_only: false,
+      minimal_response: true, ...(!this._timelineNeedsAttributes(ids) ? { no_attributes: true } : {}), significant_changes_only: false,
     }, (res) => this._timelineHistory(res, allIds));
     if (!hist) { box.hidden = true; return; }
     // The window is cached for five minutes; the bar always ends at "now".
