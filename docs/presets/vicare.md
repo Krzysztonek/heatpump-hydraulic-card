@@ -2,6 +2,8 @@
 
 Preset `vicare`. Back to the [README](../../README.md#supported-heat-pumps).
 
+Confirmed on a Vitocal 250 (#186, #196) and on a Vitocal 200-S with combined storage and fresh-water station, heating and hot-water charging (#282). Other Vitocal models remain welcome test coverage.
+
 ## Setup
 
 ```yaml

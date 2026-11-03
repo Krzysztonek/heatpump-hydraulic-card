@@ -286,6 +286,8 @@ const HFC_PRESETS = {
   // so entity ids and the HA language do not matter. Restrict to one device with `device:`.
   vicare: {
     name: 'Viessmann (ViCare)',
+    // Confirmed on a Vitocal 250 (#186, #196) and a Vitocal 200-S with combined storage and fresh-water station (#282).
+    tested: true,
     unit_style: 'viessmann',
     // Gas boilers also report outside_temperature, so only compressor entities count as a heat pump.
     detect: (ctx) => (ctx.key('vicare', 'binary_sensor', 'compressor') || ctx.key('vicare', 'sensor', 'compressor_phase')
@@ -1056,6 +1058,8 @@ const HFC_PRESETS = {
   // sensor sits in it depends on the hydraulic scheme. Status texts from RunDataStatuscode in ebusd-configuration.
   ebusd: {
     name: 'ebusd (Vaillant aroTHERM, HMU)',
+    // Confirmed on an aroTHERM plus cascade with two circuits and on a single aroTHERM plus with a buffer (#189, #295).
+    tested: true,
     unit_style: 'vaillant',
     // The controller reports all its circuits, inactive ones included, so the editor stub cannot count them.
     auto_circuits: false,

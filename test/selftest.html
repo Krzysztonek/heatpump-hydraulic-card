@@ -101,6 +101,7 @@
 
   // 5. detection: the right preset for each installation, nothing for gas boilers or foreign entities
   check(HFC_PRESETS.heishamon.tested === true, 'HeishaMon preset is marked real-installation tested');
+  check(HFC_PRESETS.vicare.tested === true && HFC_PRESETS.ebusd.tested === true, 'ViCare (#282) and ebusd (#295) presets are marked real-installation tested');
 
   // 5-00. Two integrations for one heat pump (#143): the preset with more live core entities wins, a tie keeps the order
   {

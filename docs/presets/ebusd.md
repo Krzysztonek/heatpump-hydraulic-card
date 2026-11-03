@@ -2,6 +2,8 @@
 
 Preset `ebusd`. Back to the [README](../../README.md#supported-heat-pumps).
 
+Confirmed on an aroTHERM plus cascade with two circuits and on a single aroTHERM plus with a sensoCOMFORT controller and a buffer (#189, #295).
+
 ## Setup
 
 ```yaml
