@@ -1,5 +1,7 @@
 # Development plan
 
+**Roadmap draft for review, 3 November 2026.** After the 0.18 hydraulic fixes, measure setup success on real installations, guide users through ambiguous hydraulic configurations, then explain individual operating cycles. The draft defines how to verify each result. The tracker now follows this sequence. The earlier release plan is retained below for context. [Milestones and gap analysis](ROADMAP-DRAFT.md) · [Issue assignments](ISSUE-PLAN.md)
+
 This plan keeps correctness and supportability ahead of new surface area. Impact is the expected benefit across installations; effort is relative (`S` local, `M` several code paths, `L` public API or data logic, `XL` architecture or a second layout).
 
 ## Current status: 0.17.2
@@ -38,6 +40,8 @@ The 0.18 milestone contains four bounded, vendor-neutral improvements, in priori
 4. **Circulation program window** ([#34](https://github.com/Sturmi77/heatpump-hydraulic-card/issues/34); impact medium, effort S–M). Support one explicit start/end window from time or text entities and a Home Assistant schedule's next change. Missing values stay hidden. Multiple weekday windows and preset mappings are follow-ups, not blockers.
 
 ## 0.19.0 – data aggregation and long-term analytics
+
+This was the original 0.19 scope. The [current issue assignments](ISSUE-PLAN.md#github-milestones) put installation confirmation in 0.19, measurement completeness in 0.20, and the two specialist analytics in Later.
 
 1. **Several entities per key** ([#23](https://github.com/Sturmi77/heatpump-hydraulic-card/issues/23); impact high, effort L). Define the public configuration, availability rules, units and editor flow for average, sum, minimum and maximum before using it for room climate and multi-unit values.
 2. **DHW loss from an energy balance** ([#114](https://github.com/Sturmi77/heatpump-hydraulic-card/issues/114); impact medium, effort M–L). Add a conservative period tile from explicitly configured cumulative heat-in, auxiliary-input and heat-out counters. Compute only when every configured path has valid statistics over the same period; never infer a missing heater or usage meter.
