@@ -1,0 +1,1 @@
+- Show one configured circulation-pump start/end window or the next change of a Home Assistant schedule helper beside the pump state.
