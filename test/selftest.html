@@ -434,6 +434,11 @@
     };
     const segs = card._timelineSegments(hist, ids, 0, 90 * M).map((s) => `${s.kind}:${s.from / M}-${s.to / M}`).join(' ');
     check(segs === 'idle:0-10 heat:10-40 dhw:40-70 idle:70-90', `ViCare timeline: heating, then hot water while the flow is above the tank (${segs})`);
+    const heatingPhase = card._timelineSegments({
+      'sensor.v250_phase': [{ t: 0, s: 'heating' }], 'binary_sensor.v250_compressor': [{ t: 0, s: 'on' }],
+      'sensor.v250_flow': [{ t: 0, s: '48' }], 'sensor.v250_dhw': [{ t: 0, s: '45' }],
+    }, ids, 0, 90 * M).map((s) => s.kind).join();
+    check(heatingPhase === 'dhw', `ViCare timeline: flow-derived hot-water routing overrides a stale heating phase (${heatingPhase})`);
     const report = C._diagnosticReport({ preset: 'vicare' }, hassOf(state('ready', 'on', '29'), registry));
     check(report.includes('Hot water without a valve entity: while the heat pump runs and flow is above dhw_top'), 'ViCare: the report names the hot-water rule');
     card.remove();

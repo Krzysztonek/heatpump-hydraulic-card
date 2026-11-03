@@ -4813,7 +4813,9 @@ class HeatpumpFlowCard extends HTMLElement {
         if (ids.mode) {
           if (ms === undefined) return;
           const kind = kindOfMode(ms);
-          points.push({ t, kind: kind === 'idle' && on(cs) ? (toDhw ? 'dhw' : 'heat') : kind, raw: ms });
+          // ViCare may keep reporting either ready/idle or heating while the inferred hydraulic route already charges DHW.
+          const routed = on(cs) && ['idle', 'heat'].includes(kind) ? (toDhw ? 'dhw' : 'heat') : kind;
+          points.push({ t, kind: routed, raw: ms });
         } else if (['unknown', 'unavailable'].includes(cs)) points.push({ t, kind: 'gap', raw: cs });
         else points.push({ t, kind: on(cs) ? (toDhw ? 'dhw' : 'heat') : 'idle', raw: on(cs) ? 'on' : 'off' });
       });
