@@ -13,6 +13,13 @@
 <body>
 <pre id="result">RUNNING</pre>
 <pre id="log"></pre>
+<script>
+  // Without Home Assistant the editor falls back to the browser language. The checks expect English texts, so the browser
+  // language is fixed here: a self-test run in a German (or any other) browser gives the same result as the English CI.
+  // Checks of the language fallback set the Home Assistant locale themselves.
+  Object.defineProperty(navigator, 'language', { get: () => 'en-US', configurable: true });
+  Object.defineProperty(navigator, 'languages', { get: () => ['en-US', 'en'], configurable: true });
+</script>
 <script src="../dist/heatpump-hydraulic-card.js"></script>
 <script src="../demo/setups.js"></script>
 <script>
@@ -2886,6 +2893,10 @@
     check(r.tiles.energy_heating?.now === `sensor.${p}_main_heat_energy_consumption` && r.tiles.heat_dhw?.now === `sensor.${p}_main_dhw_energy_production`, 'HeishaMon tiles accept the Energy spelling');
     check(r.entities.hc_setpoint === `sensor.${p}_main_z1_water_target_temp` && r.entities.hc2_setpoint === `sensor.${p}_main_z2_water_target_temp`, 'HeishaMon takes the zone target temperature, not the outlet target');
     check(r.entities.program === `switch.${p}_main_holiday_mode_state`, 'HeishaMon falls back to the holiday switch');
+    // #276: the water pressure (K/L series) only where the entity exists, and only for the first circuit.
+    const withPressure = C._resolve({ preset: 'heishamon', hc_count: 2 }, hassOf(toStates({ ...v2, [`sensor.${p}_main_water_pressure`]: ['2.26', 'bar'] }))).entities;
+    check(!r.entities.hc_pressure && withPressure.hc_pressure === `sensor.${p}_main_water_pressure` && !withPressure.hc2_pressure,
+      `HeishaMon maps the water pressure only where it exists (${r.entities.hc_pressure} / ${withPressure.hc_pressure} / ${withPressure.hc2_pressure})`);
     const card = mount({ preset: 'heishamon' }, hassOf(toStates(v2))); await wait(20);
     const chip = card.shadowRoot.getElementById('chip-program');
     check(chip.classList.contains('on') && chip.classList.contains('holiday'), 'holiday switch on shows the holiday chip');
@@ -3342,6 +3353,14 @@
     card.remove();
     card = mount({ preset: 'heishamon' }, hassOf(st({ [`sensor.${p}_main_pump_flow`]: ['0', 'l/min'], [`sensor.${p}_main_compressor_freq`]: ['0', 'Hz'] }))); await wait(20);
     check(!q(card, '#impeller-primary').classList.contains('on'), 'the primary pump stands still without a flow rate');
+    card.remove();
+    // #312: EMS-ESP reports PC0 below about 50 % speed as -1 l/h. A negative flow rate is unknown: the pump follows the
+    // running heat pump, no "-1 l/h" label, no estimated heat from it.
+    card = mount({ preset: 'heishamon' }, hassOf(st({ [`sensor.${p}_main_pump_flow`]: ['-1', 'l/h'] }))); await wait(20);
+    check(q(card, '#impeller-primary').classList.contains('on') && q(card, '#t-vol').textContent === '' && q(card, '#p-vl').classList.contains('on'),
+      `#312: a negative flow rate is unknown, the primary pump turns while the heat pump runs (${q(card, '#t-vol').textContent})`);
+    card.hass = hassOf(st({ [`sensor.${p}_main_pump_flow`]: ['-1', 'l/h'], [`sensor.${p}_main_compressor_freq`]: ['0', 'Hz'] })); await wait(5);
+    check(!q(card, '#impeller-primary').classList.contains('on'), '#312: with a negative flow rate and the heat pump off the primary pump stands still');
     card.remove();
     // Sniffing: the compressor is off, the primary pump moves a few l/h. The water circulates slowly, the mode stays idle.
     card = mount({ preset: 'heishamon', hc_type: 'radiator' }, hassOf(st({ [`sensor.${p}_main_pump_flow`]: ['0.13', 'l/min'], [`sensor.${p}_main_compressor_freq`]: ['0', 'Hz'] }))); await wait(20);
