@@ -13,6 +13,13 @@
 <body>
 <pre id="result">RUNNING</pre>
 <pre id="log"></pre>
+<script>
+  // Without Home Assistant the editor falls back to the browser language. The checks expect English texts, so the browser
+  // language is fixed here: a self-test run in a German (or any other) browser gives the same result as the English CI.
+  // Checks of the language fallback set the Home Assistant locale themselves.
+  Object.defineProperty(navigator, 'language', { get: () => 'en-US', configurable: true });
+  Object.defineProperty(navigator, 'languages', { get: () => ['en-US', 'en'], configurable: true });
+</script>
 <script src="../dist/heatpump-hydraulic-card.js"></script>
 <script src="../demo/setups.js"></script>
 <script>
