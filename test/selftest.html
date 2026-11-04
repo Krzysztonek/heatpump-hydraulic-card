@@ -475,6 +475,9 @@
     const M = 60000;
     const card = mount({ entities: { mode: 'sensor.m', compressor: 'sensor.c' } }, hassOf(toStates({ 'sensor.m': 'idle', 'sensor.c': ['0', 'Hz'] }))); await wait(20);
     check(card._timelineIds().cycle === 'sensor.c' && !card._timelineIds().comp, 'with a mode the runs read the compressor as `cycle`, the segments stay on the mode');
+    const speedOnly = mount({ entities: { mode: 'sensor.m', compressor_speed: 'sensor.cs' } }, hassOf(toStates({ 'sensor.m': 'idle', 'sensor.cs': ['0', '%'] }))); await wait(20);
+    check(speedOnly._timelineIds().cycle === 'sensor.cs', 'without a compressor entity the compressor speed delimits the runs (Lambda)');
+    speedOnly.remove();
     const h = (pairs) => pairs.map(([t, s]) => ({ t: t * M, s }));
     const hist = {
       'sensor.m': h([[0, 'idle'], [10, 'heating'], [22, 'dhw'], [40, 'idle'], [50, 'heating'], [52, 'defrost'], [55, 'heating'], [70, 'idle']]),

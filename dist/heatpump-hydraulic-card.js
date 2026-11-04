@@ -4957,7 +4957,9 @@ class HeatpumpFlowCard extends HTMLElement {
     const base = this._has('mode') ? { mode: this._e.mode, ...byFlow, ...(comp && this._preset?.compressor_over_idle ? comp : {}) }
       : comp ? { ...comp, ...byFlow } : null;
     // The runs read the compressor even where the segments follow the mode alone; `cycle` only when `comp` is not there already.
-    const cycle = base && comp && !base.comp ? { cycle: comp.comp } : {};
+    // Presets without a compressor entity but with its speed (Lambda, Bosch/Buderus Home Comfort) delimit the runs by the speed.
+    const runSignal = comp ? comp.comp : (this._has('compressor_speed') ? this._e.compressor_speed : null);
+    const cycle = base && runSignal && !base.comp ? { cycle: runSignal } : {};
     return base ? { ...base, ...cycle, ...(this._has('pv_boost') ? { pv: this._e.pv_boost } : {}), ...(this._has('sg_ready') ? { sg: this._e.sg_ready } : {}) } : null;
   }
 
