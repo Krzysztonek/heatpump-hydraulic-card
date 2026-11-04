@@ -1553,7 +1553,7 @@ const HFC_EDITOR = {
     flow_speed: 'Animation speed', source_spread: 'Show source spread',
     theme: 'Card theme', theme_auto: 'Automatic (dashboard)', theme_night: 'Night', theme_contrast: 'High contrast', fullscreen: 'Full-screen button', diagnostic: 'Diagnostic report button',
     wall_timeout: 'Hide controls after (seconds, 0 = never)',
-    hc_flow_label: 'Show circuit flow temperature', hc_return_label: 'Show circuit return temperature', dew_point_margin: 'Minimum dew-point margin (K)', narrow_values: 'Keep tank sub-values, hot-water target and circuit return on narrow cards', buffer_values: 'Buffer temperature emphasis', buffer_values_default: 'Top value prominent (default)', buffer_values_equal: 'All configured values equal', storage: 'Storage', storage_separate: 'Separate hot-water tank and buffer', storage_combined: 'Combined storage (one tank, hot-water zone on top)', buffer: 'Parallel buffer (also without sensors)', dhw_type: 'Hot-water preparation', dhw_type_coil: 'Tank with heat-exchanger coil', dhw_type_fresh_water: 'Fresh-water station (on the buffer or the combined storage)', dhw_type_tank_in_tank: 'Tank in tank (combined storage)', series_buffer: 'Series buffer in the return', series_bypass: 'Series buffer with bypass valve (off: the circuits run in defrost)', primary_pump: 'Primary pump', hc_name: 'Circuit 1 name', hc2_name: 'Circuit 2 name', hc3_name: 'Circuit 3 name', hc4_name: 'Circuit 4 name', hc5_name: 'Circuit 5 name', hc6_name: 'Circuit 6 name',
+    hc_flow_label: 'Show circuit flow temperature', hc_return_label: 'Show circuit return temperature', dew_point_margin: 'Minimum dew-point margin (K)', narrow_values: 'Keep tank sub-values, hot-water target and circuit return on narrow cards', narrow_focus: 'Phone focus: larger key values on narrow cards, secondary values in one line below', buffer_values: 'Buffer temperature emphasis', buffer_values_default: 'Top value prominent (default)', buffer_values_equal: 'All configured values equal', storage: 'Storage', storage_separate: 'Separate hot-water tank and buffer', storage_combined: 'Combined storage (one tank, hot-water zone on top)', buffer: 'Parallel buffer (also without sensors)', dhw_type: 'Hot-water preparation', dhw_type_coil: 'Tank with heat-exchanger coil', dhw_type_fresh_water: 'Fresh-water station (on the buffer or the combined storage)', dhw_type_tank_in_tank: 'Tank in tank (combined storage)', series_buffer: 'Series buffer in the return', series_bypass: 'Series buffer with bypass valve (off: the circuits run in defrost)', primary_pump: 'Primary pump', hc_name: 'Circuit 1 name', hc2_name: 'Circuit 2 name', hc3_name: 'Circuit 3 name', hc4_name: 'Circuit 4 name', hc5_name: 'Circuit 5 name', hc6_name: 'Circuit 6 name',
     sec_hc2: 'Heating circuit 2', sec_hc3: 'Heating circuit 3', sec_hc4: 'Heating circuit 4', sec_hc5: 'Heating circuit 5', sec_hc6: 'Heating circuit 6', sec_details: 'Details: operation', sec_refrigerant: 'Details: refrigerant circuit', sec_cutouts: 'Details: cut-out counters',
     controls: 'Quick controls (switch, button, select, number …)', details_open: 'Details open by default',
     from_preset: 'Found by the preset', more_fields: 'More fields',
@@ -1646,7 +1646,7 @@ const HFC_EDITOR = {
     flow_speed: 'Animationsgeschwindigkeit', source_spread: 'Quellenspreizung anzeigen',
     theme: 'Kartendarstellung', theme_auto: 'Automatisch (Dashboard)', theme_night: 'Nacht', theme_contrast: 'Hoher Kontrast', fullscreen: 'Vollbild-Schaltfläche', diagnostic: 'Diagnosebericht-Schaltfläche',
     wall_timeout: 'Bedienelemente ausblenden nach (Sekunden, 0 = nie)',
-    hc_flow_label: 'Heizkreis-Vorlauf anzeigen', hc_return_label: 'Heizkreis-Rücklauf anzeigen', dew_point_margin: 'Mindestabstand zum Taupunkt (K)', narrow_values: 'Speicher-Unterwerte, WW-Soll und Heizkreis-Rücklauf auf schmalen Karten zeigen', buffer_values: 'Gewichtung der Puffertemperaturen', buffer_values_default: 'Oberen Wert hervorheben (Standard)', buffer_values_equal: 'Alle vorhandenen Werte gleich', storage: 'Speicher', storage_separate: 'Getrennter Warmwasserspeicher und Puffer', storage_combined: 'Kombispeicher (ein Speicher, Warmwasserzone oben)', buffer: 'Parallelpuffer (auch ohne Sensoren)', dhw_type: 'Warmwasserbereitung', dhw_type_coil: 'Speicher mit Wärmetauscher-Wendel', dhw_type_fresh_water: 'Frischwasserstation (am Puffer oder Kombispeicher)', dhw_type_tank_in_tank: 'Tank im Tank (Kombispeicher)', series_buffer: 'Reihenpuffer im Rücklauf', series_bypass: 'Reihenpuffer mit Bypass-Ventil (aus: die Heizkreise laufen beim Abtauen)', primary_pump: 'Primärpumpe', hc_name: 'Name Heizkreis 1', hc2_name: 'Name Heizkreis 2', hc3_name: 'Name Heizkreis 3', hc4_name: 'Name Heizkreis 4', hc5_name: 'Name Heizkreis 5', hc6_name: 'Name Heizkreis 6',
+    hc_flow_label: 'Heizkreis-Vorlauf anzeigen', hc_return_label: 'Heizkreis-Rücklauf anzeigen', dew_point_margin: 'Mindestabstand zum Taupunkt (K)', narrow_values: 'Speicher-Unterwerte, WW-Soll und Heizkreis-Rücklauf auf schmalen Karten zeigen', narrow_focus: 'Handy-Fokus: Kernwerte auf schmalen Karten größer, Nebenwerte in einer Zeile darunter', buffer_values: 'Gewichtung der Puffertemperaturen', buffer_values_default: 'Oberen Wert hervorheben (Standard)', buffer_values_equal: 'Alle vorhandenen Werte gleich', storage: 'Speicher', storage_separate: 'Getrennter Warmwasserspeicher und Puffer', storage_combined: 'Kombispeicher (ein Speicher, Warmwasserzone oben)', buffer: 'Parallelpuffer (auch ohne Sensoren)', dhw_type: 'Warmwasserbereitung', dhw_type_coil: 'Speicher mit Wärmetauscher-Wendel', dhw_type_fresh_water: 'Frischwasserstation (am Puffer oder Kombispeicher)', dhw_type_tank_in_tank: 'Tank im Tank (Kombispeicher)', series_buffer: 'Reihenpuffer im Rücklauf', series_bypass: 'Reihenpuffer mit Bypass-Ventil (aus: die Heizkreise laufen beim Abtauen)', primary_pump: 'Primärpumpe', hc_name: 'Name Heizkreis 1', hc2_name: 'Name Heizkreis 2', hc3_name: 'Name Heizkreis 3', hc4_name: 'Name Heizkreis 4', hc5_name: 'Name Heizkreis 5', hc6_name: 'Name Heizkreis 6',
     sec_hc2: 'Heizkreis 2', sec_hc3: 'Heizkreis 3', sec_hc4: 'Heizkreis 4', sec_hc5: 'Heizkreis 5', sec_hc6: 'Heizkreis 6', sec_details: 'Details: Betrieb', sec_refrigerant: 'Details: Kältekreis', sec_cutouts: 'Details: Abschaltzähler',
     controls: 'Schnellbedienung (Schalter, Taste, Auswahl, Zahl …)', details_open: 'Details standardmäßig offen',
     from_preset: 'Von der Voreinstellung gefunden', more_fields: 'Weitere Felder',
@@ -1741,6 +1741,7 @@ const HFC_EDITOR = {
     theme: 'Téma karty', theme_auto: 'Automaticky (podľa panelu)', theme_night: 'Nočná', theme_contrast: 'Vysoký kontrast', fullscreen: 'Tlačidlo na celú obrazovku', diagnostic: 'Tlačidlo diagnostickej správy',
     wall_timeout: 'Skryť ovládacie prvky po (sekundy, 0 = nikdy)',
     narrow_values: 'Ponechať podhodnoty akumulačnej nádrže a spiatočku okruhu na úzkych kartách',
+    narrow_focus: 'Mobilné zobrazenie: hlavné hodnoty na úzkych kartách väčšie, vedľajšie v jednom riadku pod schémou',
     buffer_values: 'Zvýraznenie teplôt akumulačnej nádrže', buffer_values_default: 'Zvýrazniť hornú hodnotu (predvolené)', buffer_values_equal: 'Všetky nakonfigurované hodnoty rovnocenné',
     assistant_device: 'Nájsť entity na tomto zariadení tepelného čerpadla',
     assistant_device_help: 'Dostupné iba vtedy, ak nie je detegovaný žiadny podporovaný profil (preset). Návrhy sa neuložia, kým ich nevyberiete a nepotvrdíte.',
@@ -1870,6 +1871,7 @@ const HFC_EDITOR = {
     theme: 'Téma karty', theme_auto: 'Automaticky (podle panelu)', theme_night: 'Noční', theme_contrast: 'Vysoký kontrast', fullscreen: 'Tlačítko na celou obrazovku', diagnostic: 'Tlačítko diagnostické zprávy',
     wall_timeout: 'Skrýt ovládací prvky po (sekundy, 0 = nikdy)',
     narrow_values: 'Ponechat podhodnoty akumulační nádrže a zpátečku okruhu na úzkých kartách',
+    narrow_focus: 'Mobilní zobrazení: hlavní hodnoty na úzkých kartách větší, vedlejší v jednom řádku pod schématem',
     buffer_values: 'Zvýraznění teplot akumulační nádrže', buffer_values_default: 'Zvýraznit horní hodnotu (výchozí)', buffer_values_equal: 'Všechny nakonfigurované hodnoty rovnocenné',
     assistant_device: 'Najít entity na tomto zařízení tepelného čerpadla',
     assistant_device_help: 'Dostupné pouze tehdy, pokud není detekován žádný podporovaný profil (preset). Návrhy se neuloží, dokud je nevyberete a nepotvrdíte.',
@@ -1997,7 +1999,7 @@ const HFC_EDITOR = {
     flow_speed: 'Animatiesnelheid', source_spread: 'ΔT van de bron tonen',
     theme: 'Kaartthema', theme_auto: 'Automatisch (dashboard)', theme_night: 'Nacht', theme_contrast: 'Hoog contrast', fullscreen: 'Knop volledig scherm', diagnostic: 'Knop diagnoserapport',
     wall_timeout: 'Bediening verbergen na (seconden, 0 = nooit)',
-    hc_flow_label: 'Aanvoertemperatuur per groep tonen', hc_return_label: 'Retourtemperatuur per groep tonen', dew_point_margin: 'Minimale dauwpuntsmarge (K)', narrow_values: 'Vat-subwaarden, warmwaterdoel en groepsretour op smalle kaarten tonen', buffer_values: 'Nadruk buffertemperaturen', buffer_values_default: 'Bovenste waarde prominent (standaard)', buffer_values_equal: 'Alle ingestelde waarden gelijk', storage: 'Opslag', storage_separate: 'Apart warmwatervat en buffervat', storage_combined: 'Combivat (één vat, warmwaterzone bovenin)', buffer: 'Parallel buffervat (ook zonder sensoren)', dhw_type: 'Warmwaterbereiding', dhw_type_coil: 'Vat met warmtewisselaarspiraal', dhw_type_fresh_water: 'Verswaterstation (op het buffervat of het combivat)', dhw_type_tank_in_tank: 'Tank in tank (combivat)', series_buffer: 'Seriebuffer in de retour', series_bypass: 'Seriebuffer met bypassklep (uit: de groepen draaien door bij ontdooien)', primary_pump: 'Primaire pomp', hc_name: 'Naam groep 1', hc2_name: 'Naam groep 2', hc3_name: 'Naam groep 3', hc4_name: 'Naam groep 4', hc5_name: 'Naam groep 5', hc6_name: 'Naam groep 6',
+    hc_flow_label: 'Aanvoertemperatuur per groep tonen', hc_return_label: 'Retourtemperatuur per groep tonen', dew_point_margin: 'Minimale dauwpuntsmarge (K)', narrow_values: 'Vat-subwaarden, warmwaterdoel en groepsretour op smalle kaarten tonen', narrow_focus: 'Telefoonweergave: kernwaarden groter op smalle kaarten, bijwaarden in één regel eronder', buffer_values: 'Nadruk buffertemperaturen', buffer_values_default: 'Bovenste waarde prominent (standaard)', buffer_values_equal: 'Alle ingestelde waarden gelijk', storage: 'Opslag', storage_separate: 'Apart warmwatervat en buffervat', storage_combined: 'Combivat (één vat, warmwaterzone bovenin)', buffer: 'Parallel buffervat (ook zonder sensoren)', dhw_type: 'Warmwaterbereiding', dhw_type_coil: 'Vat met warmtewisselaarspiraal', dhw_type_fresh_water: 'Verswaterstation (op het buffervat of het combivat)', dhw_type_tank_in_tank: 'Tank in tank (combivat)', series_buffer: 'Seriebuffer in de retour', series_bypass: 'Seriebuffer met bypassklep (uit: de groepen draaien door bij ontdooien)', primary_pump: 'Primaire pomp', hc_name: 'Naam groep 1', hc2_name: 'Naam groep 2', hc3_name: 'Naam groep 3', hc4_name: 'Naam groep 4', hc5_name: 'Naam groep 5', hc6_name: 'Naam groep 6',
     sec_hc2: 'Verwarmingsgroep 2', sec_hc3: 'Verwarmingsgroep 3', sec_hc4: 'Verwarmingsgroep 4', sec_hc5: 'Verwarmingsgroep 5', sec_hc6: 'Verwarmingsgroep 6', sec_details: 'Details: bedrijf', sec_refrigerant: 'Details: koudemiddelcircuit', sec_cutouts: 'Details: uitschakeltellers',
     controls: 'Snelbediening (schakelaar, knop, keuzelijst, getal …)', details_open: 'Details standaard open',
     from_preset: 'Gevonden door de preset', more_fields: 'Meer velden',
@@ -2199,6 +2201,9 @@ const HFC_STAT_PERIODS = { today: ['day', 0], yesterday: ['day', -1], week: ['we
 const HFC_ACTIONS = ['tap_action', 'hold_action', 'double_tap_action'];
 const HFC_LAYOUTS = ['default', 'compact', 'wide', 'wall'];
 const HFC_BUFFER_VALUES = ['default', 'equal'];
+// Option for phones: key values of the schematic grow below 500 px, secondary ones move to one line under it (#4). The name lives
+// here, in the editor labels and in the CSS class narrow-focus.
+const HFC_NARROW_FOCUS = 'narrow_focus';
 const HFC_ANIMATIONS = ['auto', 'always', 'off'];
 const HFC_THEMES = ['auto', 'night', 'contrast'];
 // Storage: a hot-water tank and a buffer, or one combined (layered) tank with the hot-water zone on top (docs/TOPOLOGY.md, phase 1).
@@ -2556,6 +2561,7 @@ class HeatpumpFlowCard extends HTMLElement {
               { name: 'hc_return_label', selector: { boolean: {} } },
               { name: 'dew_point_margin', selector: { number: { min: 0, max: 10, step: 0.5, mode: 'box', unit_of_measurement: 'K' } } },
               { name: 'narrow_values', selector: { boolean: {} } },
+              { name: HFC_NARROW_FOCUS, selector: { boolean: {} } },
               { name: 'buffer_values', selector: { select: { mode: 'dropdown', options: HFC_BUFFER_VALUES.map((v) => ({ value: v, label: L[`buffer_values_${v}`] })) } } },
               { name: 'storage', selector: { select: { mode: 'dropdown', options: HFC_STORAGES.map((v) => ({ value: v, label: L[`storage_${v}`] })) } } },
               { name: 'dhw_type', selector: { select: { mode: 'dropdown', options: HFC_DHW_TYPES.filter((v) => v !== 'tank_in_tank' || (config && config.storage === 'combined')).map((v) => ({ value: v, label: L[`dhw_type_${v}`] })) } } },
@@ -2667,6 +2673,9 @@ class HeatpumpFlowCard extends HTMLElement {
     }
     if (config.narrow_values !== undefined && config.narrow_values !== null && typeof config.narrow_values !== 'boolean') {
       throw new Error('narrow_values must be true or false');
+    }
+    if (config[HFC_NARROW_FOCUS] !== undefined && config[HFC_NARROW_FOCUS] !== null && typeof config[HFC_NARROW_FOCUS] !== 'boolean') {
+      throw new Error(`${HFC_NARROW_FOCUS} must be true or false`);
     }
     if (config.buffer !== undefined && config.buffer !== null && typeof config.buffer !== 'boolean') {
       throw new Error('buffer must be true or false');
@@ -3582,6 +3591,27 @@ class HeatpumpFlowCard extends HTMLElement {
     return true;
   }
 
+  // The line under the schematic in the narrow focus view: outdoor and air inlet temperatures, the power from PV, battery and grid
+  // (as configured, in the format of the schematic) and the room humidity of a single circuit. Missing values are left out.
+  _focusLine(srcParts) {
+    const el = this._$('focus-line'); const i = this._i; const P = this._parts;
+    const parts = [];
+    if (this._has('outdoor')) parts.push(`${i.outdoor} ${this._t(this._n('outdoor'))}`);
+    if (this._sourceType === 'air') parts.push(...srcParts);
+    if (P.power) {
+      const split = P.power === 'energy' ? this._energySplit() : null;
+      const labels = { pv: i.pv, battery: i.battery, grid: i.grid };
+      this._srcKeys().forEach((key) => {
+        const w = P.power === 'energy' ? (split ? split[key] : NaN) : this._w(key);
+        if (Number.isFinite(w)) parts.push(`${labels[key]} ${P.power === 'energy' ? '≈' : ''}${this._fmt(w, 0)} W`);
+      });
+    }
+    const humidity = P.house && this._hcCount === 1 ? this._roomHumidity(1) : NaN;
+    if (Number.isFinite(humidity)) parts.push(`${i.humidity} ${this._fmt(humidity, 0)} %`);
+    const html = parts.map((p) => `<span>${this._esc(p)}</span>`).join(' · ');
+    if (el.innerHTML !== html) el.innerHTML = html;
+  }
+
   // Room keys of circuit n: circuit 1 uses the room and target of the house, circuits 2 to 6 their own.
   _roomKey(n, key = 'room') { return n === 1 ? key : `hc${n}_${key}`; }
 
@@ -3619,6 +3649,18 @@ class HeatpumpFlowCard extends HTMLElement {
     el.append(t, text);
   }
   _txt(id, text) { const el = this._$(id); if (el && el.textContent !== text) el.textContent = text; }
+  // Label whose tail (for example the humidity after the room target) the narrow focus view hides; without the option a plain label.
+  _txtTail(id, main, tail) {
+    if (!this._narrowFocus()) { this._txt(id, `${main}${tail}`); return; }
+    const el = this._$(id); if (!el) return;
+    const key = `${main}|${tail}`;
+    if (el._k === key) return;
+    el._k = key; el.textContent = main;
+    if (!tail) return;
+    const t = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+    t.setAttribute('class', 'nf-tail'); t.textContent = tail;
+    el.append(t);
+  }
   _cls(id, on) { const el = this._$(id); if (el) el.classList.toggle('on', !!on); }
   _esc(s) { return String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
 
@@ -3740,6 +3782,7 @@ class HeatpumpFlowCard extends HTMLElement {
     const U = this._sourceType === 'air' ? this._unitArt() : null;
     const H = 560 + (showHc ? (this._hcCount - 1) * 250 : 0);
     const equalBuffer = this._config.buffer_values === 'equal';
+    const nf = this._narrowFocus();
     const bufferKeys = ['buffer_top', 'buffer_middle', 'buffer_bottom'].filter((key) => this._has(key));
     const bufferY = equalBuffer && bufferKeys.length
       ? Object.fromEntries(bufferKeys.map((key, n) => [key, bufferKeys.length === 1 ? 446 : 382 + n * (118 / (bufferKeys.length - 1))]))
@@ -3748,7 +3791,7 @@ class HeatpumpFlowCard extends HTMLElement {
     this._renderRoot().innerHTML = `
       <style>${HeatpumpFlowCard.styles}</style>
       <div class="fullscreen-backdrop" id="fullscreen-backdrop" ${this._fullscreenOpen ? '' : 'hidden'}></div>
-      <ha-card class="layout-${this._layout} motion-${this._animations} theme-${this._theme}${this._config.narrow_values ? ' narrow-values' : ''}${equalBuffer ? ' buffer-values-equal' : ''}${this._fullscreenOpen ? ' fullscreen' : ''}"${this._fullscreenOpen ? ` role="dialog" aria-modal="true" aria-label="${T}"` : ''}>
+      <ha-card class="layout-${this._layout} motion-${this._animations} theme-${this._theme}${this._config.narrow_values ? ' narrow-values' : ''}${nf ? ' narrow-focus' : ''}${equalBuffer ? ' buffer-values-equal' : ''}${this._fullscreenOpen ? ' fullscreen' : ''}"${this._fullscreenOpen ? ` role="dialog" aria-modal="true" aria-label="${T}"` : ''}>
         <div class="head">
           ${T ? `<div class="title">${T}</div>` : '<div></div>'}
           <div class="head-right">
@@ -3803,7 +3846,7 @@ class HeatpumpFlowCard extends HTMLElement {
             <circle class="pump" cx="${P.boiler ? 316 : 340}" cy="250" r="16"/>
             <g class="impeller" id="impeller-primary" style="transform-origin:${P.boiler ? 316 : 340}px 250px"><path d="M${P.boiler ? 316 : 340} 238 L${P.boiler ? 322 : 346} 250 L${P.boiler ? 310 : 334} 250Z M${P.boiler ? 316 : 340} 262 L${P.boiler ? 310 : 334} 250 L${P.boiler ? 322 : 346} 250Z" class="imp"/></g>
           </g>` : ''}
-          <g class="tap" ${de('flow')}><text class="pipe-label" id="t-vl" x="${P.boiler ? 316 : (this._primaryPump() ? 340 : 338)}" y="${this._primaryPump() ? 226 : 236}" text-anchor="middle"></text></g>
+          <g class="tap" ${de('flow')}><text class="pipe-label${nf && !P.boiler ? ' nf-big' : ''}" id="t-vl" x="${P.boiler ? 316 : (this._primaryPump() ? 340 : 338)}" y="${this._primaryPump() ? 226 : 236}" text-anchor="middle"></text></g>
           <g class="tap" ${de('volume')}><text class="vol-label" id="t-vol" x="${P.boiler ? 316 : (this._primaryPump() ? 340 : 346)}" y="${this._primaryPump() ? 284 : 275}" text-anchor="middle"></text></g>
           <g class="tap" ${de('return')}><text class="pipe-label" id="t-rl" x="335" y="406" text-anchor="middle"></text></g>
 
@@ -3818,8 +3861,9 @@ class HeatpumpFlowCard extends HTMLElement {
             <text class="unit-status" id="t-hp-status" x="170" y="366" text-anchor="middle"></text>
             <text class="unit-val" id="t-hp-power" x="170" y="390" text-anchor="middle"></text>
             <text class="unit-val strong" id="t-hp-cop" x="170" y="412" text-anchor="middle"></text>
+            ${nf ? '<text class="unit-val" id="t-hp-heat" x="170" y="374" text-anchor="middle"></text>' : ''}
           </g>
-          ${this._sourceType === 'air' ? `<g class="tap" ${de(e.source_in ? 'source_in' : 'source_volume')}><text class="small" id="t-src-in" x="170" y="450" text-anchor="middle"></text></g>${this._has('outdoor') ? `<g class="tap" ${de('outdoor')}><text class="small" id="t-outdoor-hp" x="170" y="472" text-anchor="middle"></text></g>` : ''}` : ''}
+          ${this._sourceType === 'air' ? `<g class="tap" ${de(e.source_in ? 'source_in' : 'source_volume')}><text class="small${nf ? ' nf-moved' : ''}" id="t-src-in" x="170" y="450" text-anchor="middle"></text></g>${this._has('outdoor') ? `<g class="tap" ${de('outdoor')}><text class="small" id="t-outdoor-hp" x="170" y="472" text-anchor="middle"></text></g>` : ''}` : ''}
           ${this._heaterSvg('heater', 'inline')}
           ${P.boiler ? `<g class="tap boiler" id="boiler" ${de(e.boiler_state ? 'boiler_state' : (e.boiler_power ? 'boiler_power' : 'boiler_flow'))}>
             <text class="boiler-title" x="372" y="207" text-anchor="middle">${this._esc(i.boiler)}</text>
@@ -3874,6 +3918,7 @@ class HeatpumpFlowCard extends HTMLElement {
 
           ${P.house ? this._houseSvg() : (this._has('outdoor') && this._sourceType !== 'air' ? `<g class="tap" ${de('outdoor')}><text class="small" id="t-outdoor" x="880" y="120" text-anchor="middle"></text></g>` : '')}
         </svg>
+        ${nf ? '<div class="focus-line" id="focus-line"></div>' : ''}
         </div>
         <div class="side">
           ${this._config.timeline ? '<div class="timeline" id="timeline" hidden></div>' : ''}
@@ -4463,13 +4508,15 @@ class HeatpumpFlowCard extends HTMLElement {
         ${this._sourceType === 'air' ? '' : '<text class="small" id="t-outdoor" x="830" y="226" text-anchor="middle"></text>'}
       </g>`;
     }
+    // narrow_focus with up to three circuits: each row takes two lines on a narrow schematic, the name above a larger value.
+    const twoLines = this._narrowFocus() && this._hcCount <= 3 ? ' nf-two' : '';
     const rows = Array.from({ length: this._hcCount }, (_, x) => {
       const n = x + 1; const s = n === 1 ? '' : String(n); const key = this._roomKey(n);
       const target = this._roomKey(n, 'room_target'); const humidity = this._roomKey(n, 'room_humidity');
       const entityKey = [key, target, humidity].find((candidate) => e[candidate]);
       const name = this._config[n === 1 ? 'hc_name' : `hc${n}_name`] || `${i.heating_circuit} ${n}`;
       const y = 118 + x * 21.5;
-      return `<g class="tap house-row" id="house-row${s}" ${de(entityKey)} data-name="${this._esc(name)}">
+      return `<g class="tap house-row${twoLines}" id="house-row${s}" ${de(entityKey)} data-name="${this._esc(name)}">
         <circle class="house-comfort unknown" id="house-comfort${s}" cx="734" cy="${y - 4}" r="5"/>
         <text class="house-row-name" x="746" y="${y}">${this._esc(name)}</text>
         <text class="house-row-value" id="t-house-room${s}" x="950" y="${y}" text-anchor="end"></text>
@@ -4539,6 +4586,9 @@ class HeatpumpFlowCard extends HTMLElement {
   // The heat pump has its own primary pump (`primary_pump`, default from the preset). It is drawn on the flow pipe next to the
   // heat pump block, centred between the flow temperature and the flow rate. A single direct circuit without its own pump sensor then has no pump of its own.
   _primaryPump() { return this._config.primary_pump ?? !!this._preset?.primary_pump; }
+  // narrow_focus (#4): below 500 px the key values grow and the secondary ones move to one line under the schematic. Only CSS
+  // inside the narrow container query uses it, so wider schematics look the same with and without the option.
+  _narrowFocus() { return this._config[HFC_NARROW_FOCUS] === true; }
   // Three-way mixer of circuit n (#214): drawn as soon as one of its keys is mapped. Most controllers drive a three-point motor
   // without position feedback, so opening and closing are motor pulses and hc_mixer is shown as reported, not read as a position.
   _hasMixer(n) { return ['mixer', 'mixer_opening', 'mixer_closing'].some((key) => this._has(this._hk(n, key))); }
@@ -5998,6 +6048,11 @@ class HeatpumpFlowCard extends HTMLElement {
       : i.compressor_off);
     const cop = running && power > 50 && heat > 0 ? (heat * 1000) / power : NaN;
     this._txt('t-hp-cop', Number.isFinite(cop) ? `COP ${heatEstimated ? '≈' : ''}${this._fmt(cop, 1)}` : '');
+    const hpHeat = this._$('t-hp-heat');
+    if (hpHeat) {
+      this._txt('t-hp-heat', running ? (heatTxt || (Number.isFinite(power) ? `${this._fmt(power, 0)} W` : i.running)) : i.compressor_off);
+      hpHeat.classList.toggle('off', !running);
+    }
     const srcVol = this._lh('source_volume');
     const srcParts = [];
     if (this._has('source_in')) srcParts.push(`${i.source_in} ${this._t(this._n('source_in'))}`);
@@ -6072,7 +6127,8 @@ class HeatpumpFlowCard extends HTMLElement {
         const humidity = this._roomHumidity(1); const humidityText = Number.isFinite(humidity) ? `${i.humidity} ${this._fmt(humidity, 0)} %` : '';
         // Room sensor missing or unknown: promote the target to the big line.
         this._txt('t-room', Number.isFinite(r) ? this._t(r) : tgt);
-        this._txt('t-room-target', [Number.isFinite(r) ? tgt : '', humidityText].filter(Boolean).join(' · '));
+        const target = Number.isFinite(r) ? tgt : '';
+        this._txtTail('t-room-target', target, humidityText ? `${target ? ' · ' : ''}${humidityText}` : '');
       } else {
         for (let n = 1; n <= this._hcCount; n++) {
           const s = n === 1 ? '' : String(n); const key = this._roomKey(n); const targetKey = this._roomKey(n, 'room_target');
@@ -6080,8 +6136,8 @@ class HeatpumpFlowCard extends HTMLElement {
           const hasRoom = !!this._e[key]; const hasTarget = !!this._e[targetKey];
           const humidity = this._roomHumidity(n); const humidityText = Number.isFinite(humidity) ? `${this._fmt(humidity, 0)} %` : '';
           const temperatures = hasRoom && hasTarget ? `${value(r)} / ${value(rt)} °C` : hasRoom ? `${value(r)} °C` : hasTarget ? `${i.target} ${value(rt)} °C` : '';
-          const text = [temperatures, humidityText].filter(Boolean).join(' · ') || '–';
-          this._txt(`t-house-room${s}`, text);
+          if (temperatures || !humidityText) this._txtTail(`t-house-room${s}`, temperatures || '–', humidityText ? ` · ${humidityText}` : '');
+          else this._txtTail(`t-house-room${s}`, '', humidityText);
           const state = Number.isFinite(r) && Number.isFinite(rt) ? (r < rt - 0.5 ? 'below' : r > rt + 0.5 ? 'above' : 'on') : 'unknown';
           const dot = this._$(`house-comfort${s}`); const row = this._$(`house-row${s}`);
           if (dot) dot.setAttribute('class', `house-comfort ${state}`);
@@ -6105,6 +6161,7 @@ class HeatpumpFlowCard extends HTMLElement {
         this._txt(`t-src-${id}-v`, on ? `${P.power === 'energy' ? '≈' : ''}${this._fmt(w, 0)} W` : '');
       });
     }
+    if (this._$('focus-line')) this._focusLine(srcParts);
 
     // header chips
     const chip = this._$('chip-mode');
@@ -6514,6 +6571,27 @@ HeatpumpFlowCard.styles = `
   .stage { container-type: inline-size; }
   @container (max-width: 640px) { #svg { --k: 1.2; --ku: 1.1; --kp: 1; --k2: 1; --ks: 1.2; --kt: 1.15; } }
   @container (max-width: 500px) { #svg { --k: 1.4; --ku: 1.25; --kp: 1.4; --k2: 1.3; --ks: 1.4; --kt: 1.3; } .vol-label, .tank-sub, .pre, #t-valve, #t-circ, #t-dhw-mode { display: none; } .narrow-values #t-buf-middle, .narrow-values #t-buf-bottom, .narrow-values #t-dhw-middle, .narrow-values #t-dhw-bottom, .narrow-values #t-dhw-mode, .narrow-values [id^="t-hc-rl"] { display: block; font-size: calc(13px * var(--k2, 1)); } }
+  /* narrow_focus: below 500 px the key values grow to about the size of the tank temperature; the outdoor, air inlet and power
+     source values move to one line under the schematic, and the secondary labels are hidden. Wins over narrow_values. */
+  #t-hp-heat, .focus-line { display: none; }
+  .focus-line { margin: 2px 4px 0; text-align: center; font-size: .85em; line-height: 1.45; color: var(--primary-text-color); }
+  .focus-line span { white-space: nowrap; }
+  @container (max-width: 500px) {
+    .narrow-focus #t-hp-status, .narrow-focus #t-hp-power, .narrow-focus .src text, .narrow-focus .nf-moved, .narrow-focus #t-outdoor, .narrow-focus #t-outdoor-hp,
+    .narrow-focus .pipe-label[id^="t-hc"]:not(.dew-warning), .narrow-focus [id^="t-hc-mode"], .narrow-focus #t-valve, .narrow-focus #t-bypass, .narrow-focus .nf-tail { display: none; }
+    .narrow-focus #t-hp-heat { display: inline; font-size: 32px; font-weight: 700; fill: var(--primary-text-color); }
+    .narrow-focus #t-hp-heat.off { font-size: 22px; font-weight: 600; fill: var(--hfc-muted); }
+    .narrow-focus #t-hp-cop { font-size: 32px; }
+    .narrow-focus #t-vl.nf-big { font-size: 30px; transform: translate(7px, -31px); }
+    .narrow-focus #t-rl { font-size: 30px; text-anchor: start; transform: translate(57px, 14px); }
+    .narrow-focus #t-room-target { font-size: 28px; transform: translateY(6px); }
+    .narrow-focus .house-row-value { font-size: 20px; }
+    .narrow-focus .house-row-name { clip-path: polygon(0 0, 72px 0, 72px 100%, 0 100%); }
+    .narrow-focus .nf-two .house-row-name { font-size: 18px; clip-path: polygon(0 0, 200px 0, 200px 100%, 0 100%); }
+    .narrow-focus .nf-two .house-row-value { font-size: 26px; text-anchor: start; transform: translate(-204px, 27px); }
+    .narrow-focus #house-row2.nf-two { transform: translateY(24.5px); } .narrow-focus #house-row3.nf-two { transform: translateY(49px); }
+    .narrow-focus .focus-line:not(:empty) { display: block; }
+  }
   /* layout: compact – tighter spacing for narrow dashboard columns */
   ha-card.layout-compact { padding: 6px 6px 4px; }
   .layout-compact .head { margin: 0 2px 2px; }
