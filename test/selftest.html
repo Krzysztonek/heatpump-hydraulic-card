@@ -498,6 +498,8 @@
     // Without a compressor, a stretch of operating periods without a pause is one phase run.
     const phase = runsOf({ 'sensor.m': h([[0, 'idle'], [10, 'heating'], [20, 'defrost'], [22, 'heating'], [30, 'idle'], [40, 'dhw'], [50, 'idle']]) }, { mode: 'sensor.m' }, 0, 60);
     check(fmt(phase) === 'heat:10-30:s1 dhw:40-50:s2:p10' && phase.every((r) => r.source === 'phase'), `without a compressor the runs are phases (${fmt(phase)})`);
+    const unrecorded = runsOf({ 'sensor.m': h([[0, 'idle'], [10, 'heating'], [30, 'idle']]) }, ids, 0, 60);
+    check(fmt(unrecorded) === 'heat:10-30:s1' && unrecorded[0].source === 'phase', `a compressor without recorded history leaves the mode phases (${fmt(unrecorded)})`);
     card.remove();
   }
   {

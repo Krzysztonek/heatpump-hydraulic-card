@@ -4979,8 +4979,9 @@ class HeatpumpFlowCard extends HTMLElement {
       const last = runs[runs.length - 1];
       if (last && last.to === from) last.to = to; else runs.push({ from, to, source });
     };
-    const list = (ids.cycle || ids.comp) ? hist[ids.cycle || ids.comp] || [] : null;
-    if (list) {
+    // A compressor without recorded history (excluded from the recorder) leaves the phases of the operating mode.
+    const list = (ids.cycle || ids.comp) ? hist[ids.cycle || ids.comp] || [] : [];
+    if (list.length) {
       // The same on-states as the segments; a speed or frequency of 0 is off, unavailable ends the run.
       const on = (s) => !['off', 'unavailable', 'unknown', 'none', ''].includes(String(s).toLowerCase()) && !(parseFloat(s) <= 0);
       list.forEach((e, n) => {
