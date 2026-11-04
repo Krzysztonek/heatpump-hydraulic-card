@@ -562,7 +562,7 @@
       'sensor.boiler_heat_carrier_forward_tc1': ['36.3', '°C'], 'sensor.boiler_heat_carrier_return_tc0': ['30.1', '°C'],
       'sensor.boiler_current_flow_temperature': ['32.9', '°C'], 'sensor.boiler_return_temperature': ['30', '°C'],
       'sensor.thermostat_hc1_target_flow_temperature': ['30', '°C'], 'sensor.boiler_outside_temperature': ['6', '°C'],
-      'sensor.boiler_heatpump_total_uptime': ['1122401', 'min'], 'sensor.boiler_total_energy_supplied': ['66061', 'kWh'],
+      'sensor.boiler_heatpump_total_uptime': ['1122401', 'min'], 'sensor.boiler_total_operating_time_heat': ['421700', 'min'], 'sensor.boiler_total_energy_supplied': ['66061', 'kWh'],
       'sensor.boiler_total_energy_consumption': ['15513', 'kWh'], 'sensor.boiler_evaporator_inlet_temperature_tr4': ['2.9', '°C'],
       'sensor.boiler_expansion_valve_vr1': ['20', '%'],
     });
@@ -574,11 +574,11 @@
       `EMS-ESP 3.9 long names: compressor speed, heat output and fan (${e.compressor} / ${e.heat} / ${e.fan_speed})`);
     check(e.hc_flow === 'sensor.boiler_current_flow_temperature' && e.hc_setpoint === 'sensor.thermostat_hc1_target_flow_temperature'
       && e.hc_return === undefined, `EMS-ESP 3.9 long names: circuit flow T0, target as setpoint, no circuit return (${e.hc_flow} / ${e.hc_setpoint} / ${e.hc_return})`);
-    check(e.hours === 'sensor.boiler_heatpump_total_uptime' && e.heat_total === 'sensor.boiler_total_energy_supplied'
+    check(e.hours === 'sensor.boiler_total_operating_time_heat' && e.heat_total === 'sensor.boiler_total_energy_supplied'
       && e.evap_temp === 'sensor.boiler_evaporator_inlet_temperature_tr4' && e.eev === 'sensor.boiler_expansion_valve_vr1',
     `EMS-ESP 3.9 long names: hours, heat counter, evaporator inlet and expansion valve (${e.hours} / ${e.heat_total} / ${e.evap_temp} / ${e.eev})`);
     check(r.tiles.heat?.total === 'sensor.boiler_total_energy_supplied' && r.tiles.energy?.total === 'sensor.boiler_total_energy_consumption'
-      && r.tiles.hours?.total === 'sensor.boiler_heatpump_total_uptime', `EMS-ESP 3.9 long names: catalog tiles from the totals (${JSON.stringify(r.tiles.heat)})`);
+      && r.tiles.hours?.total === 'sensor.boiler_total_operating_time_heat', `EMS-ESP 3.9 long names: catalog tiles from the totals (${JSON.stringify(r.tiles.heat)})`);
     const findings = C._checks({ preset: 'emsesp' }, hass, r).map((f) => f.key);
     check(!['compressor', 'heat', 'fan_speed', 'hours', 'heat_total', 'evap_temp', 'eev', 'hc_flow', 'hc_setpoint'].some((k) => findings.includes(k)),
       `EMS-ESP 3.9 long names: the new mappings pass the plausibility checks (${findings.join(', ')})`);
@@ -591,6 +591,20 @@
     check(plain.flow === 'sensor.boiler_current_flow_temperature' && !noTc1[plain.hc_flow],
       `EMS-ESP without TC1: the current flow temperature is the heat pump flow, not the circuit flow (${plain.flow} / ${plain.hc_flow})`);
     check(!noTc1[plain.hc_volume] && !noTc1[plain.hc_pump], `EMS-ESP without TC1: no PC1 circuit pump or flow rate (${plain.hc_volume} / ${plain.hc_pump})`);
+  }
+  {
+    // #333: the compressor operating time is uptimecontrol ("total operating time heat"); uptimetotal counts standby too and
+    // uptimecomp is the hot-water share (dhw tag). The values of chris94834's installation are of this kind.
+    const times = toStates({ 'sensor.boiler_hpactivity': 'heating', 'sensor.boiler_hptc1': ['31.5', '°C'], 'sensor.boiler_uptimetotal': ['1180000', 'min'],
+      'sensor.boiler_uptimecontrol': ['388000', 'min'], 'sensor.boiler_dhw_uptimecomp': ['61000', 'min'], 'sensor.boiler_totalcompstarts': ['9120', ''] });
+    const timesReg = Object.fromEntries(Object.keys(times).map((id) => [id, { platform: 'mqtt' }]));
+    const rt = C._resolve({ preset: 'emsesp' }, hassOf(times, timesReg));
+    check(rt.entities.hours === 'sensor.boiler_uptimecontrol' && rt.tiles.hours?.total === 'sensor.boiler_uptimecontrol',
+      `#333: compressor hours and the hours tile from uptimecontrol (${rt.entities.hours} / ${JSON.stringify(rt.tiles.hours)})`);
+    const { 'sensor.boiler_uptimecontrol': _uc, ...uptimeOnly } = times;
+    const ru = C._resolve({ preset: 'emsesp' }, hassOf(uptimeOnly, timesReg));
+    check(ru.entities.hours !== 'sensor.boiler_uptimetotal' && !uptimeOnly[ru.entities.hours] && ru.tiles.hours?.total !== 'sensor.boiler_uptimetotal',
+      `#333: the total uptime with standby is never taken as compressor hours (${ru.entities.hours})`);
   }
   {
     // #224: Buderus WLW186i with EMS-ESP short names: PC0 is the heat pump circuit, PC1 the pump of the first heating circuit.
