@@ -583,6 +583,39 @@
     check(at38 && !flows(), `EMS-ESP: PC1 at 38 % runs the circuit, at 0 % it stands still (${at38} / ${flows()})`);
     card.remove();
   }
+  {
+    // EMS-ESP short names with writable values: Bosch Compress with mixer module, the ids of a real installation (EMS-ESP MQTT discovery).
+    const states = toStates({
+      'sensor.boiler_hpactivity': 'Heizen', 'binary_sensor.boiler_hpcompon': 'on', 'sensor.boiler_hptc1': ['27.6', '°C'], 'sensor.boiler_hptc0': ['25', '°C'],
+      'sensor.boiler_hppower': ['1500.0', 'W'], 'sensor.boiler_hpcurrpower': ['286', 'W'], 'sensor.boiler_pc0flow': ['670', 'L/h'],
+      'binary_sensor.boiler_dhw_3wayvalve': 'off', 'number.boiler_dhw_seltemp': ['48', '°C'], 'number.thermostat_hc1_seltemp': ['22', '°C'],
+      'switch.boiler_dhw_circpump': 'on', 'switch.boiler_dhw_circ': 'off', 'switch.mixer_hc1_pumpstatus': 'on', 'binary_sensor.boiler_heatingpump': 'on',
+      'sensor.mixer_hc1_flowtemphc': ['25.3', '°C'], 'sensor.thermostat_hc1_currtemp': ['22.5', '°C'],
+    });
+    const registry = Object.fromEntries(Object.keys(states).map((id) => [id, { platform: 'mqtt' }]));
+    const hass = hassOf(states, registry);
+    const r = C._resolve({ preset: 'emsesp' }, hass);
+    const e = r.entities;
+    check(e.valve === 'binary_sensor.boiler_dhw_3wayvalve' && e.heat === 'sensor.boiler_hppower',
+      `EMS-ESP short names: 3-way valve and heat output (${e.valve} / ${e.heat})`);
+    check(e.dhw_target === 'number.boiler_dhw_seltemp' && e.room_target === 'number.thermostat_hc1_seltemp',
+      `EMS-ESP short names: writable hot-water and room targets as number entities (${e.dhw_target} / ${e.room_target})`);
+    check(e.circulation === 'switch.boiler_dhw_circ' && e.hc_pump === 'switch.mixer_hc1_pumpstatus',
+      `EMS-ESP short names: circulation and mixer circuit pump as switches (${e.circulation} / ${e.hc_pump})`);
+    const findings = C._checks({ preset: 'emsesp' }, hass, r).map((f) => f.key);
+    check(!['valve', 'heat', 'dhw_target', 'room_target', 'circulation', 'hc_pump'].some((k) => findings.includes(k)),
+      `EMS-ESP short names: the writable mappings pass the plausibility checks (${findings.join(', ')})`);
+    const card = mount({ preset: 'emsesp' }, hass); await wait(20);
+    check(card._kw('heat') === 1.5, `EMS-ESP short names: heat output 1500 W is 1.5 kW (${card._kw('heat')})`);
+    card.remove();
+    // Without the mixer switch the boiler's heating pump (short name heatingpump) drives the first circuit.
+    const { 'switch.mixer_hc1_pumpstatus': _mixer, ...noMixer } = states;
+    const direct = C._resolve({ preset: 'emsesp' }, hassOf(noMixer, registry)).entities;
+    check(direct.hc_pump === 'binary_sensor.boiler_heatingpump', `EMS-ESP short names: boiler heating pump for a direct circuit (${direct.hc_pump})`);
+    // A circulation pump reported as not fitted under its short name maps no circulation.
+    const noCirc = C._resolve({ preset: 'emsesp' }, hassOf({ ...states, ...toStates({ 'switch.boiler_dhw_circpump': 'off' }) }, registry)).entities;
+    check(noCirc.circulation === undefined, `EMS-ESP short names: no circulation without a fitted circulation pump (${noCirc.circulation})`);
+  }
   check(!detects('vicare', { 'sensor.vitodens_outside_temperature': '5', 'sensor.vitodens_boiler_temperature': '60' },
     { 'sensor.vitodens_outside_temperature': { platform: 'vicare', translation_key: 'outside_temperature' } }), 'ViCare gas boiler is not a heat pump');
   check(!detects('lambda', { 'sensor.other_hp1_operating_state': 'x' }, { 'sensor.other_hp1_operating_state': { platform: 'something_else' } }), 'foreign hp1_operating_state is not Lambda');

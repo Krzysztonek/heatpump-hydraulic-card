@@ -544,18 +544,19 @@ const HFC_PRESETS = {
       const sw = (...ks) => ks.map((k) => `switch.${x}boiler_${k}`);
       // EMS-ESP publishes whether a circulation pump is fitted at all; without one the card draws no circulation (#257). Only a
       // switch that reports on maps it, so a switch that is unavailable at the first build cannot leave a mapping behind.
-      const circPump = ['dhw_circulation_pump_available', 'wwcircpump'].map((k) => ctx?.state(`switch.${x}boiler_${k}`)).find((v) => v !== undefined);
+      const circPump = ['dhw_circulation_pump_available', 'dhw_circpump', 'wwcircpump'].map((k) => ctx?.state(`switch.${x}boiler_${k}`)).find((v) => v !== undefined);
       const s = (...ks) => ks.map((k) => `sensor.${x}${k}`);
       const hc = `hc${i.hc}`;
       // With the heat pump's own flow sensor (TC1) the boiler's current flow temperature is T0, the flow to the heating side
       // (WLW indoor units, #224); without TC1 it is the heat pump flow itself. The thermostat's flow temperature is a target (#287).
       const tc1 = ['boiler_hptc1', 'boiler_heat_carrier_forward_tc1'].some((k) => ctx?.state(`sensor.${x}${k}`) !== undefined);
+      // Short names: writable values come as number and switch entities (dhw/seltemp, hc1/seltemp, dhw/circ, mixer pumpstatus).
       return {
         mode: s('boiler_hpactivity', 'boiler_compressor_activity'),
         // Long names: binary_sensor.boiler_hp_compressor read off while the compressor ran at 31 % (EMS-ESP 3.9.0-dev, #287),
         // so the compressor speed comes first there.
         compressor: b('hpcompon').concat(s('boiler_compressor_speed'), b('hp_compressor')),
-        valve: b('hp3way', 'dhw_3_way_valve_active').concat(sw('3_way_valve')),
+        valve: b('hp3way', 'dhw_3wayvalve', 'ww3wayvalve', 'dhw_3_way_valve_active').concat(sw('3_way_valve')),
         power: s('boiler_hpcurrpower', 'boiler_compressor_current_power'),
         // "Compressor power output" is the heat output in kW, next to the electrical current power in W.
         heat: s('boiler_hppower', 'boiler_compressor_power_output'),
@@ -569,18 +570,19 @@ const HFC_PRESETS = {
         outdoor: s('boiler_outdoortemp', 'thermostat_outdoortemp', 'boiler_outside_temperature'),
         dhw_top: s('boiler_dhw_curtemp', 'boiler_wwcurtemp', 'boiler_dhw_storagetemp1').concat(hasIntern ? dhwIntern : dhwExtern),
         dhw_bottom: s('boiler_dhw_storagetemp2').concat(hasIntern ? [dhwExtern] : []),
-        dhw_target: s('boiler_dhw_seltemp', 'boiler_wwseltemp').concat(`number.${x}boiler_dhw_selected_temperature`),
-        circulation: circPump !== undefined && circPump !== 'on' ? undefined : b('dhw_circ', 'wwcirc').concat(sw('dhw_circulation_active')),
+        dhw_target: s('boiler_dhw_seltemp', 'boiler_wwseltemp').concat(`number.${x}boiler_dhw_seltemp`, `number.${x}boiler_wwseltemp`,
+          `number.${x}boiler_dhw_selected_temperature`),
+        circulation: circPump !== undefined && circPump !== 'on' ? undefined : b('dhw_circ', 'wwcirc').concat(sw('dhw_circ', 'wwcirc', 'dhw_circulation_active')),
         // The indoor unit's own circuit pump PC1 drives the first circuit (WLW, #224): on/off where reported, else its rate in %.
-        hc_pump: [`binary_sensor.${x}mixer_${hc}_pumpstatus`, `sensor.${x}mixer_${hc}_pumpstatus`,
-          ...(i.hc === 1 ? [`binary_sensor.${x}boiler_heating_pump`] : []),
+        hc_pump: [`binary_sensor.${x}mixer_${hc}_pumpstatus`, `sensor.${x}mixer_${hc}_pumpstatus`, `switch.${x}mixer_${hc}_pumpstatus`,
+          ...(i.hc === 1 ? [`binary_sensor.${x}boiler_heating_pump`, `binary_sensor.${x}boiler_heatingpump`] : []),
           ...(tc1 && i.hc === 1 ? b('pc1on', 'pc1').concat(s('boiler_pc1rate', 'boiler_pc1_rate')) : [])],
         // Only a reported PC1 flow: a candidate id without an entity would draw an empty flow-rate label at the circuit.
         hc_volume: tc1 && i.hc === 1 ? s('boiler_pc1flow', 'boiler_flow_pc1').find((id) => ctx?.state(id) !== undefined) : undefined,
         hc_flow: s(`mixer_${hc}_flowtemphc`).concat(tc1 && i.hc === 1 ? s('boiler_curflowtemp', 'boiler_current_flow_temperature') : []),
         hc_setpoint: s(`thermostat_${hc}_targetflowtemp`, `thermostat_${hc}_target_flow_temperature`),
         room: s(`thermostat_${hc}_currtemp`, `thermostat_${hc}_current_room_temperature`),
-        room_target: s(`thermostat_${hc}_seltemp`).concat(`number.${x}thermostat_${hc}_selected_room_temperature`),
+        room_target: s(`thermostat_${hc}_seltemp`).concat(`number.${x}thermostat_${hc}_seltemp`, `number.${x}thermostat_${hc}_selected_room_temperature`),
         program: s(`thermostat_${hc}_modetype`),
         hours: s('boiler_uptimecomp', 'boiler_uptimetotal', 'boiler_heatpump_total_uptime'),
         starts_total: s('boiler_totalcompstarts', 'boiler_total_compressor_control_starts'),

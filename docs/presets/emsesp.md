@@ -33,6 +33,8 @@ What you get:
 
 **Heating circuit:** the thermostat's flow temperature is a target, so it is the circuit target, not its flow. On WLW indoor units TC1 is the flow from the outdoor unit and T0 (`boiler_current_flow_temperature`) the flow to the heating side; there is no return sensor of the heating circuit (#224). A return sensor fitted later can be added with `entities: { hc_return: … }`. The indoor unit has two pumps: PC0 for the heat pump circuit (flow rate as `volume`) and PC1 for the first heating circuit (`hc_pump`, `hc_volume`). Below about 50 % speed PC0 reports no flow rate; a template sensor that estimates it from `hpcircspd` can be set as `volume`. The heater stages `el_heater_step_1` … `_3` are stages of the electric flow heater, not tank heater rods at three heights.
 
+**Writable values with short names:** EMS-ESP publishes values that can be changed as `number` and `switch` entities, so the preset also looks for the hot-water target `number.boiler_dhw_seltemp` (older `wwseltemp`), the room target `number.thermostat_hc1_seltemp`, circulation `switch.boiler_dhw_circ` (older `wwcirc`) and the mixer circuit pump `switch.mixer_hc1_pumpstatus`. The 3-way valve is also found as `dhw_3wayvalve` (older `ww3wayvalve`), the boiler heating pump of a direct circuit as `heatingpump`, and the "circulation pump fitted" switch as `dhw_circpump`. Taken from a Bosch Compress with mixer module and EMS-ESP MQTT discovery.
+
 Without a heat output sensor, the heat output is estimated from flow rate × spread. With `hc_count: 2` (up to 6) the mixer and thermostat entities of the further circuits are added; `index: {hc: 2}` starts at circuit 2 instead.
 
 ### PV, battery and grid
