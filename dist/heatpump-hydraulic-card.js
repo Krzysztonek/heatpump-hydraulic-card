@@ -544,18 +544,19 @@ const HFC_PRESETS = {
       const sw = (...ks) => ks.map((k) => `switch.${x}boiler_${k}`);
       // EMS-ESP publishes whether a circulation pump is fitted at all; without one the card draws no circulation (#257). Only a
       // switch that reports on maps it, so a switch that is unavailable at the first build cannot leave a mapping behind.
-      const circPump = ['dhw_circulation_pump_available', 'wwcircpump'].map((k) => ctx?.state(`switch.${x}boiler_${k}`)).find((v) => v !== undefined);
+      const circPump = ['dhw_circulation_pump_available', 'dhw_circpump', 'wwcircpump'].map((k) => ctx?.state(`switch.${x}boiler_${k}`)).find((v) => v !== undefined);
       const s = (...ks) => ks.map((k) => `sensor.${x}${k}`);
       const hc = `hc${i.hc}`;
       // With the heat pump's own flow sensor (TC1) the boiler's current flow temperature is T0, the flow to the heating side
       // (WLW indoor units, #224); without TC1 it is the heat pump flow itself. The thermostat's flow temperature is a target (#287).
       const tc1 = ['boiler_hptc1', 'boiler_heat_carrier_forward_tc1'].some((k) => ctx?.state(`sensor.${x}${k}`) !== undefined);
+      // Short names: writable values come as number and switch entities (dhw/seltemp, hc1/seltemp, dhw/circ, mixer pumpstatus).
       return {
         mode: s('boiler_hpactivity', 'boiler_compressor_activity'),
         // Long names: binary_sensor.boiler_hp_compressor read off while the compressor ran at 31 % (EMS-ESP 3.9.0-dev, #287),
         // so the compressor speed comes first there.
         compressor: b('hpcompon').concat(s('boiler_compressor_speed'), b('hp_compressor')),
-        valve: b('hp3way', 'dhw_3_way_valve_active').concat(sw('3_way_valve')),
+        valve: b('hp3way', 'dhw_3wayvalve', 'ww3wayvalve', 'dhw_3_way_valve_active').concat(sw('3_way_valve')),
         power: s('boiler_hpcurrpower', 'boiler_compressor_current_power'),
         // "Compressor power output" is the heat output in kW, next to the electrical current power in W.
         heat: s('boiler_hppower', 'boiler_compressor_power_output'),
@@ -569,18 +570,19 @@ const HFC_PRESETS = {
         outdoor: s('boiler_outdoortemp', 'thermostat_outdoortemp', 'boiler_outside_temperature'),
         dhw_top: s('boiler_dhw_curtemp', 'boiler_wwcurtemp', 'boiler_dhw_storagetemp1').concat(hasIntern ? dhwIntern : dhwExtern),
         dhw_bottom: s('boiler_dhw_storagetemp2').concat(hasIntern ? [dhwExtern] : []),
-        dhw_target: s('boiler_dhw_seltemp', 'boiler_wwseltemp').concat(`number.${x}boiler_dhw_selected_temperature`),
-        circulation: circPump !== undefined && circPump !== 'on' ? undefined : b('dhw_circ', 'wwcirc').concat(sw('dhw_circulation_active')),
+        dhw_target: s('boiler_dhw_seltemp', 'boiler_wwseltemp').concat(`number.${x}boiler_dhw_seltemp`, `number.${x}boiler_wwseltemp`,
+          `number.${x}boiler_dhw_selected_temperature`),
+        circulation: circPump !== undefined && circPump !== 'on' ? undefined : b('dhw_circ', 'wwcirc').concat(sw('dhw_circ', 'wwcirc', 'dhw_circulation_active')),
         // The indoor unit's own circuit pump PC1 drives the first circuit (WLW, #224): on/off where reported, else its rate in %.
-        hc_pump: [`binary_sensor.${x}mixer_${hc}_pumpstatus`, `sensor.${x}mixer_${hc}_pumpstatus`,
-          ...(i.hc === 1 ? [`binary_sensor.${x}boiler_heating_pump`] : []),
+        hc_pump: [`binary_sensor.${x}mixer_${hc}_pumpstatus`, `sensor.${x}mixer_${hc}_pumpstatus`, `switch.${x}mixer_${hc}_pumpstatus`,
+          ...(i.hc === 1 ? [`binary_sensor.${x}boiler_heating_pump`, `binary_sensor.${x}boiler_heatingpump`] : []),
           ...(tc1 && i.hc === 1 ? b('pc1on', 'pc1').concat(s('boiler_pc1rate', 'boiler_pc1_rate')) : [])],
         // Only a reported PC1 flow: a candidate id without an entity would draw an empty flow-rate label at the circuit.
         hc_volume: tc1 && i.hc === 1 ? s('boiler_pc1flow', 'boiler_flow_pc1').find((id) => ctx?.state(id) !== undefined) : undefined,
         hc_flow: s(`mixer_${hc}_flowtemphc`).concat(tc1 && i.hc === 1 ? s('boiler_curflowtemp', 'boiler_current_flow_temperature') : []),
         hc_setpoint: s(`thermostat_${hc}_targetflowtemp`, `thermostat_${hc}_target_flow_temperature`),
         room: s(`thermostat_${hc}_currtemp`, `thermostat_${hc}_current_room_temperature`),
-        room_target: s(`thermostat_${hc}_seltemp`).concat(`number.${x}thermostat_${hc}_selected_room_temperature`),
+        room_target: s(`thermostat_${hc}_seltemp`).concat(`number.${x}thermostat_${hc}_seltemp`, `number.${x}thermostat_${hc}_selected_room_temperature`),
         program: s(`thermostat_${hc}_modetype`),
         hours: s('boiler_uptimecomp', 'boiler_uptimetotal', 'boiler_heatpump_total_uptime'),
         starts_total: s('boiler_totalcompstarts', 'boiler_total_compressor_control_starts'),
@@ -1538,7 +1540,7 @@ const HFC_EDITOR = {
     layout: 'Layout', layout_default: 'Default', layout_compact: 'Compact (narrow columns)', layout_wide: 'Wide (tiles beside the schematic)', layout_wall: 'Wall display (large, controls fade out)',
     animations: 'Animations', animations_auto: 'Automatic (respect reduced motion)', animations_always: 'Always', animations_off: 'Off',
     flow_speed: 'Animation speed', source_spread: 'Show source spread',
-    theme: 'Card theme', theme_auto: 'Automatic (dashboard)', theme_night: 'Night', theme_contrast: 'High contrast', fullscreen: 'Full-screen button',
+    theme: 'Card theme', theme_auto: 'Automatic (dashboard)', theme_night: 'Night', theme_contrast: 'High contrast', fullscreen: 'Full-screen button', diagnostic: 'Diagnostic report button',
     wall_timeout: 'Hide controls after (seconds, 0 = never)',
     hc_flow_label: 'Show circuit flow temperature', hc_return_label: 'Show circuit return temperature', dew_point_margin: 'Minimum dew-point margin (K)', narrow_values: 'Keep tank sub-values, hot-water target and circuit return on narrow cards', buffer_values: 'Buffer temperature emphasis', buffer_values_default: 'Top value prominent (default)', buffer_values_equal: 'All configured values equal', storage: 'Storage', storage_separate: 'Separate hot-water tank and buffer', storage_combined: 'Combined storage (one tank, hot-water zone on top)', buffer: 'Parallel buffer (also without sensors)', dhw_type: 'Hot-water preparation', dhw_type_coil: 'Tank with heat-exchanger coil', dhw_type_fresh_water: 'Fresh-water station (on the buffer or the combined storage)', dhw_type_tank_in_tank: 'Tank in tank (combined storage)', series_buffer: 'Series buffer in the return', series_bypass: 'Series buffer with bypass valve (off: the circuits run in defrost)', primary_pump: 'Primary pump', hc_name: 'Circuit 1 name', hc2_name: 'Circuit 2 name', hc3_name: 'Circuit 3 name', hc4_name: 'Circuit 4 name', hc5_name: 'Circuit 5 name', hc6_name: 'Circuit 6 name',
     sec_hc2: 'Heating circuit 2', sec_hc3: 'Heating circuit 3', sec_hc4: 'Heating circuit 4', sec_hc5: 'Heating circuit 5', sec_hc6: 'Heating circuit 6', sec_details: 'Details: operation', sec_refrigerant: 'Details: refrigerant circuit', sec_cutouts: 'Details: cut-out counters',
@@ -1631,7 +1633,7 @@ const HFC_EDITOR = {
     layout: 'Layout', layout_default: 'Standard', layout_compact: 'Kompakt (schmale Spalten)', layout_wide: 'Breit (Kacheln neben dem Schema)', layout_wall: 'Wanddisplay (groß, Bedienelemente blenden aus)',
     animations: 'Animationen', animations_auto: 'Automatisch (reduzierte Bewegung beachten)', animations_always: 'Immer', animations_off: 'Aus',
     flow_speed: 'Animationsgeschwindigkeit', source_spread: 'Quellenspreizung anzeigen',
-    theme: 'Kartendarstellung', theme_auto: 'Automatisch (Dashboard)', theme_night: 'Nacht', theme_contrast: 'Hoher Kontrast', fullscreen: 'Vollbild-Schaltfläche',
+    theme: 'Kartendarstellung', theme_auto: 'Automatisch (Dashboard)', theme_night: 'Nacht', theme_contrast: 'Hoher Kontrast', fullscreen: 'Vollbild-Schaltfläche', diagnostic: 'Diagnosebericht-Schaltfläche',
     wall_timeout: 'Bedienelemente ausblenden nach (Sekunden, 0 = nie)',
     hc_flow_label: 'Heizkreis-Vorlauf anzeigen', hc_return_label: 'Heizkreis-Rücklauf anzeigen', dew_point_margin: 'Mindestabstand zum Taupunkt (K)', narrow_values: 'Speicher-Unterwerte, WW-Soll und Heizkreis-Rücklauf auf schmalen Karten zeigen', buffer_values: 'Gewichtung der Puffertemperaturen', buffer_values_default: 'Oberen Wert hervorheben (Standard)', buffer_values_equal: 'Alle vorhandenen Werte gleich', storage: 'Speicher', storage_separate: 'Getrennter Warmwasserspeicher und Puffer', storage_combined: 'Kombispeicher (ein Speicher, Warmwasserzone oben)', buffer: 'Parallelpuffer (auch ohne Sensoren)', dhw_type: 'Warmwasserbereitung', dhw_type_coil: 'Speicher mit Wärmetauscher-Wendel', dhw_type_fresh_water: 'Frischwasserstation (am Puffer oder Kombispeicher)', dhw_type_tank_in_tank: 'Tank im Tank (Kombispeicher)', series_buffer: 'Reihenpuffer im Rücklauf', series_bypass: 'Reihenpuffer mit Bypass-Ventil (aus: die Heizkreise laufen beim Abtauen)', primary_pump: 'Primärpumpe', hc_name: 'Name Heizkreis 1', hc2_name: 'Name Heizkreis 2', hc3_name: 'Name Heizkreis 3', hc4_name: 'Name Heizkreis 4', hc5_name: 'Name Heizkreis 5', hc6_name: 'Name Heizkreis 6',
     sec_hc2: 'Heizkreis 2', sec_hc3: 'Heizkreis 3', sec_hc4: 'Heizkreis 4', sec_hc5: 'Heizkreis 5', sec_hc6: 'Heizkreis 6', sec_details: 'Details: Betrieb', sec_refrigerant: 'Details: Kältekreis', sec_cutouts: 'Details: Abschaltzähler',
@@ -1725,7 +1727,7 @@ const HFC_EDITOR = {
     layout: 'Rozloženie', layout_default: 'Predvolené', layout_compact: 'Kompaktné (úzke stĺpce)', layout_wide: 'Široké (dlaždice vedľa schémy)', layout_wall: 'Nástenný displej (veľký, ovládacie prvky miznú)',
     animations: 'Animácie', animations_auto: 'Automaticky (rešpektovať obmedzenie pohybu)', animations_always: 'Vždy', animations_off: 'Vypnuté',
     flow_speed: 'Rýchlosť animácie', source_spread: 'Zobraziť rozpätie (spread) zdroja',
-    theme: 'Téma karty', theme_auto: 'Automaticky (podľa panelu)', theme_night: 'Nočná', theme_contrast: 'Vysoký kontrast', fullscreen: 'Tlačidlo na celú obrazovku',
+    theme: 'Téma karty', theme_auto: 'Automaticky (podľa panelu)', theme_night: 'Nočná', theme_contrast: 'Vysoký kontrast', fullscreen: 'Tlačidlo na celú obrazovku', diagnostic: 'Tlačidlo diagnostickej správy',
     wall_timeout: 'Skryť ovládacie prvky po (sekundy, 0 = nikdy)',
     narrow_values: 'Ponechať podhodnoty akumulačnej nádrže a spiatočku okruhu na úzkych kartách',
     buffer_values: 'Zvýraznenie teplôt akumulačnej nádrže', buffer_values_default: 'Zvýrazniť hornú hodnotu (predvolené)', buffer_values_equal: 'Všetky nakonfigurované hodnoty rovnocenné',
@@ -1854,7 +1856,7 @@ const HFC_EDITOR = {
     layout: 'Rozvržení', layout_default: 'Výchozí', layout_compact: 'Kompaktní (úzké sloupce)', layout_wide: 'Široké (dlaždice vedle schématu)', layout_wall: 'Nástěnný displej (velký, ovládací prvky mizí)',
     animations: 'Animace', animations_auto: 'Automaticky (respektovat omezení pohybu)', animations_always: 'Vždy', animations_off: 'Vypnuto',
     flow_speed: 'Rychlost animace', source_spread: 'Zobrazit rozpětí (spread) zdroje',
-    theme: 'Téma karty', theme_auto: 'Automaticky (podle panelu)', theme_night: 'Noční', theme_contrast: 'Vysoký kontrast', fullscreen: 'Tlačítko na celou obrazovku',
+    theme: 'Téma karty', theme_auto: 'Automaticky (podle panelu)', theme_night: 'Noční', theme_contrast: 'Vysoký kontrast', fullscreen: 'Tlačítko na celou obrazovku', diagnostic: 'Tlačítko diagnostické zprávy',
     wall_timeout: 'Skrýt ovládací prvky po (sekundy, 0 = nikdy)',
     narrow_values: 'Ponechat podhodnoty akumulační nádrže a zpátečku okruhu na úzkých kartách',
     buffer_values: 'Zvýraznění teplot akumulační nádrže', buffer_values_default: 'Zvýraznit horní hodnotu (výchozí)', buffer_values_equal: 'Všechny nakonfigurované hodnoty rovnocenné',
@@ -1982,7 +1984,7 @@ const HFC_EDITOR = {
     layout: 'Opmaak', layout_default: 'Standaard', layout_compact: 'Compact (smalle kolommen)', layout_wide: 'Breed (tegels naast het schema)', layout_wall: 'Wandscherm (groot, bediening verdwijnt)',
     animations: 'Animaties', animations_auto: 'Automatisch (respecteert minder beweging)', animations_always: 'Altijd', animations_off: 'Uit',
     flow_speed: 'Animatiesnelheid', source_spread: 'ΔT van de bron tonen',
-    theme: 'Kaartthema', theme_auto: 'Automatisch (dashboard)', theme_night: 'Nacht', theme_contrast: 'Hoog contrast', fullscreen: 'Knop volledig scherm',
+    theme: 'Kaartthema', theme_auto: 'Automatisch (dashboard)', theme_night: 'Nacht', theme_contrast: 'Hoog contrast', fullscreen: 'Knop volledig scherm', diagnostic: 'Knop diagnoserapport',
     wall_timeout: 'Bediening verbergen na (seconden, 0 = nooit)',
     hc_flow_label: 'Aanvoertemperatuur per groep tonen', hc_return_label: 'Retourtemperatuur per groep tonen', dew_point_margin: 'Minimale dauwpuntsmarge (K)', narrow_values: 'Vat-subwaarden, warmwaterdoel en groepsretour op smalle kaarten tonen', buffer_values: 'Nadruk buffertemperaturen', buffer_values_default: 'Bovenste waarde prominent (standaard)', buffer_values_equal: 'Alle ingestelde waarden gelijk', storage: 'Opslag', storage_separate: 'Apart warmwatervat en buffervat', storage_combined: 'Combivat (één vat, warmwaterzone bovenin)', buffer: 'Parallel buffervat (ook zonder sensoren)', dhw_type: 'Warmwaterbereiding', dhw_type_coil: 'Vat met warmtewisselaarspiraal', dhw_type_fresh_water: 'Verswaterstation (op het buffervat of het combivat)', dhw_type_tank_in_tank: 'Tank in tank (combivat)', series_buffer: 'Seriebuffer in de retour', series_bypass: 'Seriebuffer met bypassklep (uit: de groepen draaien door bij ontdooien)', primary_pump: 'Primaire pomp', hc_name: 'Naam groep 1', hc2_name: 'Naam groep 2', hc3_name: 'Naam groep 3', hc4_name: 'Naam groep 4', hc5_name: 'Naam groep 5', hc6_name: 'Naam groep 6',
     sec_hc2: 'Verwarmingsgroep 2', sec_hc3: 'Verwarmingsgroep 3', sec_hc4: 'Verwarmingsgroep 4', sec_hc5: 'Verwarmingsgroep 5', sec_hc6: 'Verwarmingsgroep 6', sec_details: 'Details: bedrijf', sec_refrigerant: 'Details: koudemiddelcircuit', sec_cutouts: 'Details: uitschakeltellers',
@@ -2535,6 +2537,7 @@ class HeatpumpFlowCard extends HTMLElement {
                 .map((name) => ({ name, selector: { number: { min: 0, max: 20, step: 0.1, mode: 'box', unit_of_measurement: 'bar' } } })),
               { name: 'language', selector: { select: { mode: 'dropdown', options: languageOptions } } },
               { name: 'fullscreen', selector: { boolean: {} } },
+              { name: 'diagnostic', selector: { boolean: {} } },
               { name: 'hc_flow_label', selector: { boolean: {} } },
               { name: 'hc_return_label', selector: { boolean: {} } },
               { name: 'dew_point_margin', selector: { number: { min: 0, max: 10, step: 0.5, mode: 'box', unit_of_measurement: 'K' } } },
@@ -2644,6 +2647,9 @@ class HeatpumpFlowCard extends HTMLElement {
     }
     if (config.fullscreen !== undefined && config.fullscreen !== null && typeof config.fullscreen !== 'boolean') {
       throw new Error('fullscreen must be true or false');
+    }
+    if (config.diagnostic !== undefined && config.diagnostic !== null && typeof config.diagnostic !== 'boolean') {
+      throw new Error('diagnostic must be true or false');
     }
     if (config.narrow_values !== undefined && config.narrow_values !== null && typeof config.narrow_values !== 'boolean') {
       throw new Error('narrow_values must be true or false');
@@ -3735,7 +3741,7 @@ class HeatpumpFlowCard extends HTMLElement {
               <span class="chip err" id="chip-err"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3.5 2.5 20.5h19z" stroke-linejoin="round"/><path d="M12 10v4.5M12 17.5v.01" stroke-linecap="round"/></svg>${this._esc(i.error)}</span>
             </div>
             <div class="card-tools">
-              <button class="icon-button" id="diagnostic-copy" type="button" title="${this._esc(i.diagnostic_copy)}" aria-label="${this._esc(i.diagnostic_copy)}">${diagnosticIcon}</button>
+              ${this._config.diagnostic === false ? '' : `<button class="icon-button" id="diagnostic-copy" type="button" title="${this._esc(i.diagnostic_copy)}" aria-label="${this._esc(i.diagnostic_copy)}">${diagnosticIcon}</button>`}
               ${this._config.fullscreen === false ? '' : `<button class="icon-button" id="fullscreen-toggle" type="button" title="${this._esc(fullLabel)}" aria-label="${this._esc(fullLabel)}" aria-pressed="${!!this._fullscreenOpen}">${fullscreenIcon}</button>`}
               <span class="sr-only" id="tool-status" aria-live="polite"></span>
             </div>
@@ -6503,7 +6509,7 @@ class HeatpumpFlowCardEditor extends HTMLElement {
       error_ok_text: (this._config.error_ok !== undefined ? this._config.error_ok : this._presetErrorOk).join(', '), tiles_custom: custom,
       animations: this._config.animations || 'auto', flow_speed: this._config.flow_speed ?? 1, source_spread: this._config.source_spread !== false,
       hc_flow_label: this._config.hc_flow_label !== false,
-      theme: this._config.theme || 'auto', fullscreen: this._config.fullscreen !== false, series_bypass: this._config.series_bypass !== false,
+      theme: this._config.theme || 'auto', fullscreen: this._config.fullscreen !== false, diagnostic: this._config.diagnostic !== false, series_bypass: this._config.series_bypass !== false,
       storage: this._config.storage || 'separate', dhw_type: this._config.dhw_type || 'coil',
       valve_dhw_text: this._valveText.dhw, valve_heating_text: this._valveText.heating, all_entities: !!this._allEntities,
       ...(assistant ? { assistant_device: this._assistantDevice || '' } : {}) };
@@ -6577,6 +6583,7 @@ class HeatpumpFlowCardEditor extends HTMLElement {
     if (!value.animations || value.animations === 'auto') delete config.animations;
     if (!value.theme || value.theme === 'auto') delete config.theme;
     if (value.fullscreen !== false) delete config.fullscreen;
+    if (value.diagnostic !== false) delete config.diagnostic;
     if (value.flow_speed === undefined || value.flow_speed === null || value.flow_speed === '' || +value.flow_speed === 1) delete config.flow_speed;
     if (value.source_spread !== false) delete config.source_spread;
     if (value.hc_flow_label !== false) delete config.hc_flow_label;

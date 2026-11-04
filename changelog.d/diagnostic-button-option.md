@@ -1,0 +1,1 @@
+- Option `diagnostic: false` hides the "Copy diagnostic report" button in the card header, like `fullscreen: false` for the full-screen button; the editor has a switch for it. The report stays available by switching the option back on.

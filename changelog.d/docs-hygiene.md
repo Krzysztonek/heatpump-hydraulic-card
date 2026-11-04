@@ -1,0 +1,1 @@
+- Documentation: the `texts` reference lists exactly the accepted keys again (`middle` and `bottom` no longer exist and were rejected; the start hint, boiler, comfort and mixer texts were missing). The README names the heater rods at three heights and has a troubleshooting row for a chosen operating mode mapped as `mode`.
