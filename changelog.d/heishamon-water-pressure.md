@@ -1,1 +1,0 @@
-- HeishaMon: the water pressure (`…_main_water_pressure`, K/L series) is shown as the heating pressure where the entity exists; units without it draw no pressure label (#276).

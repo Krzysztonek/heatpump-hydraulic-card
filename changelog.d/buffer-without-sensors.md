@@ -1,1 +1,0 @@
-- Add `buffer: true` to draw a neutral parallel heating buffer without requiring temperature or mode sensors; expose it in the editor and diagnostic report and keep it mutually exclusive with combined and series storage.

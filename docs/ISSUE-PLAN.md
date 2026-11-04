@@ -9,7 +9,7 @@
 | [#296 · Circuit pump states](https://github.com/Sturmi77/heatpump-hydraulic-card/pull/296) | Merged to `main`, #295 is closed. | Check running, stopped and unavailable states on the reporting ebusd installation after release. |
 | [#297 · EMS-ESP PC1](https://github.com/Sturmi77/heatpump-hydraulic-card/pull/297) | Merged to `main`. The reporter in #224 confirmed that `boiler_pc1on` exists, so it comes before `pc1rate`. | Check both entity-name formats on WLW circuit 1 after release. |
 | [#303 · Circuit flow label](https://github.com/Sturmi77/heatpump-hydraulic-card/pull/303), [#304 · Mode check](https://github.com/Sturmi77/heatpump-hydraulic-card/pull/304), [#305 · Tested presets](https://github.com/Sturmi77/heatpump-hydraulic-card/pull/305), [#306 · ESPAltherma](https://github.com/Sturmi77/heatpump-hydraulic-card/pull/306) | Merged to `main`; #291 is closed. | Include all four in the 0.18 release notes. Ask for a field confirmation of `espaltherma` in #254. |
-| [#281 · Circulation window](https://github.com/Sturmi77/heatpump-hydraulic-card/pull/281) and [#286 · ViCare DHW](https://github.com/Sturmi77/heatpump-hydraulic-card/pull/286) | Merged to `main`. The latest public release is 0.17.2. | Include both in 0.18 release notes. Follow up on field verification for the temperature-based ViCare fallback with #282. |
+| [#281 · Circulation window](https://github.com/Sturmi77/heatpump-hydraulic-card/pull/281) and [#286 · ViCare DHW](https://github.com/Sturmi77/heatpump-hydraulic-card/pull/286) | Released in 0.18.0. | Include both in 0.18 release notes. Follow up on field verification for the temperature-based ViCare fallback with #282. |
 
 ## GitHub milestones
 
