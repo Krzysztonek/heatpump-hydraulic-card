@@ -2286,6 +2286,9 @@ const HFC_TILES = {
 // Standby loss of the hot-water tank: history window, minimum standby window, settling time after charging or draw-off,
 // and the temperature changes within 30 minutes that count as draw-off or as heating the card cannot explain.
 const HFC_LOSS = { hours: 48, minWindow: 3, settle: 0.5, drawOff: 1.5, rise: 1.0 };
+// Runs of the timeline (#300): a pause shorter than seriesGap minutes continues a series of runs, so short cycling shows as
+// "3rd run since 21:00"; a longer standstill starts a new series.
+const HFC_RUNS = { seriesGap: 60 };
 
 /* ------------------------------------------------------------------ */
 /* Card                                                                */
@@ -4845,7 +4848,8 @@ class HeatpumpFlowCard extends HTMLElement {
     const timeline = this._timelineIds();
     // Grid instructions only annotate the public operating timeline. They must not replace a real DHW or gap segment while
     // deciding whether a tank cool-down happened in verified standby (for example SG forced-on during a DHW charge).
-    const run = timeline ? { ...timeline, sg: null } : null;
+    // The compressor that only delimits the runs (`cycle`) does not decide the segments, so the loss analysis leaves it out too.
+    const run = timeline ? { ...timeline, sg: null, cycle: null } : null;
     if (!temps.length || (configured ? !measured : sensors[0] !== keys[0]) || !run) return null;
     // A fresh-water station on the buffer has no tank of its own. In a combined storage the circuits draw heat from the same
     // tank, so the pump of every circuit must be known and every window with a running circuit pump is left out (docs/TOPOLOGY.md,
@@ -4952,7 +4956,52 @@ class HeatpumpFlowCard extends HTMLElement {
     const byFlow = this._valveByFlow() ? { vflow: this._e.flow, vtank: this._e.dhw_top } : {};
     const base = this._has('mode') ? { mode: this._e.mode, ...byFlow, ...(comp && this._preset?.compressor_over_idle ? comp : {}) }
       : comp ? { ...comp, ...byFlow } : null;
-    return base ? { ...base, ...(this._has('pv_boost') ? { pv: this._e.pv_boost } : {}), ...(this._has('sg_ready') ? { sg: this._e.sg_ready } : {}) } : null;
+    // The runs read the compressor even where the segments follow the mode alone; `cycle` only when `comp` is not there already.
+    const cycle = base && comp && !base.comp ? { cycle: comp.comp } : {};
+    return base ? { ...base, ...cycle, ...(this._has('pv_boost') ? { pv: this._e.pv_boost } : {}), ...(this._has('sg_ready') ? { sg: this._e.sg_ready } : {}) } : null;
+  }
+
+  // Runs of the heat pump between start and end, from the segments of _timelineSegments (#300, #324). With a compressor a run
+  // lasts from on to off; the operating periods inside it (heating, hot water, defrost) are its phases. Without one, every
+  // stretch of operating periods without a pause is a phase run. A run that began before the window is `partial`, one still
+  // going at its end `ongoing`. `pause` is the standstill before the run; `series` counts the runs since the last standstill of
+  // at least HFC_RUNS.seriesGap minutes, which began at `seriesFrom`.
+  // Returns [{ from, to, kind, phases: [{ kind, from, to }], source: 'run' | 'phase', partial, ongoing, pause, series, seriesFrom }].
+  _timelineRuns(hist, ids, segs, start, end) {
+    const heatKinds = ['heat', 'pv', 'sg-boost', 'sg-forced'];
+    const active = (kind) => [...heatKinds, 'dhw', 'defrost', 'cool'].includes(kind);
+    const phasesIn = (from, to) => segs.filter((s) => s.to > from && s.from < to && active(s.kind))
+      .map((s) => ({ kind: s.kind, from: Math.max(s.from, from), to: Math.min(s.to, to) }));
+    const runs = [];
+    const add = (from, to, source) => {
+      const last = runs[runs.length - 1];
+      if (last && last.to === from) last.to = to; else runs.push({ from, to, source });
+    };
+    const list = (ids.cycle || ids.comp) ? hist[ids.cycle || ids.comp] || [] : null;
+    if (list) {
+      // The same on-states as the segments; a speed or frequency of 0 is off, unavailable ends the run.
+      const on = (s) => !['off', 'unavailable', 'unknown', 'none', ''].includes(String(s).toLowerCase()) && !(parseFloat(s) <= 0);
+      list.forEach((e, n) => {
+        if (!on(e.s)) return;
+        const from = Math.max(e.t, start); const to = Math.min(list[n + 1] ? list[n + 1].t : end, end);
+        if (to > from) add(from, to, 'run');
+      });
+    } else segs.forEach((s) => { if (active(s.kind)) add(s.from, s.to, 'phase'); });
+    runs.forEach((r, n) => {
+      r.phases = phasesIn(r.from, r.to);
+      // The kind is the phase kind that lasted longest; PV surplus and SG boost are heating. Without any phase the compressor
+      // ran for heating as far as the card can tell.
+      const time = {};
+      r.phases.forEach((p) => { const k = heatKinds.includes(p.kind) ? 'heat' : p.kind; time[k] = (time[k] || 0) + p.to - p.from; });
+      r.kind = Object.keys(time).sort((a, b) => time[b] - time[a])[0] || 'heat';
+      r.partial = r.from <= start;
+      r.ongoing = r.to >= end;
+      const prev = runs[n - 1];
+      r.pause = prev ? r.from - prev.to : null;
+      r.series = prev && r.pause < HFC_RUNS.seriesGap * 60000 ? prev.series + 1 : 1;
+      r.seriesFrom = r.series > 1 ? prev.seriesFrom : r.from;
+    });
+    return runs;
   }
 
   // Preset rule for units without a valve or hot-water charging entity (`valve_rule: 'flow_above_dhw'`, ViCare #196): hot water
