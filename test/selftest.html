@@ -471,6 +471,38 @@
     card.remove();
   }
   {
+    // #324: runs of the timeline from the compressor; the operating periods inside a run are its phases.
+    const M = 60000;
+    const card = mount({ entities: { mode: 'sensor.m', compressor: 'sensor.c' } }, hassOf(toStates({ 'sensor.m': 'idle', 'sensor.c': ['0', 'Hz'] }))); await wait(20);
+    check(card._timelineIds().cycle === 'sensor.c' && !card._timelineIds().comp, 'with a mode the runs read the compressor as `cycle`, the segments stay on the mode');
+    const speedOnly = mount({ entities: { mode: 'sensor.m', compressor_speed: 'sensor.cs' } }, hassOf(toStates({ 'sensor.m': 'idle', 'sensor.cs': ['0', '%'] }))); await wait(20);
+    check(speedOnly._timelineIds().cycle === 'sensor.cs', 'without a compressor entity the compressor speed delimits the runs (Lambda)');
+    speedOnly.remove();
+    const h = (pairs) => pairs.map(([t, s]) => ({ t: t * M, s }));
+    const hist = {
+      'sensor.m': h([[0, 'idle'], [10, 'heating'], [22, 'dhw'], [40, 'idle'], [50, 'heating'], [52, 'defrost'], [55, 'heating'], [70, 'idle']]),
+      'sensor.c': h([[0, '0'], [10, '45'], [40, '0'], [50, '30'], [70, '0.0'], [75, '20'], [80, 'unavailable'], [82, '20'], [90, '0']]),
+    };
+    const ids = { mode: 'sensor.m', cycle: 'sensor.c' };
+    const runsOf = (hh, ii, s, e) => card._timelineRuns(hh, ii, card._timelineSegments(hh, ii, s * M, e * M), s * M, e * M);
+    const fmt = (runs) => runs.map((r) => `${r.kind}:${r.from / M}-${r.to / M}:s${r.series}${r.pause !== null ? `:p${r.pause / M}` : ''}${r.partial ? ':partial' : ''}${r.ongoing ? ':ongoing' : ''}`).join(' ');
+    const runs = runsOf(hist, ids, 0, 100);
+    check(fmt(runs) === 'dhw:10-40:s1 heat:50-70:s2:p10 heat:75-80:s3:p5 heat:82-90:s4:p2',
+      `runs: hot water outweighs the heating start, defrost stays in its run, unavailable ends a run, short pauses continue the series (${fmt(runs)})`);
+    check(runs[1].phases.map((p) => `${p.kind}:${p.from / M}-${p.to / M}`).join() === 'heat:50-52,defrost:52-55,heat:55-70' && runs[0].seriesFrom === 10 * M && runs[3].seriesFrom === 10 * M,
+      `a run keeps its phases and the start of its series (${runs[1].phases.map((p) => p.kind).join()})`);
+    const cut = runsOf({ 'sensor.m': h([[0, 'heating'], [40, 'idle'], [55, 'heating']]), 'sensor.c': h([[0, 'on'], [40, 'off'], [55, 'on']]) }, ids, 20, 60);
+    check(fmt(cut) === 'heat:20-40:s1:partial heat:55-60:s2:p15:ongoing', `runs cut by the window are partial or ongoing (${fmt(cut)})`);
+    const apart = runsOf({ 'sensor.m': h([[0, 'heating']]), 'sensor.c': h([[0, 'off'], [10, 'on'], [20, 'off'], [100, 'on'], [110, 'off']]) }, ids, 0, 120);
+    check(fmt(apart) === 'heat:10-20:s1 heat:100-110:s1:p80', `a standstill of an hour or more starts a new series (${fmt(apart)})`);
+    // Without a compressor, a stretch of operating periods without a pause is one phase run.
+    const phase = runsOf({ 'sensor.m': h([[0, 'idle'], [10, 'heating'], [20, 'defrost'], [22, 'heating'], [30, 'idle'], [40, 'dhw'], [50, 'idle']]) }, { mode: 'sensor.m' }, 0, 60);
+    check(fmt(phase) === 'heat:10-30:s1 dhw:40-50:s2:p10' && phase.every((r) => r.source === 'phase'), `without a compressor the runs are phases (${fmt(phase)})`);
+    const unrecorded = runsOf({ 'sensor.m': h([[0, 'idle'], [10, 'heating'], [30, 'idle']]) }, ids, 0, 60);
+    check(fmt(unrecorded) === 'heat:10-30:s1' && unrecorded[0].source === 'phase', `a compressor without recorded history leaves the mode phases (${fmt(unrecorded)})`);
+    card.remove();
+  }
+  {
     // #257: the complete "long names" entity list of a Nefit EnviLine (EMS-ESP 3.8.6).
     const states = toStates({
       'sensor.boiler_compressor_activity': 'heating', 'binary_sensor.boiler_hp_compressor': 'on', 'sensor.boiler_compressor_current_power': ['322', 'W'],
