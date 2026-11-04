@@ -4027,6 +4027,26 @@
     const noFull = mount({ ...s.config, fullscreen: false }, h);
     check(!noFull.shadowRoot.getElementById('fullscreen-toggle'), 'fullscreen: false removes the button');
     noFull.remove();
+    {
+      // diagnostic: false hides the diagnostic report button; the editor shows it switched on by default and writes only false.
+      const noDiag = mount({ ...s.config, diagnostic: false }, h);
+      check(!noDiag.shadowRoot.getElementById('diagnostic-copy') && !!noDiag.shadowRoot.getElementById('fullscreen-toggle'),
+        'diagnostic: false removes the diagnostic button and keeps the full-screen button');
+      noDiag.remove();
+      let threw = false; try { new C().setConfig({ ...s.config, diagnostic: 'no' }); } catch (e) { threw = true; }
+      check(threw, 'diagnostic must be true or false');
+      const keys = (n) => (n.schema ? n.schema.flatMap(keys) : [n.name]);
+      check(C._formSchema(s.config).schema.flatMap(keys).includes('diagnostic'), 'editor offers the diagnostic button switch');
+      const dEd = document.createElement('heatpump-flow-card-editor'); let dChanged;
+      dEd.addEventListener('config-changed', (ev) => { dChanged = ev.detail.config; });
+      dEd.setConfig(s.config); dEd.hass = h; await wait(10);
+      const shownByDefault = dEd._form.data.diagnostic === true;
+      dEd._changed({ ...dEd._form.data, diagnostic: false });
+      const off = dChanged.diagnostic === false;
+      dEd._changed({ ...dEd._form.data, diagnostic: true });
+      check(shownByDefault && off && !('diagnostic' in dChanged), `editor: diagnostic button on by default, writes only false (${shownByDefault} / ${off} / ${JSON.stringify(dChanged.diagnostic)})`);
+      dEd.remove();
+    }
 
     const custom = { ...s.config, title: undefined, language: 'xy', texts: { xy: {
       title: 'Warmtepomp & huis', heat_pump: 'Warm <bron>', details: 'Details NL',
