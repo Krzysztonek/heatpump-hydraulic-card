@@ -1,0 +1,150 @@
+name: Field test – first setup
+description: Report how long the first setup took on your installation and whether the schematic is right. Takes about five minutes.
+title: "[Field test] "
+labels: [field-test]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for taking part! The field test measures how often a fresh card shows the right schematic within a few minutes, and where people need help (#298). The answers are counted in a published summary without names.
+
+        **How to measure:** start the clock when you add a new card to a dashboard, with your heat pump integration already working in Home Assistant. Stop it when the schematic is usable for you. Waiting for a heating or hot-water run afterwards does not count as setup time. If you gave up, please report that too: failed attempts count just as much.
+
+        One report per installation. The diagnostic report (document button in the card header) is optional but very helpful; entity ids may contain names, so review it before pasting.
+  - type: input
+    id: version
+    attributes:
+      label: Card version
+      description: Shown in the diagnostic report, or in HACS.
+      placeholder: e.g. 0.18.0
+    validations:
+      required: true
+  - type: dropdown
+    id: preset
+    attributes:
+      label: Preset
+      description: The preset the card detected or you selected.
+      options:
+        - lambda (Lambda)
+        - vicare (Viessmann ViCare)
+        - open3e (Viessmann Open3E)
+        - vaillant (Vaillant myPyllant)
+        - ebusd (Vaillant ebusd)
+        - emsesp (Bosch, Buderus … EMS-ESP)
+        - bosch_buderus_heating (Bosch/Buderus Home Comfort)
+        - heishamon (Panasonic HeishaMon)
+        - samsung (Samsung esphome-samsung-nasa)
+        - wolf (Wolf)
+        - kronoterm (Kronoterm)
+        - luxtronik (Luxtronik)
+        - stiebel_isg (Stiebel Eltron ISG)
+        - espaltherma (Daikin ESPAltherma)
+        - No preset (mapping assistant or own entities)
+    validations:
+      required: true
+  - type: input
+    id: heatpump
+    attributes:
+      label: Heat pump model and integration version
+      placeholder: e.g. Buderus WLW186i, EMS-ESP 3.7.3
+    validations:
+      required: true
+  - type: dropdown
+    id: hydraulics
+    attributes:
+      label: Hydraulics
+      description: Select everything your installation has.
+      multiple: true
+      options:
+        - Direct heating, no buffer
+        - Parallel buffer
+        - Series buffer in the return
+        - Separate hot-water tank
+        - Combined storage (one tank with a hot-water zone)
+        - Fresh-water station
+        - Boiler or second heat generator
+        - Solar thermal
+    validations:
+      required: true
+  - type: dropdown
+    id: circuits
+    attributes:
+      label: Number of heating circuits
+      options: ['1', '2', '3', '4', '5', '6']
+    validations:
+      required: true
+  - type: input
+    id: minutes
+    attributes:
+      label: Minutes until the schematic was usable
+      description: Write "gave up" if it did not work.
+      placeholder: e.g. 3
+    validations:
+      required: true
+  - type: dropdown
+    id: setup
+    attributes:
+      label: What did you need?
+      multiple: true
+      options:
+        - Nothing, the card was right as added
+        - Changed fields in the visual editor
+        - Edited YAML
+        - Read the README or a preset page
+        - Asked someone or searched the issues
+    validations:
+      required: true
+  - type: textarea
+    id: fields
+    attributes:
+      label: Fields you set or cleared by hand
+      description: For example `buffer_top`, `hc_count`, `source_type`. Leave empty if none.
+  - type: textarea
+    id: friction
+    attributes:
+      label: The first thing that was unclear or wrong
+      description: Even small things help, for example a field name you did not understand.
+  - type: dropdown
+    id: layout
+    attributes:
+      label: Does the drawing match your installation (tanks, buffer, circuits)?
+      options:
+        - 'Yes'
+        - 'Partly'
+        - 'No'
+    validations:
+      required: true
+  - type: dropdown
+    id: heating_path
+    attributes:
+      label: While heating, does the water flow along the right path to the right circuit?
+      options:
+        - Confirmed during a heating run
+        - Wrong
+        - Not observed yet
+    validations:
+      required: true
+  - type: dropdown
+    id: dhw_path
+    attributes:
+      label: While heating hot water, does the water flow to the tank?
+      options:
+        - Confirmed during a hot-water run
+        - Wrong
+        - Not observed yet
+        - No hot water through the heat pump
+    validations:
+      required: true
+  - type: textarea
+    id: diagnostic
+    attributes:
+      label: Diagnostic report (optional)
+      description: Copied with the document button in the card header. Review entity ids and remove anything private.
+      render: text
+  - type: checkboxes
+    id: consent
+    attributes:
+      label: Summary
+      options:
+        - label: My answers may be counted in the published field-test summary (without names).
+          required: true

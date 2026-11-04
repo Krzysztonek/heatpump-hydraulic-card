@@ -43,7 +43,7 @@ The 0.18 milestone contains four bounded, vendor-neutral improvements, in priori
 
 ## 0.19.0 – data aggregation and long-term analytics
 
-This was the original 0.19 scope. The [current issue assignments](ISSUE-PLAN.md#github-milestones) put installation confirmation in 0.19, measurement completeness in 0.20, and the two specialist analytics in Later.
+This was the original 0.19 scope. The [current issue assignments](ISSUE-PLAN.md#github-milestones) put the cycle details and measurement completeness in 0.19, installation confirmation in 0.20 (order changed on 4 November), and the two specialist analytics in Later.
 
 1. **Several entities per key** ([#23](https://github.com/Sturmi77/heatpump-hydraulic-card/issues/23); impact high, effort L). Define the public configuration, availability rules, units and editor flow for average, sum, minimum and maximum before using it for room climate and multi-unit values.
 2. **DHW loss from an energy balance** ([#114](https://github.com/Sturmi77/heatpump-hydraulic-card/issues/114); impact medium, effort M–L). Add a conservative period tile from explicitly configured cumulative heat-in, auxiliary-input and heat-out counters. Compute only when every configured path has valid statistics over the same period; never infer a missing heater or usage meter.

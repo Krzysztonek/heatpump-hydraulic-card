@@ -1,0 +1,1 @@
+- New issue form "Field test – first setup": how long the first setup took, what had to be set by hand, and whether the heating and hot-water paths are right. The reports form the field baseline that decides the editor questions (#298). The roadmap now puts the cycle details (0.19) before the editor questions (0.20), so the reports can come in meanwhile.
