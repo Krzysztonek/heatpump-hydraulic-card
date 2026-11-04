@@ -13,6 +13,13 @@
 <body>
 <pre id="result">RUNNING</pre>
 <pre id="log"></pre>
+<script>
+  // Without Home Assistant the editor falls back to the browser language. The checks expect English texts, so the browser
+  // language is fixed here: a self-test run in a German (or any other) browser gives the same result as the English CI.
+  // Checks of the language fallback set the Home Assistant locale themselves.
+  Object.defineProperty(navigator, 'language', { get: () => 'en-US', configurable: true });
+  Object.defineProperty(navigator, 'languages', { get: () => ['en-US', 'en'], configurable: true });
+</script>
 <script src="../dist/heatpump-hydraulic-card.js"></script>
 <script src="../demo/setups.js"></script>
 <script>
@@ -2886,6 +2893,10 @@
     check(r.tiles.energy_heating?.now === `sensor.${p}_main_heat_energy_consumption` && r.tiles.heat_dhw?.now === `sensor.${p}_main_dhw_energy_production`, 'HeishaMon tiles accept the Energy spelling');
     check(r.entities.hc_setpoint === `sensor.${p}_main_z1_water_target_temp` && r.entities.hc2_setpoint === `sensor.${p}_main_z2_water_target_temp`, 'HeishaMon takes the zone target temperature, not the outlet target');
     check(r.entities.program === `switch.${p}_main_holiday_mode_state`, 'HeishaMon falls back to the holiday switch');
+    // #276: the water pressure (K/L series) only where the entity exists, and only for the first circuit.
+    const withPressure = C._resolve({ preset: 'heishamon', hc_count: 2 }, hassOf(toStates({ ...v2, [`sensor.${p}_main_water_pressure`]: ['2.26', 'bar'] }))).entities;
+    check(!r.entities.hc_pressure && withPressure.hc_pressure === `sensor.${p}_main_water_pressure` && !withPressure.hc2_pressure,
+      `HeishaMon maps the water pressure only where it exists (${r.entities.hc_pressure} / ${withPressure.hc_pressure} / ${withPressure.hc2_pressure})`);
     const card = mount({ preset: 'heishamon' }, hassOf(toStates(v2))); await wait(20);
     const chip = card.shadowRoot.getElementById('chip-program');
     check(chip.classList.contains('on') && chip.classList.contains('holiday'), 'holiday switch on shows the holiday chip');
