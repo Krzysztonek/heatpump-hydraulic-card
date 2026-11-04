@@ -5,7 +5,8 @@ body:
   - type: markdown
     attributes:
       value: |
-        The Viessmann (ViCare), EMS-ESP and Bosch/Buderus Home Comfort presets are built from the integrations' source code and have **not yet been tested on real installations** – your feedback is exactly what is needed. "It works" reports are welcome too, also for Luxtronik air and brine units (the preset is confirmed on water-to-water), Wolf with the core `wolflink` integration (confirmed with `wolf_smartset`), Stiebel Eltron controllers other than the WPMsystem, and further Vaillant/myPyllant, Open3E and ebusd installations.
+        The Bosch/Buderus Home Comfort and Daikin (ESPAltherma) presets are built from the integrations' source code and have **not yet been tested on real installations** – your feedback is exactly what is needed. "It works" reports are welcome too, also for Luxtronik air and brine units (the preset is confirmed on water-to-water), Wolf with the core `wolflink` integration (confirmed with `wolf_smartset`), Kronoterm over Modbus, Stiebel Eltron controllers other than the WPMsystem, and further installations of every other preset.
+        Setting up the card for the first time? The **Field test – first setup** form also records how long it took and where it was unclear.
         If your card version shows a document button in the header, use it to copy a diagnostic report. It stays local until you paste it. Entity ids may contain names, so review and remove anything private first.
   - type: dropdown
     id: kind

@@ -17,8 +17,8 @@
 | --- | --- | --- |
 | [0.18.0](https://github.com/Sturmi77/heatpump-hydraulic-card/milestone/11) | #34, #283 (#291 done) | Release follow-up and kiosk triage. PRs #297 and #303–#306 are merged for this release. |
 | [Field baseline (0.18.x)](https://github.com/Sturmi77/heatpump-hydraulic-card/milestone/13) | #298 (lead), #1, #282, #254 | Supported-preset cohort and field confirmations. Daikin is a separate exploratory pilot outside the cohort. |
-| [0.19.0](https://github.com/Sturmi77/heatpump-hydraulic-card/milestone/12) | #299 (lead), #269, #4, #289 | Installation confirmation, phone readability trial and display units. |
-| [0.20.0](https://github.com/Sturmi77/heatpump-hydraulic-card/milestone/14) | #300 (lead), #290, #23, #173 | Cycle details, circuit spread, and complete heat/power pairs on a real cascade. |
+| [0.19.0](https://github.com/Sturmi77/heatpump-hydraulic-card/milestone/14) | #300 (lead), #290, #23, #173, #289, #4 | Cycle details, circuit spread, complete heat/power pairs on a real cascade, display units and the phone readability trial. Moved ahead on 4 November, see [order](ROADMAP-DRAFT.md). |
+| [0.20.0](https://github.com/Sturmi77/heatpump-hydraulic-card/milestone/12) | #299 (lead) | Installation confirmation, chosen from the field baseline. |
 | [Later](https://github.com/Sturmi77/heatpump-hydraulic-card/milestone/15) | #12, #27, #31, #36, #82, #101, #114, #195, #224, #248, #250, #252, #253, #255, #256, #260, #261, #267, #276 | Open follow-ups with no release commitment. For analytics, take #27 before #114. |
 
 ## Lead issues
@@ -26,8 +26,8 @@
 | Order | Issue | Acceptance evidence |
 | --- | --- | --- |
 | 1 | [#298 · Measure first setup on real installations](https://github.com/Sturmi77/heatpump-hydraulic-card/issues/298) | A short voluntary field-test form linked from #1, a versioned ten-installation cohort, and a published baseline with unsuccessful and pending cases. Record setup time, manual fields, YAML and confirmation of the actual flow path. |
-| 2 | [#299 · Confirm ambiguous hydraulic layouts in the editor](https://github.com/Sturmi77/heatpump-hydraulic-card/issues/299) | Choose the first prompts from milestone 1 evidence. Provide preview, skip, cancel and explicit save. Compare fresh setup outcomes with the baseline and test existing overrides. |
-| 3 | [#300 · Show measurements for a selected operating cycle](https://github.com/Sturmi77/heatpump-hydraulic-card/issues/300) | Extend the existing timeline selection with heating and DHW run details. Match two real recorder traces, label mode-only phases and partial runs, and leave unsupported measurements empty. |
+| 2 | [#300 · Show measurements for a selected operating cycle](https://github.com/Sturmi77/heatpump-hydraulic-card/issues/300) | Extend the existing timeline selection with heating and DHW run details. Match two real recorder traces, label mode-only phases and partial runs, and leave unsupported measurements empty. |
+| 3 | [#299 · Confirm ambiguous hydraulic layouts in the editor](https://github.com/Sturmi77/heatpump-hydraulic-card/issues/299) | Choose the first prompts from milestone 1 evidence; this milestone now follows the cycle details (0.20). Provide preview, skip, cancel and explicit save. Compare fresh setup outcomes with the baseline and test existing overrides. |
 
 ## Scope and follow-up by issue
 
@@ -47,16 +47,16 @@
 | --- | --- |
 | [#1 · Call for testers](https://github.com/Sturmi77/heatpump-hydraulic-card/issues/1) | Keep as the recruitment entry point. Link the milestone 1 protocol, request underrepresented configurations and report trial results in the new lead issue. |
 | [#269 · Heating-circuit remapping](https://github.com/Sturmi77/heatpump-hydraulic-card/issues/269) | Use the reported contiguous Open3E circuits 2–4 as a milestone 2 example. Confirm the existing start index and count solve this case. Consider arbitrary reordering only if a different installation requires it. |
-| [#4 · Phone layout](https://github.com/Sturmi77/heatpump-hydraulic-card/issues/4) | Use in 0.19 and 0.20 usability checks. Prototype the glance view with a target, an active path and a readable temperature. Decide about a separate portrait schematic after observing phone use. |
-| [#289 · Flow units](https://github.com/Sturmi77/heatpump-hydraulic-card/issues/289) | Small 0.19 usability candidate after the editor work. Apply the unit consistently in schema, circuit and tile. Preserve calculation units. |
+| [#4 · Phone layout](https://github.com/Sturmi77/heatpump-hydraulic-card/issues/4) | Comes along in 0.19, independent of the field test; n42net offered a prototype. Use it in the 0.20 usability checks as well. Prototype the glance view with a target, an active path and a readable temperature. Decide about a separate portrait schematic after observing phone use. |
+| [#289 · Flow units](https://github.com/Sturmi77/heatpump-hydraulic-card/issues/289) | Small 0.19 candidate, independent of the field test. Apply the unit consistently in schema, circuit and tile. Preserve calculation units. |
 | [#276 · Panasonic suggestions](https://github.com/Sturmi77/heatpump-hydraulic-card/issues/276) | Keep as field evidence for #289 and #290. The missing spread and the grey timeline came from a select mapped as `mode`; the editor flags that since #304. Close the umbrella once the reporter confirms and both requests are tracked. |
 
 ### Make measurements useful in an operating cycle
 
 | Issue | Recommendation |
 | --- | --- |
-| [#290 · Circuit spread](https://github.com/Sturmi77/heatpump-hydraulic-card/issues/290) | First supporting metric for 0.20 heating-run details. Use measured flow and return of the same active circuit. Show the WP spread separately. A current-value tile can reuse the same rule. |
-| [#23 · Multiple entities per key](https://github.com/Sturmi77/heatpump-hydraulic-card/issues/23) | Scope 0.20 to measurement completeness. Existing power lists already sum. Define which members, units and missing values permit a complete total. Room averages and general-purpose combinations can ship later. |
+| [#290 · Circuit spread](https://github.com/Sturmi77/heatpump-hydraulic-card/issues/290) | First supporting metric for the 0.19 heating-run details. Use measured flow and return of the same active circuit. Show the WP spread separately. A current-value tile can reuse the same rule. |
+| [#23 · Multiple entities per key](https://github.com/Sturmi77/heatpump-hydraulic-card/issues/23) | Scope 0.19 to measurement completeness. Existing power lists already sum. Define which members, units and missing values permit a complete total. Room averages and general-purpose combinations can ship later. |
 | [#173 · Cascade power and COP](https://github.com/Sturmi77/heatpump-hydraulic-card/issues/173) | Use the real two-unit installation to test #23. Pair heat and electricity per unit over compatible intervals. Suppress misleading system COP with missing or incompatible heat data. Capture the correctness fix separately if it is ready earlier. Defer the second-unit drawing. |
 | [#31 · Pump counters](https://github.com/Sturmi77/heatpump-hydraulic-card/issues/31) and [#260 · Second fan speed](https://github.com/Sturmi77/heatpump-hydraulic-card/issues/260) | Accept opportunistic detail mappings once states, units and a tester are available. They do not determine the cycle milestone. |
 | [#27 · Seasonal brine minimum](https://github.com/Sturmi77/heatpump-hydraulic-card/issues/27) | First analytics follow-up after cycle details. Show the minimum and its date only with valid seasonal statistics. |
