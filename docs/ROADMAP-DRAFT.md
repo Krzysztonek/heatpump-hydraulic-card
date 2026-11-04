@@ -4,7 +4,7 @@
 
 | Order | Proposed milestone | What the operator or maintainer can do at the end |
 | --- | --- | --- |
-| Release in progress | 0.18.0 · Hydraulic correctness | Follow the active water path on the reported reference installations. |
+| Released 4 November | 0.18.0 · Hydraulic correctness | Follow the active water path on the reported reference installations. |
 | 1 | Field baseline on 0.18.x | Tell how often a fresh preset produces the correct schematic, how long it takes, and where people need help. |
 | 2 | 0.19.0 · Confirm the installation | Resolve an ambiguous layout in the editor by answering a short question and seeing the result. |
 | 3 | 0.20.0 · Understand a cycle | Select a heating or hot-water cycle and see its duration and the measurements that explain it. |
@@ -20,11 +20,11 @@ The field baseline is a research milestone and can start as soon as the trial pr
 | 2 · A preset identifies integration entities more reliably than physical pipework. | A user who knows their system still has to translate that knowledge into settings such as circuit count and start index. | Keep a prompt only when it resolves a demonstrated ambiguity and the repeat trial shows less manual work. |
 | 3 · The timeline describes activity and the tiles summarize periods. Their boundaries can differ. | A user can see several starts and a daily energy total but cannot tell how much is attributable to one DHW run. | Offer each cycle metric only when its source covers the same equipment and interval. A reliable duration alone is useful. |
 
-## Release in progress · 0.18.0
+## Released · 0.18.0
 
 **Target.** An operator looking at a heating or hot-water run can tell which circuit is active. A buffer without sensors can still appear in the correct place. A utility lock, cooling dew-point margin and circulation window appear when their inputs are available.
 
-**Current gap.** On 3 November the published version is 0.17.2. The four planned features, the ViCare fallback for hot-water charging and the ebusd pump-state fix have reached `main`. The EMS-ESP preset maps PC1 for the first circuit of a WLW indoor unit from a field report. Since then `main` also has the `hc_flow_label` option, a plausibility check for a chosen mode mapped as `mode`, the ViCare and ebusd presets marked as tested, and a first `espaltherma` preset for Daikin Altherma. Bosch/Buderus Home Comfort uses a different integration and still needs its own evidence. [Release](https://github.com/Sturmi77/heatpump-hydraulic-card/releases/tag/v0.17.2) · [0.18 tracker](https://github.com/Sturmi77/heatpump-hydraulic-card/milestone/11) · [Pull requests](ISSUE-PLAN.md#pull-requests)
+**State.** Released on 4 November as 0.18.0; before that the published version was 0.17.2. The four planned features, the ViCare fallback for hot-water charging and the ebusd pump-state fix have reached `main`. The EMS-ESP preset maps PC1 for the first circuit of a WLW indoor unit from a field report. Since then `main` also has the `hc_flow_label` option, a plausibility check for a chosen mode mapped as `mode`, the ViCare and ebusd presets marked as tested, and a first `espaltherma` preset for Daikin Altherma. Bosch/Buderus Home Comfort uses a different integration and still needs its own evidence. [Release](https://github.com/Sturmi77/heatpump-hydraulic-card/releases/tag/v0.17.2) · [0.18 tracker](https://github.com/Sturmi77/heatpump-hydraulic-card/milestone/11) · [Pull requests](ISSUE-PLAN.md#pull-requests)
 
 **Exit check.** Exercise running and stopped circuits behind a parallel buffer, including heating, cooling, DHW diversion, zero speed and an unavailable pump. Verify the EMS-ESP mapping against the merged pump logic, existing direct-circuit behavior, browser and topology checks. Publish release notes that distinguish a reported valve state from the ViCare temperature-based inference. Keep remaining field confirmations visible in the tracker.
 

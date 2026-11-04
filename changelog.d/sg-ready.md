@@ -1,1 +1,0 @@
-- Add a read-only `sg_ready` entity and `sg_ready_map` for SG-Ready states and utility locks, with translated header chips, timeline periods, diagnostics and visual-editor entity mapping.

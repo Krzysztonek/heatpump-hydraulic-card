@@ -1,1 +1,0 @@
-- Document the planned field test of preset setup, the editor questions for ambiguous layouts, and the analysis of individual heating and hot-water cycles.

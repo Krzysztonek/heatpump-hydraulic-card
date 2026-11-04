@@ -1,1 +1,0 @@
-- The ViCare and ebusd presets are marked as tested on real installations: ViCare on a Vitocal 250 and a Vitocal 200-S (#282), ebusd on an aroTHERM plus cascade and a single aroTHERM plus with a buffer (#295). The editor no longer shows them as untested.

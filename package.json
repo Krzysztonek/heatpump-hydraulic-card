@@ -1,6 +1,6 @@
 {
   "name": "heatpump-hydraulic-card",
-  "version": "0.17.2",
+  "version": "0.18.0",
   "private": true,
   "description": "Development and browser-test tooling for Heat Pump Hydraulic Card",
   "type": "module",

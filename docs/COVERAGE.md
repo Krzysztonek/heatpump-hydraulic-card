@@ -25,14 +25,15 @@ The percentage says how complete a preset is, not how well it was tested: see th
 | [`vicare`](#vicare) | 75 % | `power`, `dhw_target`, `hc_flow` | `heat`, `hc_return`, `room` | 20 of 49 | 16 of 29 | – | – | de, en |
 | [`open3e`](#open3e) | 92 % | `volume` | `hc_return` | 20 of 49 | 15 of 29 | – | – | – |
 | [`vaillant`](#vaillant) | 100 % | – | `heat`, `return`, `volume`, `hc_return`, `hc_pump` | 11 of 49 | 11 of 29 | yes | – | de, en |
-| [`emsesp`](#emsesp) | 92 % | `heat` | `hc_return` | 18 of 49 | 20 of 29 | – | – | – |
-| [`heishamon`](#heishamon) | 92 % | `hc_pump` | `hc_return` | 19 of 49 | 17 of 29 | yes | – | – |
+| [`emsesp`](#emsesp) | 100 % | – | `hc_return` | 22 of 49 | 20 of 29 | – | – | – |
+| [`heishamon`](#heishamon) | 92 % | `hc_pump` | `hc_return` | 20 of 49 | 17 of 29 | yes | – | – |
 | [`wolf`](#wolf) | 100 % | – | `hc_return` | 10 of 49 | 6 of 29 | – | – | de, en |
 | [`kronoterm`](#kronoterm) | 100 % | – | `volume`, `hc_return` | 11 of 49 | 9 of 29 | yes | – | – |
 | [`luxtronik`](#luxtronik) | 93 % | `hc_return` | – | 19 of 49 | 15 of 29 | – | – | – |
 | [`stiebel_isg`](#stiebel_isg) | 100 % | – | `heat`, `hc_return` | 17 of 49 | 9 of 29 | yes | yes | – |
 | [`ebusd`](#ebusd) | 100 % | – | `hc_return` | 20 of 49 | 8 of 29 | yes | – | – |
 | [`samsung`](#samsung) | 100 % | – | `hc_return`, `hc_pump` | 11 of 49 | 4 of 29 | yes | – | – |
+| [`espaltherma`](#espaltherma) | 92 % | `hc_pump` | `hc_flow`, `hc_return` | 13 of 49 | 9 of 29 | yes | – | – |
 
 ## Languages
 
@@ -43,7 +44,7 @@ English is the reference. A text without a translation shows in English.
 | Deutsch (`de`) | 100 % | 100 % |
 | Slovenčina (`sk`) | 100 % | 100 % |
 | Čeština (`cs`) | 100 % | 100 % |
-| Nederlands (`nl`) | 96 % (5 missing) | 94 % (13 missing) |
+| Nederlands (`nl`) | 100 % | 100 % |
 
 ## Details per preset
 
@@ -133,14 +134,14 @@ Not mapped:
 
 ### emsesp
 
-EMS-ESP (Bosch, Buderus, Junkers, Nefit …). Core fields 92 %, stat tiles: `cop_heating`, `cop_dhw`, `cop_cooling`, `cop_total`, `spf`, `energy`, `energy_heating`, `energy_dhw`, `energy_cooling`, `energy_aux`, `heat`, `heat_heating`, `heat_dhw`, `heat_cooling`, `starts`, `cycles_heating`, `cycles_dhw`, `cycles_cooling`, `hours`, `hours_per_start`.
+EMS-ESP (Bosch, Buderus, Junkers, Nefit …). Core fields 100 %, stat tiles: `cop_heating`, `cop_dhw`, `cop_cooling`, `cop_total`, `spf`, `energy`, `energy_heating`, `energy_dhw`, `energy_cooling`, `energy_aux`, `heat`, `heat_heating`, `heat_dhw`, `heat_cooling`, `starts`, `cycles_heating`, `cycles_dhw`, `cycles_cooling`, `hours`, `hours_per_start`.
 
 | Area | Mapped | Shown without its own entity | Not mapped, with reason | Open |
 |---|---|---|---|---|
-| Heat pump | **`mode`**, **`compressor`**, `defrost`, **`power`**, **`flow`**, **`return`**, **`volume`**, `source_in`, `source_out`, **`outdoor`**, **`valve`**, `heater` | – | – | `status`, `fan_speed`, **`heat`**, `source_volume`, `brine_pressure`, `pv_boost` |
+| Heat pump | **`mode`**, **`compressor`**, `fan_speed`, `defrost`, **`power`**, **`heat`**, **`flow`**, **`return`**, **`volume`**, `source_in`, `source_out`, **`outdoor`**, **`valve`**, `heater` | – | – | `status`, `source_volume`, `brine_pressure`, `pv_boost` |
 | Tanks | **`dhw_top`**, `dhw_bottom`, **`dhw_target`**, `circulation` | – | – | `dhw_middle`, `dhw_mode`, `dhw_heater`, `buffer_top`, `buffer_middle`, `buffer_bottom`, `buffer_mode`, `buffer_heater`, `solar_collector`, `solar_pump` |
-| Heating circuit | **`hc_flow`**, **`hc_pump`**, **`room`**, `room_target`, `program` | – | **`hc_return`** | `hc_setpoint`, `hc_mode`, `hc_volume`, `hc_curve_offset`, `hc_mixer`, `hc_pressure` |
-| Details | `hours`, `starts_total`, `energy_total`, `heat_total`, `compressor_speed`, `evap_temp`, `cond_temp`, `suction_temp`, `hot_gas`, `liquid_temp` | – | – | `aux_hours`, `env_energy`, `low_pressure`, `high_pressure`, `eev`, `superheat`, `subcooling`, `cutout_high_pressure`, `cutout_low_pressure`, `cutout_temperature` |
+| Heating circuit | **`hc_flow`**, `hc_setpoint`, **`hc_pump`**, `hc_volume`, **`room`**, `room_target`, `program` | – | **`hc_return`** | `hc_mode`, `hc_curve_offset`, `hc_mixer`, `hc_pressure` |
+| Details | `hours`, `starts_total`, `energy_total`, `heat_total`, `compressor_speed`, `evap_temp`, `cond_temp`, `suction_temp`, `hot_gas`, `liquid_temp`, `eev` | – | – | `aux_hours`, `env_energy`, `low_pressure`, `high_pressure`, `superheat`, `subcooling`, `cutout_high_pressure`, `cutout_low_pressure`, `cutout_temperature` |
 
 Not mapped:
 
@@ -154,7 +155,7 @@ Panasonic Aquarea (HeishaMon). Core fields 92 %, stat tiles: `cop_heating`, `cop
 |---|---|---|---|---|
 | Heat pump | **`compressor`**, `fan_speed`, `defrost`, **`power`**, **`heat`**, **`flow`**, **`return`**, **`volume`**, **`outdoor`**, **`valve`**, `heater` | **`mode`** | – | `status`, `source_volume`, `source_in`, `source_out`, `brine_pressure`, `pv_boost` |
 | Tanks | **`dhw_top`**, **`dhw_target`** | – | – | `dhw_middle`, `dhw_bottom`, `dhw_mode`, `circulation`, `dhw_heater`, `buffer_top`, `buffer_middle`, `buffer_bottom`, `buffer_mode`, `buffer_heater`, `solar_collector`, `solar_pump` |
-| Heating circuit | **`hc_flow`**, `hc_setpoint`, `hc_curve_offset`, **`room`**, `program` | – | **`hc_return`** | `hc_mode`, **`hc_pump`**, `hc_volume`, `hc_mixer`, `hc_pressure`, `room_target` |
+| Heating circuit | **`hc_flow`**, `hc_setpoint`, `hc_curve_offset`, `hc_pressure`, **`room`**, `program` | – | **`hc_return`** | `hc_mode`, **`hc_pump`**, `hc_volume`, `hc_mixer`, `room_target` |
 | Details | `hours`, `starts_total`, `aux_hours`, `energy_total`, `heat_total`, `compressor_speed`, `evap_temp`, `suction_temp`, `hot_gas`, `liquid_temp`, `low_pressure`, `high_pressure`, `eev` | – | – | `env_energy`, `cond_temp`, `superheat`, `subcooling`, `cutout_high_pressure`, `cutout_low_pressure`, `cutout_temperature` |
 
 Not mapped:
@@ -249,6 +250,22 @@ Not mapped:
 
 - `hc_return`: The NASA bus reports the return of the heat pump (0x4236), not one per circuit.
 - `hc_pump`: The primary water pump (0x4089) also runs for hot water, so the circuit follows the diverter valve instead of a pump of its own.
+
+### espaltherma
+
+Daikin Altherma (ESPAltherma). Core fields 92 %, stat tiles: `cop_heating`, `cop_dhw`, `cop_cooling`, `energy_heating`, `energy_dhw`, `energy_cooling`, `heat_heating`, `heat_dhw`, `heat_cooling`.
+
+| Area | Mapped | Shown without its own entity | Not mapped, with reason | Open |
+|---|---|---|---|---|
+| Heat pump | **`compressor`**, `fan_speed`, `defrost`, **`power`**, **`heat`**, **`flow`**, **`return`**, **`volume`**, **`outdoor`**, **`valve`**, `heater` | **`mode`** | – | `status`, `source_volume`, `source_in`, `source_out`, `brine_pressure`, `pv_boost` |
+| Tanks | **`dhw_top`**, **`dhw_target`**, `circulation`, `dhw_heater` | – | – | `dhw_middle`, `dhw_bottom`, `dhw_mode`, `buffer_top`, `buffer_middle`, `buffer_bottom`, `buffer_mode`, `buffer_heater`, `solar_collector`, `solar_pump` |
+| Heating circuit | `hc_setpoint`, `hc_pressure`, **`room`**, `room_target` | – | **`hc_flow`**, **`hc_return`** | `hc_mode`, **`hc_pump`**, `hc_volume`, `hc_curve_offset`, `hc_mixer`, `program` |
+| Details | `compressor_speed`, `evap_temp`, `suction_temp`, `hot_gas`, `liquid_temp` | – | – | `hours`, `starts_total`, `aux_hours`, `energy_total`, `env_energy`, `heat_total`, `cond_temp`, `low_pressure`, `high_pressure`, `eev`, `superheat`, `subcooling`, `cutout_high_pressure`, `cutout_low_pressure`, `cutout_temperature` |
+
+Not mapped:
+
+- `hc_flow`: ESPAltherma reports the leaving water of the heat pump, no flow per circuit.
+- `hc_return`: ESPAltherma reports the inlet water of the heat pump, no return per circuit.
 
 ## Improving a number
 
