@@ -1229,6 +1229,9 @@ const HFC_PRESETS = {
     // The water pump of the indoor unit (or monobloc) also runs for hot water.
     primary_pump: true,
     auto_circuits: false,
+    // No superheat or subcooling from the pipe sensors: on an EPRA12EAV3 the suction pipe (R3T) read below the saturation
+    // temperature at low pressure, so their differences mean nothing (#323).
+    refrigerant_derived: false,
     // Leaving water after the backup heater together with the inverter frequency: both belong to every Altherma definition.
     detect: (ctx) => {
       const re = /^sensor\.(.+)_leaving_water_temp_after_buh_r2t$/;
@@ -1269,7 +1272,10 @@ const HFC_PRESETS = {
         cop_dhw_today: s('stats_cop_today_hot_water'),
         hot_gas: s('discharge_pipe_tempr2t'),
         suction_temp: s('suction_pipe_tempr3t'),
-        evap_temp: s('heat_exchanger_midtempr5t'),
+        // Evaporation and condensation are the saturation temperatures at low and high pressure, in every mode. The heat exchanger
+        // mid temperature (R5T) is only the fallback: it is the evaporation while heating, but the condensation while cooling.
+        evap_temp: s('low_pressuret', 'heat_exchanger_midtempr5t'),
+        cond_temp: s('high_pressuret'),
         liquid_temp: s('liquid_pipe_tempr6t', 'liquid_pipe_temp'),
       };
     },
@@ -4332,10 +4338,12 @@ class HeatpumpFlowCard extends HTMLElement {
     const cutouts = ['cutout_high_pressure', 'cutout_low_pressure', 'cutout_temperature'].filter(ok).map((key) => [key, D[key], this._e[key], () => this._countText(key)]);
     const hydraulic = [['brine_pressure', i.brine_pressure], ['hc_pressure', i.hc_pressure]].filter(([key]) => ok(key))
       .map(([key, label]) => [key, label, this._e[key], () => this._pressureText(key)]);
-    // Superheat = suction gas − evaporation, subcooling = condensation − liquid line, unless the integration provides them.
+    // Superheat = suction gas − evaporation, subcooling = condensation − liquid line, unless the integration provides them or the
+    // preset's pipe sensors do not allow it (`refrigerant_derived: false`).
     const diff = (a, b) => { const v = this._n(a) - this._n(b); return Number.isFinite(v) && !reversed(a) && !reversed(b) ? `${this._fmt(v, 1)} K` : '–'; };
-    rf.push(row('superheat') || (ok('suction_temp') && ok('evap_temp') ? ['superheat', D.superheat, this._e.suction_temp, () => diff('suction_temp', 'evap_temp')] : null));
-    rf.push(row('subcooling') || (ok('cond_temp') && ok('liquid_temp') ? ['subcooling', D.subcooling, this._e.liquid_temp, () => diff('cond_temp', 'liquid_temp')] : null));
+    const derive = this._preset?.refrigerant_derived !== false;
+    rf.push(row('superheat') || (derive && ok('suction_temp') && ok('evap_temp') ? ['superheat', D.superheat, this._e.suction_temp, () => diff('suction_temp', 'evap_temp')] : null));
+    rf.push(row('subcooling') || (derive && ok('cond_temp') && ok('liquid_temp') ? ['subcooling', D.subcooling, this._e.liquid_temp, () => diff('cond_temp', 'liquid_temp')] : null));
     const more = (this._details || []).map((d, n) => (typeof d === 'string' ? { entity: d } : d)).filter((d) => d && this._hass.states[d.entity])
       .map((d, n) => [`x${n}`, d.name || this._hass.states[d.entity].attributes.friendly_name || d.entity, d.entity, () => this._fmtState(null, d)]);
     return [[i.sec_operation, op.filter(Boolean)], [i.sec_hydraulic, hydraulic], [i.sec_refrigerant, rf.filter(Boolean)], [i.sec_cutouts, cutouts], [i.sec_more, more]].filter(([, r]) => r.length);
