@@ -3777,8 +3777,9 @@ class HeatpumpFlowCard extends HTMLElement {
           ${pipePair('vl-buf', 'M420 268 V338 Q420 360 442 360 H520', P.dhw && !P.station)}
           ${P.buffer ? '' : P.series ? this._seriesSvg() : `${pipePair('byp-vl', 'M520 360 H640')}${pipePair('byp-rl', 'M640 495 H520')}`}
           ${showHc ? Array.from({ length: this._hcCount }, (_, n) => this._circuitSvg(n + 1)
-    // The trunk shared by all circuits lies over circuit 1 and under the risers and crossings of the others.
-    + (n === 0 && this._hcCount > 1 ? `${pipePair('hc-trunk-vl', 'M640 360 H660')}${pipePair('hc-trunk-rl', 'M676 495 H640')}` : '')).join('') : ''}
+    // The trunk shared by all circuits lies over circuit 1 and under the risers. The risers lie under circuits 2 to 6, so their
+    // labels stay in front of the pipes (#302).
+    + (n === 0 && this._hcCount > 1 ? `${pipePair('hc-trunk-vl', 'M640 360 H660')}${pipePair('hc-trunk-rl', 'M676 495 H640')}${this._risersSvg()}` : '')).join('') : ''}
           ${this._sourceSvg()}
 
           ${this._primaryPump() ? `<g class="tap" ${de(e.volume ? 'volume' : 'mode')}>
@@ -4462,6 +4463,18 @@ class HeatpumpFlowCard extends HTMLElement {
   }
 
   // Heating circuit n (1-6). Circuits 2 to 6 sit below circuit 1, fed by risers from its flow and return.
+  // Risers from the trunk down to circuits 2 to 6, one segment per step: segment n runs from circuit n − 1 to circuit n and feeds
+  // circuit n and every circuit below it. One full-length riser per circuit lay over the shorter ones, so a stopped lower circuit
+  // hid a running upper one (#302). The hop lets circuit 1's return pass under the risers.
+  _risersSvg() {
+    const pp = (id, d) => `<path class="pipe" id="p-${id}" d="${d}"/><path class="flow" id="f-${id}" d="${d}"/>`;
+    const segs = Array.from({ length: this._hcCount - 1 }, (_, x) => {
+      const n = x + 2; const top = (n - 2) * 250; const bottom = (n - 1) * 250;
+      return pp(`hc-up${n}`, `M660 ${360 + top} V${360 + bottom}`) + pp(`hc-down${n}`, `M676 ${495 + bottom} V${495 + top}`);
+    });
+    return `<path class="hop" d="M660 483 V507"/>${segs.join('')}`;
+  }
+
   _circuitSvg(n) {
     const i = this._i; const e = this._e;
     const s = n === 1 ? '' : String(n);
@@ -4475,10 +4488,8 @@ class HeatpumpFlowCard extends HTMLElement {
     let { vl, rl } = em;
     if (n > 1) { vl = vl.replace('M640 ', 'M660 '); rl = rl.replace(/H640$/, 'H676'); }
     const pp = (id, d) => `<path class="pipe" id="p-${id}" d="${d}"/><path class="flow" id="f-${id}" d="${d}"/>`;
-    const hop = n > 1 ? '<path class="hop" d="M660 483 V507"/>' : '';
     const gy = this._hcTypes[n - 1] === 'underfloor' ? [360, 480] : [365, 455];
-    const risers = n > 1 ? hop + pp(`hc-up${s}`, `M660 360 V${360 + dy}`) + pp(`hc-down${s}`, `M676 ${495 + dy} V495`) : '';
-    return `${risers}<g transform="translate(0 ${dy})">
+    return `<g transform="translate(0 ${dy})">
       <defs><linearGradient id="g-rad${s}" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" id="g-rad${s}-top"/><stop offset="100%" id="g-rad${s}-bottom"/></linearGradient>
       <linearGradient id="g-hcb${s}" gradientUnits="userSpaceOnUse" x1="0" y1="${gy[0]}" x2="0" y2="${gy[1]}"><stop offset="0" id="g-hcb${s}-a"/><stop offset="0.5" id="g-hcb${s}-m"/><stop offset="1" id="g-hcb${s}-b"/></linearGradient></defs>
       ${em.art.split('__S__').join(s)}${pp(`hc-vl${s}`, vl)}${pp(`hc-body${s}`, em.body)}${pp(`hc-rl${s}`, rl)}
@@ -5548,9 +5559,11 @@ class HeatpumpFlowCard extends HTMLElement {
       const n = x + 1; const s = n === 1 ? '' : String(n);
       const pump = !bypass && (own ?? heatLoop);
       const on = !shared ? pump : !bypass && heatLoop && (own !== false || passive);
-      [`hc-vl${s}`, `hc-body${s}`, `hc-rl${s}`, ...(n > 1 ? [`hc-up${s}`, `hc-down${s}`] : [])].forEach((id) => { pipes[id] = on; });
+      [`hc-vl${s}`, `hc-body${s}`, `hc-rl${s}`].forEach((id) => { pipes[id] = on; });
       return { n, mode, on, pump };
     });
+    // Riser segment n feeds circuit n and every circuit below it, so it flows when any of them flows (#302).
+    circuits.slice(1).forEach(({ n }) => { pipes[`hc-up${n}`] = pipes[`hc-down${n}`] = circuits.slice(n - 1).some((c) => c.on); });
     // With several circuits the first metres of flow and return feed all of them: they flow when any circuit flows.
     if (circuits.length > 1) { const trunk = circuits.some((c) => c.on); pipes['hc-trunk-vl'] = trunk; pipes['hc-trunk-rl'] = trunk; }
     // Ground and water sources: the source loop runs with the compressor.

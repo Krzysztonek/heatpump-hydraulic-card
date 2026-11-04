@@ -3775,6 +3775,23 @@
     card.hass = hassOf(st({ 'binary_sensor.p2': 'off', 'sensor.m': 'idle', 'sensor.c': ['0', 'Hz'] })); await wait(5);
     check(!on(card, 'p-hc-trunk-vl') && !on(card, 'p-hc-trunk-rl'), 'all circuits off: the trunk stands');
     card.remove();
+    // #302: three circuits behind a combined storage, only circuit 2 runs. The riser to circuit 2 flows, the segment on to the
+    // stopped circuit 3 stands and no longer covers it; the risers lie under the labels of circuits 2 and 3.
+    const three = { ...base, hc_pump: 'binary_sensor.p1', hc2_pump: 'binary_sensor.p2', hc3_pump: 'binary_sensor.p3', hc2_flow: 'sensor.f2', hc2_setpoint: 'sensor.s2',
+      dhw_top: 'sensor.t1', buffer_top: 'sensor.t4' };
+    const st3 = (extra = {}) => st({ 'binary_sensor.p3': 'off', 'sensor.f2': ['31.5', '°C'], 'sensor.s2': ['33', '°C'], ...extra });
+    card = mount({ entities: three, hc_count: 3, storage: 'combined' }, hassOf(st3())); await wait(20);
+    const segment = (id) => q(card, id).getAttribute('d');
+    check(on(card, 'p-hc-up2') && on(card, 'p-hc-down2') && !on(card, 'p-hc-up3') && !on(card, 'p-hc-down3') && on(card, 'p-hc-body2') && !on(card, 'p-hc-vl'),
+      'three circuits, only circuit 2 runs: its riser flows, the segment to circuit 3 stands');
+    check(segment('p-hc-up2') === 'M660 360 V610' && segment('p-hc-up3') === 'M660 610 V860' && segment('p-hc-down3') === 'M676 995 V745',
+      `the risers are one segment per step (${segment('p-hc-up3')} / ${segment('p-hc-down3')})`);
+    const before = (a, b) => !!(q(card, a).compareDocumentPosition(q(card, b)) & Node.DOCUMENT_POSITION_FOLLOWING);
+    check(before('p-hc-up3', 't-hc2') && before('p-hc-down3', 't-hc2') && before('p-hc-up3', 't-hc3'), 'the risers lie under the circuit labels');
+    card.hass = hassOf(st3({ 'binary_sensor.p2': 'off', 'binary_sensor.p3': 'on' })); await wait(5);
+    check(on(card, 'p-hc-up2') && on(card, 'p-hc-up3') && on(card, 'p-hc-down2') && on(card, 'p-hc-down3') && !on(card, 'p-hc-body2'),
+      'only circuit 3 runs: both riser segments flow past the stopped circuit 2');
+    card.remove();
     card = mount({ entities: { ...base, hc_pump: 'binary_sensor.p2' } }, hassOf(st())); await wait(20);
     check(!q(card, 'p-hc-trunk-vl'), 'one circuit: no separate trunk');
     card.remove();
