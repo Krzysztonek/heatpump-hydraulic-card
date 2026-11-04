@@ -1317,7 +1317,7 @@ const HFC_I18N = {
     source_flow: 'Source', target: 'Target', curve_offset: 'curve', curve_shift: 'shift', mixer: 'Mixer', mixer_opening: 'opening', mixer_closing: 'closing', return_short: 'RL', error: 'Error', circulation: 'Circ.', circulation_from: 'from', circulation_until: 'until', valve_dhw: 'DHW', solar: 'Solar',
     brine_pressure: 'Brine pressure', hc_pressure: 'Heating pressure', pressure_normal: 'normal', pressure_warning: 'warning', pressure_critical: 'critical',
     timeline_title: 'Last {h} hours', timeline_gap: 'No data', timeline_aria: 'Operating mode of the last {h} hours. Arrow keys select a period.',
-    run_series: 'run {n} since {t}', run_pause: 'pause before {d}', run_partial: 'began before the timeline', run_ongoing: 'still running', run_phase: 'operating period, no compressor data', run_close: 'Close',
+    run_series: 'run {n} since {t}', run_pause: 'pause before {d}', run_partial: 'began before the timeline', run_ongoing: 'still running', run_phase: 'operating period, no compressor data', run_close: 'Close', run_flow: 'Flow', run_reached: 'reached', run_missed: '{d} K below', run_heater: 'Heater rod', run_on: 'on', run_off: 'off',
     programs: { eco: 'Eco', night: 'Night', party: 'Party', holiday: 'Holiday' },
     sg_ready: { normal: 'SG normal', blocked: 'Utility lock', boost: 'SG boost', forced: 'SG forced on' },
     valve_heating: 'Heating', valve_cooling: 'Cooling', bypass: 'Bypass', pv: 'PV', pv_boost: 'PV surplus', battery: 'Battery', grid: 'Grid',
@@ -1360,7 +1360,7 @@ const HFC_I18N = {
     source_flow: 'Quelle', target: 'Soll', curve_offset: 'Kurve', curve_shift: 'Verschiebung', mixer: 'Mischer', mixer_opening: 'öffnet', mixer_closing: 'schließt', return_short: 'RL', error: 'Fehler', circulation: 'Zirk.', circulation_from: 'ab', circulation_until: 'bis', valve_dhw: 'WW', solar: 'Solar',
     brine_pressure: 'Soledruck', hc_pressure: 'Heizungsdruck', pressure_normal: 'normal', pressure_warning: 'Warnung', pressure_critical: 'kritisch',
     timeline_title: 'Letzte {h} Stunden', timeline_gap: 'Keine Daten', timeline_aria: 'Betriebsart der letzten {h} Stunden. Mit den Pfeiltasten einen Zeitraum wählen.',
-    run_series: '{n}. Lauf seit {t}', run_pause: 'Pause davor {d}', run_partial: 'begann vor der Zeitleiste', run_ongoing: 'läuft noch', run_phase: 'Betriebsphase, ohne Verdichterdaten', run_close: 'Schließen',
+    run_series: '{n}. Lauf seit {t}', run_pause: 'Pause davor {d}', run_partial: 'begann vor der Zeitleiste', run_ongoing: 'läuft noch', run_phase: 'Betriebsphase, ohne Verdichterdaten', run_close: 'Schließen', run_flow: 'Vorlauf', run_reached: 'erreicht', run_missed: '{d} K darunter', run_heater: 'Heizstab', run_on: 'an', run_off: 'aus',
     programs: { eco: 'Eco', night: 'Nacht', party: 'Party', holiday: 'Urlaub' },
     sg_ready: { normal: 'SG normal', blocked: 'EVU-Sperre', boost: 'SG-Anhebung', forced: 'SG-Zwangsbetrieb' },
     valve_heating: 'Heizen', valve_cooling: 'Kühlen', bypass: 'Bypass', pv: 'PV', pv_boost: 'PV-Überschuss', battery: 'Akku', grid: 'Netz',
@@ -1405,7 +1405,7 @@ const HFC_I18N = {
     source_flow: 'Zdroj', target: 'Cieľ', curve_offset: 'krivka', curve_shift: 'posun', return_short: 'RL', error: 'Chyba', circulation: 'Cirk.', circulation_from: 'od', circulation_until: 'do', valve_dhw: 'TÚV', solar: 'Solár',
     brine_pressure: 'Tlak nemrznúcej zmesi', hc_pressure: 'Tlak vykurovania', pressure_normal: 'normálny', pressure_warning: 'varovanie', pressure_critical: 'kritický',
     timeline_title: 'Posledných {h} hodín', timeline_gap: 'Žiadne dáta', timeline_aria: 'Prevádzkový režim za posledných {h} hodín. Šípkami vyberte obdobie.',
-    run_series: '{n}. beh od {t}', run_pause: 'prestávka predtým {d}', run_partial: 'začal pred časovou osou', run_ongoing: 'stále beží', run_phase: 'prevádzková fáza, bez údajov kompresora', run_close: 'Zavrieť',
+    run_series: '{n}. beh od {t}', run_pause: 'prestávka predtým {d}', run_partial: 'začal pred časovou osou', run_ongoing: 'stále beží', run_phase: 'prevádzková fáza, bez údajov kompresora', run_close: 'Zavrieť', run_flow: 'Prívod', run_reached: 'dosiahnutý', run_missed: '{d} K pod', run_heater: 'Vykurovacia tyč', run_on: 'zap', run_off: 'vyp',
     programs: { eco: 'Eko', night: 'Nočný', party: 'Párty', holiday: 'Dovolenka' },
     sg_ready: { normal: 'SG normálna prevádzka', blocked: 'Blokovanie distribučnou sieťou', boost: 'SG zvýšená prevádzka', forced: 'SG vynútená prevádzka' },
     valve_heating: 'Vykurovanie', valve_cooling: 'Chladenie', bypass: 'Obtok (Bypass)', pv: 'FVE', pv_boost: 'Prebytok FVE', battery: 'Batéria', grid: 'Sieť',
@@ -1449,7 +1449,7 @@ const HFC_I18N = {
     source_flow: 'Zdroj', target: 'Cíl', curve_offset: 'křivka', curve_shift: 'posun', return_short: 'RL', error: 'Chyba', circulation: 'Cirk.', circulation_from: 'od', circulation_until: 'do', valve_dhw: 'TUV', solar: 'Solár',
     brine_pressure: 'Tlak nemrznoucí směsi', hc_pressure: 'Tlak vytápění', pressure_normal: 'normální', pressure_warning: 'varování', pressure_critical: 'kritický',
     timeline_title: 'Posledních {h} hodin', timeline_gap: 'Žádná data', timeline_aria: 'Provozní režim za posledních {h} hodin. Šipkami vyberte období.',
-    run_series: '{n}. běh od {t}', run_pause: 'pauza předtím {d}', run_partial: 'začal před časovou osou', run_ongoing: 'stále běží', run_phase: 'provozní fáze, bez údajů kompresoru', run_close: 'Zavřít',
+    run_series: '{n}. běh od {t}', run_pause: 'pauza předtím {d}', run_partial: 'začal před časovou osou', run_ongoing: 'stále běží', run_phase: 'provozní fáze, bez údajů kompresoru', run_close: 'Zavřít', run_flow: 'Přívod', run_reached: 'dosažen', run_missed: '{d} K pod', run_heater: 'Topná tyč', run_on: 'zap', run_off: 'vyp',
     programs: { eco: 'Eko', night: 'Noční', party: 'Párty', holiday: 'Dovolená' },
     sg_ready: { normal: 'SG normální provoz', blocked: 'Blokování distribuční sítí', boost: 'SG zvýšený provoz', forced: 'SG vynucený provoz' },
     valve_heating: 'Vytápění', valve_cooling: 'Chlazení', bypass: 'Obtok (Bypass)', pv: 'FVE', pv_boost: 'Přebytek FVE', battery: 'Baterie', grid: 'Síť',
@@ -1492,7 +1492,7 @@ const HFC_I18N = {
     source_flow: 'Bron', target: 'Doel', curve_offset: 'stooklijn', curve_shift: 'verschuiving', return_short: 'RL', error: 'Storing', circulation: 'Circ.', circulation_from: 'vanaf', circulation_until: 'tot', valve_dhw: 'WW', solar: 'Zon',
     brine_pressure: 'Brondruk', hc_pressure: 'Verwarmingsdruk', pressure_normal: 'normaal', pressure_warning: 'waarschuwing', pressure_critical: 'kritiek',
     timeline_title: 'Laatste {h} uur', timeline_gap: 'Geen gegevens', timeline_aria: 'Bedrijfsstand van de laatste {h} uur. Kies een periode met de pijltjestoetsen.',
-    run_series: 'run {n} sinds {t}', run_pause: 'pauze ervoor {d}', run_partial: 'begon vóór de tijdlijn', run_ongoing: 'loopt nog', run_phase: 'bedrijfsperiode, geen compressorgegevens', run_close: 'Sluiten',
+    run_series: 'run {n} sinds {t}', run_pause: 'pauze ervoor {d}', run_partial: 'begon vóór de tijdlijn', run_ongoing: 'loopt nog', run_phase: 'bedrijfsperiode, geen compressorgegevens', run_close: 'Sluiten', run_flow: 'Aanvoer', run_reached: 'bereikt', run_missed: '{d} K eronder', run_heater: 'Verwarmingselement', run_on: 'aan', run_off: 'uit',
     programs: { eco: 'Eco', night: 'Nacht', party: 'Party', holiday: 'Vakantie' },
     sg_ready: { normal: 'SG normaal', blocked: 'Netblokkering', boost: 'SG-verhoging', forced: 'SG gedwongen aan' },
     valve_heating: 'Verwarmen', valve_cooling: 'Koelen', bypass: 'Bypass', pv: 'PV', pv_boost: 'PV-overschot', battery: 'Accu', grid: 'Net',
@@ -5235,8 +5235,12 @@ class HeatpumpFlowCard extends HTMLElement {
     const lanes = marks.map((m, n) => ({ ...m, n, segs: this._timelineMarkSegments(hist, m, start, now) })).filter((l) => l.segs.length);
     // Runs and their detail panel (#325); `timeline_details: false` keeps the one-line period detail of before.
     const runs = this._config.timeline_details === false ? [] : this._timelineRuns(hist, ids, segs, start, now);
+    // The values of a selected run arrive with their own query (#326); the panel redraws when they are there.
+    const run = runs.find((r) => r.from === this._tlRun);
+    const panel = run && this._layout !== 'wall';
+    const rows = panel ? this._runValues(run) : [];
     const minute = Math.floor(now / 60000);
-    const key = `${minute}|${segs.map((s) => `${s.kind}${s.from}${s.to}`).join(',')}|${lanes.map((l) => `${l.n}${l.label}${l.segs.map((s) => `${s.from}-${s.to}`).join(',')}`).join(';')}|${this._lang}|${this._tlSel ?? ''}|${this._tlMarkSel ?? ''}|${this._tlRun ?? ''}|${runs.length}`;
+    const key = `${minute}|${segs.map((s) => `${s.kind}${s.from}${s.to}`).join(',')}|${lanes.map((l) => `${l.n}${l.label}${l.segs.map((s) => `${s.from}-${s.to}`).join(',')}`).join(';')}|${this._lang}|${this._tlSel ?? ''}|${this._tlMarkSel ?? ''}|${this._tlRun ?? ''}|${runs.length}|${rows.map((r) => r.join('=')).join(';')}`;
     if (box._k === key) return;
     box._k = key; box.hidden = false;
     this._tl = { segs, start, now, lanes, runs };
@@ -5257,8 +5261,6 @@ class HeatpumpFlowCard extends HTMLElement {
     let detail = sel >= 0 ? this._timelineDetail(segs[sel]) : '';
     lanes.forEach((l) => l.segs.forEach((s) => { if (`${l.n}:${s.from}` === this._tlMarkSel) detail = markDetail(l, s); }));
     // A selected run opens the panel under the axis; the wall display, which nobody taps, keeps the one line.
-    const run = runs.find((r) => r.from === this._tlRun);
-    const panel = run && this._layout !== 'wall';
     if (run) detail = panel ? '' : [this._runHead(run), ...this._runNotes(run)].join(' · ');
     const edges = [...new Set(runs.filter((r) => r.source === 'run').flatMap((r) => [r.from, r.to]).filter((t) => t > start && t < now))];
     box.innerHTML = `<div class="tl-head"><span>${this._esc(i.timeline_title.replace('{h}', hours))}</span><span class="tl-detail" id="tl-detail" aria-live="polite">${this._esc(detail)}</span></div>
@@ -5268,7 +5270,7 @@ class HeatpumpFlowCard extends HTMLElement {
       ${lanes.map((l) => `<div class="tl-mark" role="img" aria-label="${this._esc(`${l.label}: ${l.segs.map((s) => `${this._timelineTime(s.from)}–${this._timelineTime(s.to)}`).join(', ')}`)}">${l.segs.map((s) =>
     `<span class="mseg${`${l.n}:${s.from}` === this._tlMarkSel ? ' sel' : ''}" data-mseg="${l.n}:${s.from}" style="left:${pct(s.from)}%;width:${(pct(s.to) - pct(s.from)).toFixed(3)}%" title="${this._esc(markDetail(l, s))}"></span>`).join('')}</div>`).join('')}
       <div class="tl-axis">${ticks.map(([t, l]) => `<span style="left:${pct(t)}%">${l}</span>`).join('')}</div>
-      ${panel ? this._runPanel(run) : ''}
+      ${panel ? this._runPanel(run, rows) : ''}
       <div class="tl-legend">${kinds.map((k) => `<span><i class="k-${k}"></i>${this._esc(this._timelineLabel({ kind: k }))}</span>`).join('')}${lanes.map((l) => `<span><i class="k-mark"></i>${this._esc(l.label)}</span>`).join('')}</div>`;
   }
 
@@ -5288,9 +5290,102 @@ class HeatpumpFlowCard extends HTMLElement {
     ].filter(Boolean);
   }
 
+  // Values of a run (#326), from the recorder history of its window only, fetched when the run is selected and cached like the
+  // other queries. Hot water: tank at start and end, target reached, heater rod, defrosts. Heating and other runs: mean flow
+  // against the circuit target, mean spread of the heat pump and of circuit 1, mean compressor modulation, flow rate and outdoor
+  // temperature, defrosts. Means are weighted by time. A value without data is left out. Returns [[label, html]], [] while loading.
+  _runValues(run) {
+    const i = this._i;
+    const dhw = run.kind === 'dhw';
+    const keys = (dhw ? ['dhw_top', 'dhw_target', 'heater', ...HFC_TANK_HEATERS.filter((k) => k.startsWith('dhw_')), 'defrost']
+      : ['flow', 'return', 'hc_flow', 'hc_return', 'hc_setpoint', 'compressor_speed', 'volume', 'outdoor', 'defrost']).filter((k) => this._has(k));
+    if (!keys.length) return [];
+    const list = [...new Set(keys.map((k) => this._e[k]))];
+    const attrs = keys.some((k) => hfcTempAttr(this._e[k], k));
+    // A run that is still going ends "now", which moves with every update: its query has no end and a fixed key, so it is
+    // refreshed every five minutes like the other queries instead of being asked again on every update.
+    const hist = this._wsCached(`run|${list.join(',')}|${run.from}|${run.ongoing ? 'now' : run.to}`, {
+      type: 'history/history_during_period', start_time: new Date(run.from).toISOString(), ...(run.ongoing ? {} : { end_time: new Date(run.to).toISOString() }),
+      entity_ids: list, minimal_response: true, ...(attrs ? {} : { no_attributes: true }), significant_changes_only: false,
+    }, (res) => res || {});
+    if (!hist) return [];
+    const time = (e) => { const v = e.lu ?? e.lc ?? e.last_updated ?? e.last_changed; return typeof v === 'number' ? (v > 1e11 ? v : v * 1000) : Date.parse(v); };
+    const states = (key) => {
+      const id = this._e[key]; const attr = hfcTempAttr(id, key);
+      return (hist[id] || []).map((e) => ({ t: time(e), s: String((attr ? e.attributes?.[attr] ?? e.a?.[attr] : undefined) ?? e.s ?? e.state) }))
+        .filter((e) => Number.isFinite(e.t)).sort((a, b) => a.t - b.t);
+    };
+    // Numbers of a key in °C for temperatures and l/h for flow rates; a negative flow rate is a marker, not a value (#312).
+    const unit = (key) => this._unit(key).trim().replace(/º/g, '°').replace('℃', '°c').replace('℉', '°f').replace('³', '3');
+    const scale = (key) => {
+      const u = unit(key);
+      if (key === 'volume') return (v) => (v < 0 ? NaN : u === 'm3/h' ? v * 1000 : u === 'l/min' ? v * 60 : v);
+      return u === '°f' ? (v) => (v - 32) * 5 / 9 : u === 'k' && key !== 'compressor_speed' ? (v) => v - 273.15 : (v) => v;
+    };
+    const nums = (key) => { const f = scale(key); return states(key).map((e) => ({ t: e.t, v: f(parseFloat(e.s)) })).filter((e) => Number.isFinite(e.v)); };
+    const at = (pts, t) => { let v = pts[0]?.v; pts.forEach((p) => { if (p.t <= t) v = p.v; }); return v; };
+    const mean = (pts) => {
+      let sum = 0; let w = 0;
+      pts.forEach((p, n) => { const a = Math.max(p.t, run.from); const b = Math.min(pts[n + 1]?.t ?? run.to, run.to); if (b > a) { sum += p.v * (b - a); w += b - a; } });
+      return w ? sum / w : NaN;
+    };
+    const diff = (a, b) => {
+      const pa = nums(a); const pb = nums(b);
+      const times = [...new Set([...pa, ...pb].map((p) => p.t))].sort((x, y) => x - y);
+      return mean(times.map((t) => ({ t, v: at(pa, t) - at(pb, t) })).filter((p) => Number.isFinite(p.v)));
+    };
+    const on = (s) => !['off', 'unavailable', 'unknown', 'none', '', 'false', 'aus'].includes(String(s).toLowerCase()) && !(parseFloat(s) <= 0);
+    // Time a key was on within the run, and how often it switched on.
+    const onTime = (key) => {
+      const ss = states(key); let ms = 0; let starts = 0;
+      ss.forEach((e, n) => {
+        if (!on(e.s)) return;
+        const a = Math.max(e.t, run.from); const b = Math.min(ss[n + 1]?.t ?? run.to, run.to);
+        if (b > a) ms += b - a;
+        if (e.t >= run.from && !(n > 0 && on(ss[n - 1].s))) starts++;
+      });
+      return { ms, starts };
+    };
+    const K = (v) => `${this._fmt(v)} K`;
+    const rows = [];
+    const defrosts = this._has('defrost') ? onTime('defrost').starts : run.phases.filter((p) => p.kind === 'defrost').length;
+    if (dhw) {
+      const tank = nums('dhw_top');
+      const a = at(tank, run.from); const b = at(tank, run.to);
+      if (Number.isFinite(a) && Number.isFinite(b)) rows.push([i.tiles.dhw_top, `${this._esc(this._t(a))} → ${this._esc(this._t(b))} <span class="m">(${b >= a ? '+' : '−'}${this._esc(K(Math.abs(b - a)))})</span>`]);
+      const target = at(nums('dhw_target'), run.to);
+      if (Number.isFinite(target) && Number.isFinite(b)) {
+        rows.push([`${i.target} ${this._fmt(target)} °C`, this._esc(b >= target - 0.5 ? i.run_reached : i.run_missed.replace('{d}', this._fmt(target - b)))]);
+      }
+      const rods = ['heater', ...HFC_TANK_HEATERS.filter((k) => k.startsWith('dhw_'))].filter((k) => keys.includes(k)).map(onTime);
+      if (rods.length) {
+        const ms = Math.max(...rods.map((r) => r.ms));
+        rows.push([i.run_heater, this._esc(ms > 0 ? `${i.run_on} · ${this._timelineDuration(ms)}` : i.run_off)]);
+      }
+    } else {
+      const flow = mean(nums('flow'));
+      const set = mean(nums('hc_setpoint'));
+      if (Number.isFinite(flow)) rows.push([`${i.run_flow} Ø`, `${this._esc(this._t(flow))}${Number.isFinite(set) ? ` <span class="m">(${this._esc(`${i.target} ${this._fmt(set)}`)})</span>` : ''}`]);
+      const spread = keys.includes('return') ? diff('flow', 'return') : NaN;
+      const circuit = keys.includes('hc_flow') && keys.includes('hc_return') ? diff('hc_flow', 'hc_return') : NaN;
+      if (Number.isFinite(spread) || Number.isFinite(circuit)) {
+        rows.push([`${i.tiles.spread} Ø`, [Number.isFinite(spread) ? this._esc(K(spread)) : '', Number.isFinite(circuit) ? `<span class="m">${this._esc(`${i.heating_circuit} ${K(circuit)}`)}</span>` : '']
+          .filter(Boolean).join(' <span class="m">·</span> ')]);
+      }
+      const mod = mean(nums('compressor_speed'));
+      if (Number.isFinite(mod)) rows.push([`${i.det.compressor_speed} Ø`, this._esc(`${this._fmt(mod, 0)} ${this._st('compressor_speed')?.attributes?.unit_of_measurement || ''}`.trim())]);
+      const vol = mean(nums('volume'));
+      if (Number.isFinite(vol)) rows.push([`${i.tiles.volume} Ø`, this._esc(`${this._fmt(vol, 0)} l/h`)]);
+      const out = mean(nums('outdoor'));
+      if (Number.isFinite(out)) rows.push([`${i.outdoor} Ø`, this._esc(this._t(out))]);
+    }
+    if (defrosts > 0 || this._has('defrost')) rows.push([i.tiles.defrosts, String(defrosts)]);
+    return rows;
+  }
+
   // Detail panel of the selected run under the timeline (#325): head, notes, the phases when the run had more than one kind,
   // and the values of the run (#326). Its colour bar follows the kind.
-  _runPanel(run) {
+  _runPanel(run, rows = []) {
     const i = this._i;
     const color = { dhw: hfcVar('hot'), defrost: hfcVar('cool-strong'), cool: hfcVar('cool') }[run.kind] || hfcVar('heat');
     const time = {};
@@ -5301,6 +5396,7 @@ class HeatpumpFlowCard extends HTMLElement {
     return `<div class="tl-run" id="tl-run" role="group" aria-live="polite" aria-label="${this._esc(this._runHead(run))}" style="--run-c:${color}">
         <div class="tl-run-head"><b>${this._esc(this._runHead(run))}</b><button class="tl-run-x" id="tl-run-x" type="button" aria-label="${this._esc(i.run_close)}" title="${this._esc(i.run_close)}">×</button></div>
         ${line(this._runNotes(run))}${line(phases)}
+        ${rows.length ? `<dl>${rows.map(([k, v]) => `<dt>${this._esc(k)}</dt><dd>${v}</dd>`).join('')}</dl>` : ''}
       </div>`;
   }
 
