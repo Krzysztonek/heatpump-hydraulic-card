@@ -675,6 +675,9 @@ const HFC_PRESETS = {
         // With the compensation curve the heat request temperature shifts the curve (-5 to +5 K); in direct mode it is the target itself.
         hc_curve_offset: curve ? [`number.${m}${z}_heat_request_temp`, `sensor.${m}${z}_heat_request_temp`] : undefined,
         room: zoneRoom ? `sensor.${m}z1_temp` : [`sensor.${m}room_thermostat_temp`, `sensor.${m}z1_temp`],
+        // Water pressure (TOP115, K/L series, seen in bar on a real installation in #276): only where the entity exists, so units
+        // without it draw no empty pressure label. One system pressure, for the first circuit only.
+        hc_pressure: i.hc === 1 && ctx.state(`sensor.${m}water_pressure`) !== undefined ? `sensor.${m}water_pressure` : undefined,
         program: [`sensor.${m}holiday_mode_state`, `switch.${m}holiday_mode_state`],
         hours: `sensor.${m}operations_hours`,
         starts_total: `sensor.${m}operations_counter`,
