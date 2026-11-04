@@ -1229,6 +1229,9 @@ const HFC_PRESETS = {
     // The water pump of the indoor unit (or monobloc) also runs for hot water.
     primary_pump: true,
     auto_circuits: false,
+    // No superheat or subcooling from the pipe sensors: on an EPRA12EAV3 the suction pipe (R3T) read below the saturation
+    // temperature at low pressure, so their differences mean nothing (#323).
+    refrigerant_derived: false,
     // Leaving water after the backup heater together with the inverter frequency: both belong to every Altherma definition.
     detect: (ctx) => {
       const re = /^sensor\.(.+)_leaving_water_temp_after_buh_r2t$/;
@@ -1269,7 +1272,10 @@ const HFC_PRESETS = {
         cop_dhw_today: s('stats_cop_today_hot_water'),
         hot_gas: s('discharge_pipe_tempr2t'),
         suction_temp: s('suction_pipe_tempr3t'),
-        evap_temp: s('heat_exchanger_midtempr5t'),
+        // Evaporation and condensation are the saturation temperatures at low and high pressure, in every mode. The heat exchanger
+        // mid temperature (R5T) is only the fallback: it is the evaporation while heating, but the condensation while cooling.
+        evap_temp: s('low_pressuret', 'heat_exchanger_midtempr5t'),
+        cond_temp: s('high_pressuret'),
         liquid_temp: s('liquid_pipe_tempr6t', 'liquid_pipe_temp'),
       };
     },
@@ -2291,6 +2297,9 @@ const HFC_TILES = {
 // Standby loss of the hot-water tank: history window, minimum standby window, settling time after charging or draw-off,
 // and the temperature changes within 30 minutes that count as draw-off or as heating the card cannot explain.
 const HFC_LOSS = { hours: 48, minWindow: 3, settle: 0.5, drawOff: 1.5, rise: 1.0 };
+// Runs of the timeline (#300): a pause shorter than seriesGap minutes continues a series of runs, so short cycling shows as
+// "3rd run since 21:00"; a longer standstill starts a new series.
+const HFC_RUNS = { seriesGap: 60 };
 
 /* ------------------------------------------------------------------ */
 /* Card                                                                */
@@ -4366,10 +4375,12 @@ class HeatpumpFlowCard extends HTMLElement {
     const cutouts = ['cutout_high_pressure', 'cutout_low_pressure', 'cutout_temperature'].filter(ok).map((key) => [key, D[key], this._e[key], () => this._countText(key)]);
     const hydraulic = [['brine_pressure', i.brine_pressure], ['hc_pressure', i.hc_pressure]].filter(([key]) => ok(key))
       .map(([key, label]) => [key, label, this._e[key], () => this._pressureText(key)]);
-    // Superheat = suction gas − evaporation, subcooling = condensation − liquid line, unless the integration provides them.
+    // Superheat = suction gas − evaporation, subcooling = condensation − liquid line, unless the integration provides them or the
+    // preset's pipe sensors do not allow it (`refrigerant_derived: false`).
     const diff = (a, b) => { const v = this._n(a) - this._n(b); return Number.isFinite(v) && !reversed(a) && !reversed(b) ? `${this._fmt(v, 1)} K` : '–'; };
-    rf.push(row('superheat') || (ok('suction_temp') && ok('evap_temp') ? ['superheat', D.superheat, this._e.suction_temp, () => diff('suction_temp', 'evap_temp')] : null));
-    rf.push(row('subcooling') || (ok('cond_temp') && ok('liquid_temp') ? ['subcooling', D.subcooling, this._e.liquid_temp, () => diff('cond_temp', 'liquid_temp')] : null));
+    const derive = this._preset?.refrigerant_derived !== false;
+    rf.push(row('superheat') || (derive && ok('suction_temp') && ok('evap_temp') ? ['superheat', D.superheat, this._e.suction_temp, () => diff('suction_temp', 'evap_temp')] : null));
+    rf.push(row('subcooling') || (derive && ok('cond_temp') && ok('liquid_temp') ? ['subcooling', D.subcooling, this._e.liquid_temp, () => diff('cond_temp', 'liquid_temp')] : null));
     const more = (this._details || []).map((d, n) => (typeof d === 'string' ? { entity: d } : d)).filter((d) => d && this._hass.states[d.entity])
       .map((d, n) => [`x${n}`, d.name || this._hass.states[d.entity].attributes.friendly_name || d.entity, d.entity, () => this._fmtState(null, d)]);
     return [[i.sec_operation, op.filter(Boolean)], [i.sec_hydraulic, hydraulic], [i.sec_refrigerant, rf.filter(Boolean)], [i.sec_cutouts, cutouts], [i.sec_more, more]].filter(([, r]) => r.length);
@@ -4895,7 +4906,8 @@ class HeatpumpFlowCard extends HTMLElement {
     const timeline = this._timelineIds();
     // Grid instructions only annotate the public operating timeline. They must not replace a real DHW or gap segment while
     // deciding whether a tank cool-down happened in verified standby (for example SG forced-on during a DHW charge).
-    const run = timeline ? { ...timeline, sg: null } : null;
+    // The compressor that only delimits the runs (`cycle`) does not decide the segments, so the loss analysis leaves it out too.
+    const run = timeline ? { ...timeline, sg: null, cycle: null } : null;
     if (!temps.length || (configured ? !measured : sensors[0] !== keys[0]) || !run) return null;
     // A fresh-water station on the buffer has no tank of its own. In a combined storage the circuits draw heat from the same
     // tank, so the pump of every circuit must be known and every window with a running circuit pump is left out (docs/TOPOLOGY.md,
@@ -5002,7 +5014,55 @@ class HeatpumpFlowCard extends HTMLElement {
     const byFlow = this._valveByFlow() ? { vflow: this._e.flow, vtank: this._e.dhw_top } : {};
     const base = this._has('mode') ? { mode: this._e.mode, ...byFlow, ...(comp && this._preset?.compressor_over_idle ? comp : {}) }
       : comp ? { ...comp, ...byFlow } : null;
-    return base ? { ...base, ...(this._has('pv_boost') ? { pv: this._e.pv_boost } : {}), ...(this._has('sg_ready') ? { sg: this._e.sg_ready } : {}) } : null;
+    // The runs read the compressor even where the segments follow the mode alone; `cycle` only when `comp` is not there already.
+    // Presets without a compressor entity but with its speed (Lambda, Bosch/Buderus Home Comfort) delimit the runs by the speed.
+    const runSignal = comp ? comp.comp : (this._has('compressor_speed') ? this._e.compressor_speed : null);
+    const cycle = base && runSignal && !base.comp ? { cycle: runSignal } : {};
+    return base ? { ...base, ...cycle, ...(this._has('pv_boost') ? { pv: this._e.pv_boost } : {}), ...(this._has('sg_ready') ? { sg: this._e.sg_ready } : {}) } : null;
+  }
+
+  // Runs of the heat pump between start and end, from the segments of _timelineSegments (#300, #324). With a compressor a run
+  // lasts from on to off; the operating periods inside it (heating, hot water, defrost) are its phases. Without one, every
+  // stretch of operating periods without a pause is a phase run. A run that began before the window is `partial`, one still
+  // going at its end `ongoing`. `pause` is the standstill before the run; `series` counts the runs since the last standstill of
+  // at least HFC_RUNS.seriesGap minutes, which began at `seriesFrom`.
+  // Returns [{ from, to, kind, phases: [{ kind, from, to }], source: 'run' | 'phase', partial, ongoing, pause, series, seriesFrom }].
+  _timelineRuns(hist, ids, segs, start, end) {
+    const heatKinds = ['heat', 'pv', 'sg-boost', 'sg-forced'];
+    const active = (kind) => [...heatKinds, 'dhw', 'defrost', 'cool'].includes(kind);
+    const phasesIn = (from, to) => segs.filter((s) => s.to > from && s.from < to && active(s.kind))
+      .map((s) => ({ kind: s.kind, from: Math.max(s.from, from), to: Math.min(s.to, to) }));
+    const runs = [];
+    const add = (from, to, source) => {
+      const last = runs[runs.length - 1];
+      if (last && last.to === from) last.to = to; else runs.push({ from, to, source });
+    };
+    // A compressor without recorded history (excluded from the recorder) leaves the phases of the operating mode.
+    const list = (ids.cycle || ids.comp) ? hist[ids.cycle || ids.comp] || [] : [];
+    if (list.length) {
+      // The same on-states as the segments; a speed or frequency of 0 is off, unavailable ends the run.
+      const on = (s) => !['off', 'unavailable', 'unknown', 'none', ''].includes(String(s).toLowerCase()) && !(parseFloat(s) <= 0);
+      list.forEach((e, n) => {
+        if (!on(e.s)) return;
+        const from = Math.max(e.t, start); const to = Math.min(list[n + 1] ? list[n + 1].t : end, end);
+        if (to > from) add(from, to, 'run');
+      });
+    } else segs.forEach((s) => { if (active(s.kind)) add(s.from, s.to, 'phase'); });
+    runs.forEach((r, n) => {
+      r.phases = phasesIn(r.from, r.to);
+      // The kind is the phase kind that lasted longest; PV surplus and SG boost are heating. Without any phase the compressor
+      // ran for heating as far as the card can tell.
+      const time = {};
+      r.phases.forEach((p) => { const k = heatKinds.includes(p.kind) ? 'heat' : p.kind; time[k] = (time[k] || 0) + p.to - p.from; });
+      r.kind = Object.keys(time).sort((a, b) => time[b] - time[a])[0] || 'heat';
+      r.partial = r.from <= start;
+      r.ongoing = r.to >= end;
+      const prev = runs[n - 1];
+      r.pause = prev ? r.from - prev.to : null;
+      r.series = prev && r.pause < HFC_RUNS.seriesGap * 60000 ? prev.series + 1 : 1;
+      r.seriesFrom = r.series > 1 ? prev.seriesFrom : r.from;
+    });
+    return runs;
   }
 
   // Preset rule for units without a valve or hot-water charging entity (`valve_rule: 'flow_above_dhw'`, ViCare #196): hot water
