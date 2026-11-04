@@ -3335,8 +3335,11 @@ class HeatpumpFlowCard extends HTMLElement {
     const values = this._sums[key].map((id) => read(this._hass?.states[id])).filter(Number.isFinite);
     return values.length ? values.reduce((a, b) => a + b, 0) : NaN;
   }
+  // Flow rate in l/h. A negative value is a marker, not a flow: EMS-ESP reports -1 for PC0 below about 50 % speed (#312). It
+  // counts as unknown, so the primary pump follows the operating state and no "-1 l/h" is shown.
   _lh(key) {
     const v = this._n(key); const u = this._unit(key).replace('³', '3');
+    if (v < 0) return NaN;
     if (u === 'm3/h') return v * 1000;
     if (u === 'l/min') return v * 60;
     return v;

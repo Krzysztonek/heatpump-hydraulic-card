@@ -3354,6 +3354,14 @@
     card = mount({ preset: 'heishamon' }, hassOf(st({ [`sensor.${p}_main_pump_flow`]: ['0', 'l/min'], [`sensor.${p}_main_compressor_freq`]: ['0', 'Hz'] }))); await wait(20);
     check(!q(card, '#impeller-primary').classList.contains('on'), 'the primary pump stands still without a flow rate');
     card.remove();
+    // #312: EMS-ESP reports PC0 below about 50 % speed as -1 l/h. A negative flow rate is unknown: the pump follows the
+    // running heat pump, no "-1 l/h" label, no estimated heat from it.
+    card = mount({ preset: 'heishamon' }, hassOf(st({ [`sensor.${p}_main_pump_flow`]: ['-1', 'l/h'] }))); await wait(20);
+    check(q(card, '#impeller-primary').classList.contains('on') && q(card, '#t-vol').textContent === '' && q(card, '#p-vl').classList.contains('on'),
+      `#312: a negative flow rate is unknown, the primary pump turns while the heat pump runs (${q(card, '#t-vol').textContent})`);
+    card.hass = hassOf(st({ [`sensor.${p}_main_pump_flow`]: ['-1', 'l/h'], [`sensor.${p}_main_compressor_freq`]: ['0', 'Hz'] })); await wait(5);
+    check(!q(card, '#impeller-primary').classList.contains('on'), '#312: with a negative flow rate and the heat pump off the primary pump stands still');
+    card.remove();
     // Sniffing: the compressor is off, the primary pump moves a few l/h. The water circulates slowly, the mode stays idle.
     card = mount({ preset: 'heishamon', hc_type: 'radiator' }, hassOf(st({ [`sensor.${p}_main_pump_flow`]: ['0.13', 'l/min'], [`sensor.${p}_main_compressor_freq`]: ['0', 'Hz'] }))); await wait(20);
     const imp = q(card, '#impeller-primary');
