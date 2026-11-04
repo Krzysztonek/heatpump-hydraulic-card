@@ -668,6 +668,19 @@
     const errOn = card.shadowRoot.getElementById('chip-err').classList.contains('on');
     check(dhw.hp === 'dhw' && errOn, `ESPAltherma: the 3-way valve on means hot water, the code U4 is an error (${dhw.hp} / ${errOn})`);
     card.remove();
+    // #323: the values of #254 (heating). Evaporation and condensation from the saturation temperatures at low and high pressure;
+    // no superheat or subcooling from the pipe sensors, whose suction reading lies below the evaporation.
+    const sat = { ...states, ...toStates({ 'sensor.espaltherma_low_pressuret': ['5.1', '°C'], 'sensor.espaltherma_high_pressuret': ['29.3', '°C'],
+      'sensor.espaltherma_suction_pipe_tempr3t': ['4.4', '°C'], 'sensor.espaltherma_heat_exchanger_midtempr5t': ['4.3', '°C'] }) };
+    const satReg = { ...registry, 'sensor.espaltherma_low_pressuret': { platform: 'mqtt' }, 'sensor.espaltherma_high_pressuret': { platform: 'mqtt' } };
+    const rs = C._resolve({ preset: 'espaltherma' }, hassOf(sat, satReg)).entities;
+    check(rs.evap_temp === 'sensor.espaltherma_low_pressuret' && rs.cond_temp === 'sensor.espaltherma_high_pressuret' && e.evap_temp === 'sensor.espaltherma_heat_exchanger_midtempr5t',
+      `#323: evaporation and condensation from the saturation temperatures, R5T only without them (${rs.evap_temp} / ${rs.cond_temp} / ${e.evap_temp})`);
+    const satCard = mount({ preset: 'espaltherma' }, hassOf(sat, satReg)); await wait(20);
+    const satRows = satCard._drawerRows().flatMap(([, list]) => list).map((x) => x[0]);
+    check(satRows.includes('evap_temp') && satRows.includes('cond_temp') && satRows.includes('suction_temp') && !satRows.includes('superheat') && !satRows.includes('subcooling'),
+      `#323: no derived superheat or subcooling for ESPAltherma (${satRows.join(', ')})`);
+    satCard.remove();
     // The attribute sensor of older versions alone is no installation the preset can read.
     check(!detects('espaltherma', { 'sensor.althermasensors': 'Online' }, { 'sensor.althermasensors': { platform: 'mqtt' } }), 'ESPAltherma: the attribute sensor alone is not detected');
   }
