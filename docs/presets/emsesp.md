@@ -27,9 +27,11 @@ What you get:
 - circuit target flow from the thermostat (`hc_setpoint`), circuit pump
 - with TC1, circuit 1 pump and flow rate from PC1 (`pc1on`, else `pc1rate`; `pc1flow`)
 - thermostat room temperature and target
-- details: compressor operating time and starts, total energy consumed and supplied, compressor speed, refrigerant temperatures (PL1 or evaporator inlet TR4, PH1, TR3, TR5, TR6), expansion valve (VR1)
+- details: compressor operating time (`uptimecontrol`, "total operating time heat") and starts, total energy consumed and supplied, compressor speed, refrigerant temperatures (PL1 or evaporator inlet TR4, PH1, TR3, TR5, TR6), expansion valve (VR1)
 
 **Compressor:** with long names the compressor speed comes before `binary_sensor.boiler_hp_compressor`, which read off while the compressor ran on a WLW166i with EMS-ESP 3.9.0-dev (#287).
+
+**Operating time:** the compressor hours and the hours tile come from `uptimecontrol` (long name `total_operating_time_heat`), the operating time of all modes. `uptimetotal` ("heatpump total uptime") also counts standby, and `uptimecomp` belongs to hot water (`dhw_uptimecomp`), so neither is used (#333).
 
 **Heating circuit:** the thermostat's flow temperature is a target, so it is the circuit target, not its flow. On WLW indoor units TC1 is the flow from the outdoor unit and T0 (`boiler_current_flow_temperature`) the flow to the heating side; there is no return sensor of the heating circuit (#224). A return sensor fitted later can be added with `entities: { hc_return: … }`. The indoor unit has two pumps: PC0 for the heat pump circuit (flow rate as `volume`) and PC1 for the first heating circuit (`hc_pump`, `hc_volume`). Below about 50 % speed PC0 reports no flow rate; a template sensor that estimates it from `hpcircspd` can be set as `volume`. The heater stages `el_heater_step_1` … `_3` are stages of the electric flow heater, not tank heater rods at three heights.
 

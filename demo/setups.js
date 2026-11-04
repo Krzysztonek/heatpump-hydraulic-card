@@ -124,13 +124,13 @@ const emsStates = (s) => ({
   'sensor.ems_esp_boiler_nrgconscompheating': { state: '4210.5', attributes: { unit_of_measurement: 'kWh', state_class: 'total_increasing' } },
   'sensor.ems_esp_boiler_nrgsuppheating': { state: '17890.2', attributes: { unit_of_measurement: 'kWh', state_class: 'total_increasing' } },
   'sensor.ems_esp_boiler_totalcompstarts': { state: '5123', attributes: { state_class: 'total_increasing' } },
-  'sensor.ems_esp_boiler_uptimetotal': { state: '312450', attributes: { unit_of_measurement: 'min', state_class: 'total_increasing' } },
+  'sensor.ems_esp_boiler_uptimecontrol': { state: '312450', attributes: { unit_of_measurement: 'min', state_class: 'total_increasing' } },
 });
 const emsStatistics = {
   'sensor.ems_esp_boiler_nrgconscompheating': { today: 9.6, yesterday: 12.1, week: 58.3, month: 210.4, year: 1890.7 },
   'sensor.ems_esp_boiler_nrgsuppheating': { today: 38.9, yesterday: 47.2, week: 231.0, month: 812.0, year: 7610.3 },
   'sensor.ems_esp_boiler_totalcompstarts': { today: 4, yesterday: 6, week: 31, month: 118, year: 1102 },
-  'sensor.ems_esp_boiler_uptimetotal': { today: 610, yesterday: 790, week: 3950, month: 14200, year: 131000 },
+  'sensor.ems_esp_boiler_uptimecontrol': { today: 610, yesterday: 790, week: 3950, month: 14200, year: 131000 },
 };
 // Simulated long-term statistics: change of a total counter per calendar period (recorder/statistic_during_period).
 const statChange = (setup, msg) => {

@@ -584,7 +584,9 @@ const HFC_PRESETS = {
         room: s(`thermostat_${hc}_currtemp`, `thermostat_${hc}_current_room_temperature`),
         room_target: s(`thermostat_${hc}_seltemp`).concat(`number.${x}thermostat_${hc}_seltemp`, `number.${x}thermostat_${hc}_selected_room_temperature`),
         program: s(`thermostat_${hc}_modetype`),
-        hours: s('boiler_uptimecomp', 'boiler_uptimetotal', 'boiler_heatpump_total_uptime'),
+        // Compressor operating time of all modes: "total operating time heat" (uptimecontrol). "heatpump total uptime" (uptimetotal)
+        // also counts standby, and uptimecomp is the hot-water share under the dhw tag (#333).
+        hours: s('boiler_uptimecontrol', 'boiler_total_operating_time_heat'),
         starts_total: s('boiler_totalcompstarts', 'boiler_total_compressor_control_starts'),
         energy_total: s('boiler_nrgconstotal', 'boiler_total_energy_consumption'),
         heat_total: s('boiler_nrgsupptotal', 'boiler_total_energy_supplied'),
@@ -605,7 +607,7 @@ const HFC_PRESETS = {
         energy_cooling: t('nrgconscompcooling', 'metercool'), energy_aux: t('auxelecheatnrgconstotal', 'metereheat'),
         heat: t('nrgsupptotal', 'total_energy_supplied'), heat_heating: t('nrgsuppheating'), heat_dhw: t('dhw_nrgsupp'), heat_cooling: t('nrgsuppcooling'),
         starts: t('totalcompstarts', 'total_compressor_control_starts'), cycles_heating: t('heatingstarts'), cycles_dhw: t('dhw_startshp'), cycles_cooling: t('coolingstarts'),
-        hours: t('uptimetotal', 'uptimecompheating', 'heatpump_total_uptime'),
+        hours: t('uptimecontrol', 'total_operating_time_heat'),
       };
     },
     mode_map: {
