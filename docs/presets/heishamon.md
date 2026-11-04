@@ -26,6 +26,7 @@ What you get:
 - zone 1 water and room temperature; zone 2 becomes heating circuit 2 with `hc_count: 2`. The room temperature is `…_main_z1_temp` when the zone sensor setting is "Internal Thermostat" or "Thermistor"; otherwise `z1_temp` is the zone water temperature and the card uses the remote control sensor `…_main_room_thermostat_temp`
 - heating curve shift (`hc_curve_offset`) in the heating mode "compensation curve": the circuit label shows the target with its parts, for example "Target 36 °C (curve 34 °C + 2 K shift)", from the heat request temperature (`number.<prefix>_main_z1_heat_request_temp`, `z2_` for circuit 2). The heating mode is read when the card is built, so reload the dashboard after changing it; in direct mode the entity is the flow target itself and is not used
 - internal backup heater
+- water pressure (`…_main_water_pressure`, TOP115, bar) as the heating pressure, only where the entity exists: K/L series, enabled by default since heishamon-homeassistant 2.12.0 (#276)
 - details: operating hours and counter, heater hours, compressor frequency, discharge temperature, high and low pressure, expansion valve
 
 Notes from real installations:
@@ -63,7 +64,6 @@ HeishaMon has no "current activity" value: the card shows heating while the comp
 
 - `dhw_heater`: `…_main_dhw_heater_state` (TOP58) and `…_room_heater_state` (TOP59) show if the heater is *permitted*, not if it runs.
 - `hc_pump`: `…_main_z1_pump_state` (TOP124) is the zone pump of the zone kit; on a single-zone system without that kit it stays `off` while the heat pump's pump runs.
-- `hc_pressure`: `…_main_water_pressure` (TOP115) exists only on K/L series. heishamon-homeassistant 2.12.0 enables it (and the other K/L-series entities TOP116 to TOP118 and the DHW sensor selection) by default when it detects a K/L model; before that it was disabled. The id is taken from the integration source and not checked on a real installation, so it is still not mapped.
 - `cond_temp`: no condensation temperature sensor, so the card computes no subcooling.
 - `mode`, `status`, `room_target`, cut-outs, daily statistics: no matching value.
 - S0 meters (`sensor.<prefix>_s0_watt_<port>`): which port measures what depends on the wiring. Set them as `power` (one entity or a list).
