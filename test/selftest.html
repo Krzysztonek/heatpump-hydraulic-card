@@ -2006,7 +2006,7 @@
       return Promise.resolve(out);
     } });
     const pvHist = (start, end) => [{ state: '0', last_updated: iso(start) }, { state: '1800', last_updated: iso(start + (end - start) * 2 / 8) }, { state: '0', last_updated: iso(start + (end - start) * 4 / 8) }];
-    let c = mount({ ...s.config, timeline: true, timeline_marks: false }, mock(pvHist)(hass('heat'))); await wait(80);
+    let c = mount({ ...s.config, timeline: true, timeline_marks: false, timeline_details: false }, mock(pvHist)(hass('heat'))); await wait(80);
     const kinds = [...c.shadowRoot.querySelectorAll('#timeline .seg')].map((x) => [...x.classList].find((k) => k.startsWith('k-')));
     check(kinds.join() === 'k-idle,k-heat,k-pv,k-heat,k-idle', `the PV surplus part of the heating period is its own period (${kinds})`);
     check(/Heating · PV surplus/.test(c.shadowRoot.querySelector('#timeline .tl-legend').textContent), 'the legend names it');
@@ -2598,7 +2598,7 @@
       const c = mount({ ...setup.config, timeline: true, ...extraCfg }, hassFn ? hassFn(h) : h); await wait(60);
       return c;
     };
-    let c = await tl(s);
+    let c = await tl(s, { timeline_details: false });
     const box = c.shadowRoot.getElementById('timeline');
     const segs = [...c.shadowRoot.querySelectorAll('#timeline .seg')];
     const kinds = new Set(segs.map((x) => [...x.classList].find((k) => k.startsWith('k-'))));
@@ -2616,6 +2616,55 @@
     c.shadowRoot.getElementById('tl-bar').dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true, composed: true, cancelable: true }));
     check(detail() !== before && /Defrost/.test(detail()), `ArrowRight selects the next period (${detail()})`);
     c.remove();
+    // #325: with run details (default) a tap on an operating period opens the panel of its run.
+    c = await tl(s);
+    const q = (sel) => c.shadowRoot.querySelector(sel);
+    const runSegs = [...c.shadowRoot.querySelectorAll('#timeline .seg')];
+    const heatSeg = runSegs.find((x) => x.classList.contains('k-heat'));
+    heatSeg.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }));
+    const head = () => q('#tl-run .tl-run-head b')?.textContent || '';
+    check(!!q('#tl-run') && /^(Heating|Hot water|Defrost) · \d\d:\d\d–\d\d:\d\d · \d/.test(head()) && q('#tl-detail').textContent === '' && !!q('#tl-bar .run-sel'),
+      `#325: a tap opens the run panel with kind, times and duration (${head()})`);
+    const edgeCount = new Set(c._tl.runs.filter((r) => r.source === 'run').flatMap((r) => [r.from, r.to]).filter((t) => t > c._tl.start && t < c._tl.now)).size;
+    check(c.shadowRoot.querySelectorAll('#tl-bar .tick').length === edgeCount && !q('#tl-bar .seg.sel'),
+      `compressor run boundaries are marked on the bar, the run outline replaces the period outline (${edgeCount} edges)`);
+    const first = head();
+    q('#tl-bar').dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true, composed: true, cancelable: true }));
+    check(head() !== first && !!head(), `ArrowRight steps to the next run (${head()})`);
+    q('#tl-bar').dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, composed: true, cancelable: true }));
+    check(!q('#tl-run') && !q('#tl-bar .run-sel'), 'Esc closes the panel');
+    c.shadowRoot.querySelector('#timeline .seg.k-heat').dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }));
+    q('#tl-run-x').dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }));
+    check(!q('#tl-run'), 'the close button closes the panel');
+    c.shadowRoot.querySelector('#timeline .seg.k-heat').dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }));
+    c.shadowRoot.querySelector('#timeline .seg.k-heat').dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }));
+    check(!q('#tl-run'), 'a second tap on the same run closes the panel');
+    c.remove();
+    // The wall display, which nobody taps, keeps the one-line detail; the arrow keys step through runs there as well.
+    c = await tl(s, { layout: 'wall' });
+    c.shadowRoot.querySelector('#timeline .seg.k-heat').dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }));
+    check(!c.shadowRoot.querySelector('#tl-run') && /^(Heating|Hot water|Defrost) · \d\d:\d\d–/.test(c.shadowRoot.getElementById('tl-detail').textContent),
+      `wall layout: the run shows as one line (${c.shadowRoot.getElementById('tl-detail').textContent})`);
+    c.remove();
+    {
+      // The panel content of one run: notes for a partial run in a series, and the phases when the run had more than one kind.
+      const M = 60000;
+      const k = await tl(s);
+      const run = { from: 0, to: 40 * M, kind: 'dhw', source: 'run', partial: true, ongoing: false, pause: 8 * M, series: 3, seriesFrom: 0,
+        phases: [{ kind: 'heat', from: 0, to: 10 * M }, { kind: 'dhw', from: 10 * M, to: 40 * M }] };
+      const html = k._runPanel(run).replace(/<[^>]+>/g, '');
+      check(/began before the timeline/.test(html) && /run 3 since \d\d:\d\d/.test(html) && /pause before 8 min/.test(html) && /Heating 10 min · Hot water 30 min/.test(html),
+        `run panel notes and phases (${html.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()})`);
+      const phase = k._runPanel({ ...run, source: 'phase', partial: false, series: 1, pause: null, phases: [{ kind: 'heat', from: 0, to: 40 * M }] });
+      check(/operating period, no compressor data/.test(phase) && !/run \d since/.test(phase) && !/Heating \d+ min ·/.test(phase), 'a phase run says so and lists no single phase');
+      k.remove();
+    }
+    let error = '';
+    try { new C().setConfig({ timeline: true, timeline_details: 'no' }); } catch (e) { error = e.message; }
+    check(error === 'timeline_details must be true or false', `timeline_details must be a boolean (${error})`);
+    const keysOfRun = (n) => (n.schema ? n.schema.flatMap(keysOfRun) : [n.name]);
+    check(C._formSchema({ timeline: true }).schema.flatMap(keysOfRun).includes('timeline_details') && !C._formSchema({}).schema.flatMap(keysOfRun).includes('timeline_details'),
+      'the editor offers the run details with the timeline');
     // no option, no timeline; no history, no timeline
     c = mount(setups[1].config, hassOf(toStates(setups[1].states('heat')), {}, setups[1].energy, setups[1])); await wait(30);
     check(!c.shadowRoot.getElementById('timeline'), 'without the option there is no timeline');
@@ -2650,7 +2699,7 @@
     const keysOf = (n) => (n.schema ? n.schema.flatMap(keysOf) : [n.name]);
     check(C._formSchema({}).schema.flatMap(keysOf).includes('timeline') && !C._formSchema({}).schema.flatMap(keysOf).includes('timeline_hours') && C._formSchema({ timeline: true }).schema.flatMap(keysOf).includes('timeline_hours'), 'editor offers the timeline and its length');
     // marks: badges (or a list of entities) as extra lanes under the bar
-    c = await tl(s);
+    c = await tl(s, { timeline_details: false });
     const lane = c.shadowRoot.querySelectorAll('#timeline .tl-mark');
     const ms = [...c.shadowRoot.querySelectorAll('#timeline .mseg')];
     check(lane.length === 1 && ms.length === 2, `the Boost badge gets a lane with its two periods (${lane.length} lane, ${ms.length} periods)`);
