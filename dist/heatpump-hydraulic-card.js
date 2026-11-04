@@ -1323,6 +1323,7 @@ const HFC_I18N = {
     source_flow: 'Source', target: 'Target', curve_offset: 'curve', curve_shift: 'shift', mixer: 'Mixer', mixer_opening: 'opening', mixer_closing: 'closing', return_short: 'RL', error: 'Error', circulation: 'Circ.', circulation_from: 'from', circulation_until: 'until', valve_dhw: 'DHW', solar: 'Solar',
     brine_pressure: 'Brine pressure', hc_pressure: 'Heating pressure', pressure_normal: 'normal', pressure_warning: 'warning', pressure_critical: 'critical',
     timeline_title: 'Last {h} hours', timeline_gap: 'No data', timeline_aria: 'Operating mode of the last {h} hours. Arrow keys select a period.',
+    run_series: 'run {n} since {t}', run_pause: 'pause before {d}', run_partial: 'began before the timeline', run_ongoing: 'still running', run_phase: 'operating period, no compressor data', run_close: 'Close', run_flow: 'Flow', run_reached: 'reached', run_missed: '{d} K below', run_heater: 'Heater rod', run_on: 'on', run_off: 'off',
     programs: { eco: 'Eco', night: 'Night', party: 'Party', holiday: 'Holiday' },
     sg_ready: { normal: 'SG normal', blocked: 'Utility lock', boost: 'SG boost', forced: 'SG forced on' },
     valve_heating: 'Heating', valve_cooling: 'Cooling', bypass: 'Bypass', pv: 'PV', pv_boost: 'PV surplus', battery: 'Battery', grid: 'Grid',
@@ -1365,6 +1366,7 @@ const HFC_I18N = {
     source_flow: 'Quelle', target: 'Soll', curve_offset: 'Kurve', curve_shift: 'Verschiebung', mixer: 'Mischer', mixer_opening: 'öffnet', mixer_closing: 'schließt', return_short: 'RL', error: 'Fehler', circulation: 'Zirk.', circulation_from: 'ab', circulation_until: 'bis', valve_dhw: 'WW', solar: 'Solar',
     brine_pressure: 'Soledruck', hc_pressure: 'Heizungsdruck', pressure_normal: 'normal', pressure_warning: 'Warnung', pressure_critical: 'kritisch',
     timeline_title: 'Letzte {h} Stunden', timeline_gap: 'Keine Daten', timeline_aria: 'Betriebsart der letzten {h} Stunden. Mit den Pfeiltasten einen Zeitraum wählen.',
+    run_series: '{n}. Lauf seit {t}', run_pause: 'Pause davor {d}', run_partial: 'begann vor der Zeitleiste', run_ongoing: 'läuft noch', run_phase: 'Betriebsphase, ohne Verdichterdaten', run_close: 'Schließen', run_flow: 'Vorlauf', run_reached: 'erreicht', run_missed: '{d} K darunter', run_heater: 'Heizstab', run_on: 'an', run_off: 'aus',
     programs: { eco: 'Eco', night: 'Nacht', party: 'Party', holiday: 'Urlaub' },
     sg_ready: { normal: 'SG normal', blocked: 'EVU-Sperre', boost: 'SG-Anhebung', forced: 'SG-Zwangsbetrieb' },
     valve_heating: 'Heizen', valve_cooling: 'Kühlen', bypass: 'Bypass', pv: 'PV', pv_boost: 'PV-Überschuss', battery: 'Akku', grid: 'Netz',
@@ -1409,6 +1411,7 @@ const HFC_I18N = {
     source_flow: 'Zdroj', target: 'Cieľ', curve_offset: 'krivka', curve_shift: 'posun', return_short: 'RL', error: 'Chyba', circulation: 'Cirk.', circulation_from: 'od', circulation_until: 'do', valve_dhw: 'TÚV', solar: 'Solár',
     brine_pressure: 'Tlak nemrznúcej zmesi', hc_pressure: 'Tlak vykurovania', pressure_normal: 'normálny', pressure_warning: 'varovanie', pressure_critical: 'kritický',
     timeline_title: 'Posledných {h} hodín', timeline_gap: 'Žiadne dáta', timeline_aria: 'Prevádzkový režim za posledných {h} hodín. Šípkami vyberte obdobie.',
+    run_series: '{n}. beh od {t}', run_pause: 'prestávka predtým {d}', run_partial: 'začal pred časovou osou', run_ongoing: 'stále beží', run_phase: 'prevádzková fáza, bez údajov kompresora', run_close: 'Zavrieť', run_flow: 'Prívod', run_reached: 'dosiahnutý', run_missed: '{d} K pod', run_heater: 'Vykurovacia tyč', run_on: 'zap', run_off: 'vyp',
     programs: { eco: 'Eko', night: 'Nočný', party: 'Párty', holiday: 'Dovolenka' },
     sg_ready: { normal: 'SG normálna prevádzka', blocked: 'Blokovanie distribučnou sieťou', boost: 'SG zvýšená prevádzka', forced: 'SG vynútená prevádzka' },
     valve_heating: 'Vykurovanie', valve_cooling: 'Chladenie', bypass: 'Obtok (Bypass)', pv: 'FVE', pv_boost: 'Prebytok FVE', battery: 'Batéria', grid: 'Sieť',
@@ -1452,6 +1455,7 @@ const HFC_I18N = {
     source_flow: 'Zdroj', target: 'Cíl', curve_offset: 'křivka', curve_shift: 'posun', return_short: 'RL', error: 'Chyba', circulation: 'Cirk.', circulation_from: 'od', circulation_until: 'do', valve_dhw: 'TUV', solar: 'Solár',
     brine_pressure: 'Tlak nemrznoucí směsi', hc_pressure: 'Tlak vytápění', pressure_normal: 'normální', pressure_warning: 'varování', pressure_critical: 'kritický',
     timeline_title: 'Posledních {h} hodin', timeline_gap: 'Žádná data', timeline_aria: 'Provozní režim za posledních {h} hodin. Šipkami vyberte období.',
+    run_series: '{n}. běh od {t}', run_pause: 'pauza předtím {d}', run_partial: 'začal před časovou osou', run_ongoing: 'stále běží', run_phase: 'provozní fáze, bez údajů kompresoru', run_close: 'Zavřít', run_flow: 'Přívod', run_reached: 'dosažen', run_missed: '{d} K pod', run_heater: 'Topná tyč', run_on: 'zap', run_off: 'vyp',
     programs: { eco: 'Eko', night: 'Noční', party: 'Párty', holiday: 'Dovolená' },
     sg_ready: { normal: 'SG normální provoz', blocked: 'Blokování distribuční sítí', boost: 'SG zvýšený provoz', forced: 'SG vynucený provoz' },
     valve_heating: 'Vytápění', valve_cooling: 'Chlazení', bypass: 'Obtok (Bypass)', pv: 'FVE', pv_boost: 'Přebytek FVE', battery: 'Baterie', grid: 'Síť',
@@ -1494,6 +1498,7 @@ const HFC_I18N = {
     source_flow: 'Bron', target: 'Doel', curve_offset: 'stooklijn', curve_shift: 'verschuiving', return_short: 'RL', error: 'Storing', circulation: 'Circ.', circulation_from: 'vanaf', circulation_until: 'tot', valve_dhw: 'WW', solar: 'Zon',
     brine_pressure: 'Brondruk', hc_pressure: 'Verwarmingsdruk', pressure_normal: 'normaal', pressure_warning: 'waarschuwing', pressure_critical: 'kritiek',
     timeline_title: 'Laatste {h} uur', timeline_gap: 'Geen gegevens', timeline_aria: 'Bedrijfsstand van de laatste {h} uur. Kies een periode met de pijltjestoetsen.',
+    run_series: 'run {n} sinds {t}', run_pause: 'pauze ervoor {d}', run_partial: 'begon vóór de tijdlijn', run_ongoing: 'loopt nog', run_phase: 'bedrijfsperiode, geen compressorgegevens', run_close: 'Sluiten', run_flow: 'Aanvoer', run_reached: 'bereikt', run_missed: '{d} K eronder', run_heater: 'Verwarmingselement', run_on: 'aan', run_off: 'uit',
     programs: { eco: 'Eco', night: 'Nacht', party: 'Party', holiday: 'Vakantie' },
     sg_ready: { normal: 'SG normaal', blocked: 'Netblokkering', boost: 'SG-verhoging', forced: 'SG gedwongen aan' },
     valve_heating: 'Verwarmen', valve_cooling: 'Koelen', bypass: 'Bypass', pv: 'PV', pv_boost: 'PV-overschot', battery: 'Accu', grid: 'Net',
@@ -1542,7 +1547,7 @@ const HFC_EDITOR = {
     hc_count: 'Heating circuits', hc2_type: 'Circuit 2 emitter', hc3_type: 'Circuit 3 emitter', hc4_type: 'Circuit 4 emitter', hc5_type: 'Circuit 5 emitter', hc6_type: 'Circuit 6 emitter',
     unit_style: 'Unit drawing', unit_auto: 'Automatic (from the preset)', unit_generic: 'Generic (fan)', unit_lambda: 'Lambda EU-L', unit_vaillant: 'Vaillant aroTHERM plus', unit_panasonic: 'Panasonic Aquarea', unit_viessmann: 'Viessmann Vitocal', unit_bosch: 'Bosch / Buderus', unit_saunier: 'Saunier Duval GeniaAir', unit_samsung: 'Samsung EHS Mono', unit_wolf: 'Wolf CHA', unit_kronoterm: 'Kronoterm ADAPT', unit_alpha_innotec: 'Alpha Innotec Hybrox', unit_stiebel: 'Stiebel Eltron WPL-A',
     unit_size: 'Size of the unit drawing', size_pana_medium: '1 fan (3 to 9 kW)', size_pana_large: '2 fans (T-CAP, 12 and 16 kW)', size_small: '3.5 / 5.5 kW (1 fan, low)', size_medium: '7.5 kW (1 fan)', size_large: '10.5 / 12.5 kW (2 fans)',
-    timeline: 'Timeline of the operating mode', timeline_hours: 'Timeline length (hours)', timeline_marks: 'Show the badges (e.g. Boost) as extra lanes',
+    timeline: 'Timeline of the operating mode', timeline_hours: 'Timeline length (hours)', timeline_details: 'Run details under the timeline', timeline_marks: 'Show the badges (e.g. Boost) as extra lanes',
     layout: 'Layout', layout_default: 'Default', layout_compact: 'Compact (narrow columns)', layout_wide: 'Wide (tiles beside the schematic)', layout_wall: 'Wall display (large, controls fade out)',
     animations: 'Animations', animations_auto: 'Automatic (respect reduced motion)', animations_always: 'Always', animations_off: 'Off',
     flow_speed: 'Animation speed', source_spread: 'Show source spread',
@@ -1635,7 +1640,7 @@ const HFC_EDITOR = {
     hc_count: 'Heizkreise', hc2_type: 'Wärmeabgabe Heizkreis 2', hc3_type: 'Wärmeabgabe Heizkreis 3', hc4_type: 'Wärmeabgabe Heizkreis 4', hc5_type: 'Wärmeabgabe Heizkreis 5', hc6_type: 'Wärmeabgabe Heizkreis 6',
     unit_style: 'Geräte-Zeichnung', unit_auto: 'Automatisch (aus der Voreinstellung)', unit_generic: 'Allgemein (Lüfter)', unit_lambda: 'Lambda EU-L', unit_vaillant: 'Vaillant aroTHERM plus', unit_panasonic: 'Panasonic Aquarea', unit_viessmann: 'Viessmann Vitocal', unit_bosch: 'Bosch / Buderus', unit_saunier: 'Saunier Duval GeniaAir', unit_samsung: 'Samsung EHS Mono', unit_wolf: 'Wolf CHA', unit_kronoterm: 'Kronoterm ADAPT', unit_alpha_innotec: 'Alpha Innotec Hybrox', unit_stiebel: 'Stiebel Eltron WPL-A',
     unit_size: 'Größe der Geräte-Zeichnung', size_pana_medium: '1 Lüfter (3 bis 9 kW)', size_pana_large: '2 Lüfter (T-CAP, 12 und 16 kW)', size_small: '3,5 / 5,5 kW (1 Lüfter, niedrig)', size_medium: '7,5 kW (1 Lüfter)', size_large: '10,5 / 12,5 kW (2 Lüfter)',
-    timeline: 'Zeitleiste der Betriebsart', timeline_hours: 'Länge der Zeitleiste (Stunden)', timeline_marks: 'Badges (z. B. Boost) als zusätzliche Spuren zeigen',
+    timeline: 'Zeitleiste der Betriebsart', timeline_hours: 'Länge der Zeitleiste (Stunden)', timeline_details: 'Laufdetails unter der Zeitleiste', timeline_marks: 'Badges (z. B. Boost) als zusätzliche Spuren zeigen',
     layout: 'Layout', layout_default: 'Standard', layout_compact: 'Kompakt (schmale Spalten)', layout_wide: 'Breit (Kacheln neben dem Schema)', layout_wall: 'Wanddisplay (groß, Bedienelemente blenden aus)',
     animations: 'Animationen', animations_auto: 'Automatisch (reduzierte Bewegung beachten)', animations_always: 'Immer', animations_off: 'Aus',
     flow_speed: 'Animationsgeschwindigkeit', source_spread: 'Quellenspreizung anzeigen',
@@ -1729,7 +1734,7 @@ const HFC_EDITOR = {
     hc_count: 'Vykurovacie okruhy', hc2_type: 'Teleso okruhu 2', hc3_type: 'Teleso okruhu 3', hc4_type: 'Teleso okruhu 4', hc5_type: 'Teleso okruhu 5', hc6_type: 'Teleso okruhu 6',
     unit_style: 'Nákres jednotky', unit_auto: 'Automaticky (z predvoľby)', unit_generic: 'Všeobecná (ventilátor)', unit_lambda: 'Lambda EU-L', unit_vaillant: 'Vaillant aroTHERM plus', unit_panasonic: 'Panasonic Aquarea', unit_viessmann: 'Viessmann Vitocal', unit_bosch: 'Bosch / Buderus', unit_saunier: 'Saunier Duval GeniaAir', unit_samsung: 'Samsung EHS Mono',
     unit_size: 'Veľkosť Vaillant', size_small: '3.5 / 5.5 kW (1 ventilátor, nízky)', size_medium: '7.5 kW (1 ventilátor)', size_large: '10.5 / 12.5 kW (2 ventilátory)',
-    timeline: 'Časová os prevádzkového režimu', timeline_hours: 'Dĺžka časovej osi (hodiny)', timeline_marks: 'Zobraziť odznaky (napr. Boost) ako extra riadky',
+    timeline: 'Časová os prevádzkového režimu', timeline_hours: 'Dĺžka časovej osi (hodiny)', timeline_details: 'Podrobnosti behu pod časovou osou', timeline_marks: 'Zobraziť odznaky (napr. Boost) ako extra riadky',
     layout: 'Rozloženie', layout_default: 'Predvolené', layout_compact: 'Kompaktné (úzke stĺpce)', layout_wide: 'Široké (dlaždice vedľa schémy)', layout_wall: 'Nástenný displej (veľký, ovládacie prvky miznú)',
     animations: 'Animácie', animations_auto: 'Automaticky (rešpektovať obmedzenie pohybu)', animations_always: 'Vždy', animations_off: 'Vypnuté',
     flow_speed: 'Rýchlosť animácie', source_spread: 'Zobraziť rozpätie (spread) zdroja',
@@ -1859,7 +1864,7 @@ const HFC_EDITOR = {
     hc_count: 'Topné okruhy', hc2_type: 'Těleso okruhu 2', hc3_type: 'Těleso okruhu 3', hc4_type: 'Těleso okruhu 4', hc5_type: 'Těleso okruhu 5', hc6_type: 'Těleso okruhu 6',
     unit_style: 'Nákres jednotky', unit_auto: 'Automaticky (z předvolby)', unit_generic: 'Obecná (ventilátor)', unit_lambda: 'Lambda EU-L', unit_vaillant: 'Vaillant aroTHERM plus', unit_panasonic: 'Panasonic Aquarea', unit_viessmann: 'Viessmann Vitocal', unit_bosch: 'Bosch / Buderus', unit_saunier: 'Saunier Duval GeniaAir', unit_samsung: 'Samsung EHS Mono',
     unit_size: 'Velikost Vaillant', size_small: '3.5 / 5.5 kW (1 ventilátor, nízký)', size_medium: '7.5 kW (1 ventilátor)', size_large: '10.5 / 12.5 kW (2 ventilátory)',
-    timeline: 'Časová osa provozního režimu', timeline_hours: 'Délka časové osy (hodiny)', timeline_marks: 'Zobrazit odznaky (např. Boost) jako extra řádky',
+    timeline: 'Časová osa provozního režimu', timeline_hours: 'Délka časové osy (hodiny)', timeline_details: 'Podrobnosti běhu pod časovou osou', timeline_marks: 'Zobrazit odznaky (např. Boost) jako extra řádky',
     layout: 'Rozvržení', layout_default: 'Výchozí', layout_compact: 'Kompaktní (úzké sloupce)', layout_wide: 'Široké (dlaždice vedle schématu)', layout_wall: 'Nástěnný displej (velký, ovládací prvky mizí)',
     animations: 'Animace', animations_auto: 'Automaticky (respektovat omezení pohybu)', animations_always: 'Vždy', animations_off: 'Vypnuto',
     flow_speed: 'Rychlost animace', source_spread: 'Zobrazit rozpětí (spread) zdroje',
@@ -1988,7 +1993,7 @@ const HFC_EDITOR = {
     hc_count: 'Verwarmingsgroepen', hc2_type: 'Afgifte groep 2', hc3_type: 'Afgifte groep 3', hc4_type: 'Afgifte groep 4', hc5_type: 'Afgifte groep 5', hc6_type: 'Afgifte groep 6',
     unit_style: 'Tekening buitenunit', unit_auto: 'Automatisch (uit de preset)', unit_generic: 'Algemeen (ventilator)', unit_lambda: 'Lambda EU-L', unit_vaillant: 'Vaillant aroTHERM plus', unit_panasonic: 'Panasonic Aquarea', unit_viessmann: 'Viessmann Vitocal', unit_bosch: 'Bosch / Buderus', unit_saunier: 'Saunier Duval GeniaAir', unit_samsung: 'Samsung EHS Mono', unit_wolf: 'Wolf CHA', unit_kronoterm: 'Kronoterm ADAPT', unit_alpha_innotec: 'Alpha Innotec Hybrox', unit_stiebel: 'Stiebel Eltron WPL-A',
     unit_size: 'Grootte van de buitenunit', size_pana_medium: '1 ventilator (3 tot 9 kW)', size_pana_large: '2 ventilatoren (T-CAP, 12 en 16 kW)', size_small: '3,5 / 5,5 kW (1 ventilator, laag)', size_medium: '7,5 kW (1 ventilator)', size_large: '10,5 / 12,5 kW (2 ventilatoren)',
-    timeline: 'Tijdlijn van de bedrijfsstand', timeline_hours: 'Lengte tijdlijn (uren)', timeline_marks: 'Badges (bijv. Boost) als extra banen tonen',
+    timeline: 'Tijdlijn van de bedrijfsstand', timeline_hours: 'Lengte tijdlijn (uren)', timeline_details: 'Rundetails onder de tijdlijn', timeline_marks: 'Badges (bijv. Boost) als extra banen tonen',
     layout: 'Opmaak', layout_default: 'Standaard', layout_compact: 'Compact (smalle kolommen)', layout_wide: 'Breed (tegels naast het schema)', layout_wall: 'Wandscherm (groot, bediening verdwijnt)',
     animations: 'Animaties', animations_auto: 'Automatisch (respecteert minder beweging)', animations_always: 'Altijd', animations_off: 'Uit',
     flow_speed: 'Animatiesnelheid', source_spread: 'ΔT van de bron tonen',
@@ -2571,7 +2576,7 @@ class HeatpumpFlowCard extends HTMLElement {
                 ? [{ name: 'unit_size', selector: { select: { mode: 'dropdown', options: ['medium', 'large'].map((v) => ({ value: v, label: L[`size_pana_${v}`] })) } } }] : []),
               { name: 'primary_pump', selector: { boolean: {} } },
               { name: 'timeline', selector: { boolean: {} } },
-              ...(config && config.timeline ? [{ name: 'timeline_hours', selector: { number: { min: 3, max: 72, step: 1, mode: 'box', unit_of_measurement: 'h' } } }, { name: 'timeline_marks', selector: { boolean: {} } }] : []),
+              ...(config && config.timeline ? [{ name: 'timeline_hours', selector: { number: { min: 3, max: 72, step: 1, mode: 'box', unit_of_measurement: 'h' } } }, { name: 'timeline_details', selector: { boolean: {} } }, { name: 'timeline_marks', selector: { boolean: {} } }] : []),
               { name: 'details_open', selector: { boolean: {} } },
               ...(config && config.layout === 'wall' ? [{ name: 'wall_timeout', selector: { number: { min: 0, max: 600, step: 1, mode: 'box', unit_of_measurement: 's' } } }] : []),
             ],
@@ -2735,6 +2740,9 @@ class HeatpumpFlowCard extends HTMLElement {
     }
     if (config.timeline !== undefined && config.timeline !== null && typeof config.timeline !== 'boolean') throw new Error('timeline must be true or false');
     if (config.timeline_hours !== undefined && config.timeline_hours !== null && !(+config.timeline_hours > 0)) throw new Error('timeline_hours must be a number of hours above 0 (3 to 72)');
+    if (config.timeline_details !== undefined && config.timeline_details !== null && typeof config.timeline_details !== 'boolean') {
+      throw new Error('timeline_details must be true or false');
+    }
     if (config.timeline_marks !== undefined && config.timeline_marks !== null && typeof config.timeline_marks !== 'boolean') {
       if (!Array.isArray(config.timeline_marks)) throw new Error('timeline_marks must be true or a list of entities');
       config.timeline_marks.forEach((m) => { if (!(typeof m === 'string' ? m : m && m.entity)) throw new Error('timeline_marks: every entry needs an entity'); });
@@ -5283,11 +5291,17 @@ class HeatpumpFlowCard extends HTMLElement {
     const segs = this._timelineSegments(hist, ids, start, now);
     if (!segs.length) { box.hidden = true; return; }
     const lanes = marks.map((m, n) => ({ ...m, n, segs: this._timelineMarkSegments(hist, m, start, now) })).filter((l) => l.segs.length);
+    // Runs and their detail panel (#325); `timeline_details: false` keeps the one-line period detail of before.
+    const runs = this._config.timeline_details === false ? [] : this._timelineRuns(hist, ids, segs, start, now);
+    // The values of a selected run arrive with their own query (#326); the panel redraws when they are there.
+    const run = runs.find((r) => r.from === this._tlRun);
+    const panel = run && this._layout !== 'wall';
+    const rows = panel ? this._runValues(run) : [];
     const minute = Math.floor(now / 60000);
-    const key = `${minute}|${segs.map((s) => `${s.kind}${s.from}${s.to}`).join(',')}|${lanes.map((l) => `${l.n}${l.label}${l.segs.map((s) => `${s.from}-${s.to}`).join(',')}`).join(';')}|${this._lang}|${this._tlSel ?? ''}|${this._tlMarkSel ?? ''}`;
+    const key = `${minute}|${segs.map((s) => `${s.kind}${s.from}${s.to}`).join(',')}|${lanes.map((l) => `${l.n}${l.label}${l.segs.map((s) => `${s.from}-${s.to}`).join(',')}`).join(';')}|${this._lang}|${this._tlSel ?? ''}|${this._tlMarkSel ?? ''}|${this._tlRun ?? ''}|${runs.length}|${rows.map((r) => r.join('=')).join(';')}`;
     if (box._k === key) return;
     box._k = key; box.hidden = false;
-    this._tl = { segs, start, now, lanes };
+    this._tl = { segs, start, now, lanes, runs };
     const pct = (t) => (((t - start) / (now - start)) * 100).toFixed(3);
     const i = this._i;
     // Hour ticks at clock times (every 6 h for a day), found in the Home Assistant time zone.
@@ -5304,37 +5318,178 @@ class HeatpumpFlowCard extends HTMLElement {
     const markDetail = (l, s) => `${l.label} · ${this._timelineTime(s.from)}–${this._timelineTime(s.to)} · ${this._timelineDuration(s.to - s.from)}`;
     let detail = sel >= 0 ? this._timelineDetail(segs[sel]) : '';
     lanes.forEach((l) => l.segs.forEach((s) => { if (`${l.n}:${s.from}` === this._tlMarkSel) detail = markDetail(l, s); }));
+    // A selected run opens the panel under the axis; the wall display, which nobody taps, keeps the one line.
+    if (run) detail = panel ? '' : [this._runHead(run), ...this._runNotes(run)].join(' · ');
+    const edges = [...new Set(runs.filter((r) => r.source === 'run').flatMap((r) => [r.from, r.to]).filter((t) => t > start && t < now))];
     box.innerHTML = `<div class="tl-head"><span>${this._esc(i.timeline_title.replace('{h}', hours))}</span><span class="tl-detail" id="tl-detail" aria-live="polite">${this._esc(detail)}</span></div>
       <div class="tl-bar" id="tl-bar" tabindex="0" role="group" aria-label="${this._esc(i.timeline_aria.replace('{h}', hours))}">${segs.map((s, n) =>
-    `<span class="seg k-${s.kind}${n === sel ? ' sel' : ''}" data-seg="${n}" style="left:${pct(s.from)}%;width:${(pct(s.to) - pct(s.from)).toFixed(3)}%" title="${this._esc(this._timelineDetail(s))}"></span>`).join('')}</div>
+    `<span class="seg k-${s.kind}${n === sel && !run ? ' sel' : ''}" data-seg="${n}" style="left:${pct(s.from)}%;width:${(pct(s.to) - pct(s.from)).toFixed(3)}%" title="${this._esc(this._timelineDetail(s))}"></span>`).join('')}${edges.map((t) =>
+    `<span class="tick" style="left:${pct(t)}%"></span>`).join('')}${run ? `<span class="run-sel" style="left:${pct(run.from)}%;width:${(pct(run.to) - pct(run.from)).toFixed(3)}%"></span>` : ''}</div>
       ${lanes.map((l) => `<div class="tl-mark" role="img" aria-label="${this._esc(`${l.label}: ${l.segs.map((s) => `${this._timelineTime(s.from)}–${this._timelineTime(s.to)}`).join(', ')}`)}">${l.segs.map((s) =>
     `<span class="mseg${`${l.n}:${s.from}` === this._tlMarkSel ? ' sel' : ''}" data-mseg="${l.n}:${s.from}" style="left:${pct(s.from)}%;width:${(pct(s.to) - pct(s.from)).toFixed(3)}%" title="${this._esc(markDetail(l, s))}"></span>`).join('')}</div>`).join('')}
       <div class="tl-axis">${ticks.map(([t, l]) => `<span style="left:${pct(t)}%">${l}</span>`).join('')}</div>
+      ${panel ? this._runPanel(run, rows) : ''}
       <div class="tl-legend">${kinds.map((k) => `<span><i class="k-${k}"></i>${this._esc(this._timelineLabel({ kind: k }))}</span>`).join('')}${lanes.map((l) => `<span><i class="k-mark"></i>${this._esc(l.label)}</span>`).join('')}</div>`;
   }
 
-  // Tap or arrow keys select a period and show its start, end and duration.
+  // "Hot water · 10:07–10:55 · 48 min" for a run.
+  _runHead(run) {
+    return `${this._timelineLabel({ kind: run.kind })} · ${this._timelineTime(run.from)}–${this._timelineTime(run.to)} · ${this._timelineDuration(run.to - run.from)}`;
+  }
+
+  // The line under the head: phase run, cut by the window or still running, its place in a series and the pause before it.
+  _runNotes(run) {
+    const i = this._i;
+    return [
+      run.source === 'phase' ? i.run_phase : '',
+      run.partial ? i.run_partial : '', run.ongoing ? i.run_ongoing : '',
+      run.series > 1 ? i.run_series.replace('{n}', run.series).replace('{t}', this._timelineTime(run.seriesFrom)) : '',
+      run.pause !== null ? i.run_pause.replace('{d}', this._timelineDuration(run.pause)) : '',
+    ].filter(Boolean);
+  }
+
+  // Values of a run (#326), from the recorder history of its window only, fetched when the run is selected and cached like the
+  // other queries. Hot water: tank at start and end, target reached, heater rod, defrosts. Heating and other runs: mean flow
+  // against the circuit target, mean spread of the heat pump and of circuit 1, mean compressor modulation, flow rate and outdoor
+  // temperature, defrosts. Means are weighted by time. A value without data is left out. Returns [[label, html]], [] while loading.
+  _runValues(run) {
+    const i = this._i;
+    const dhw = run.kind === 'dhw';
+    const keys = (dhw ? ['dhw_top', 'dhw_target', 'heater', ...HFC_TANK_HEATERS.filter((k) => k.startsWith('dhw_')), 'defrost']
+      : ['flow', 'return', 'hc_flow', 'hc_return', 'hc_setpoint', 'compressor_speed', 'volume', 'outdoor', 'defrost']).filter((k) => this._has(k));
+    if (!keys.length) return [];
+    const list = [...new Set(keys.map((k) => this._e[k]))];
+    const attrs = keys.some((k) => hfcTempAttr(this._e[k], k));
+    // A run that is still going ends "now", which moves with every update: its query has no end and a fixed key, so it is
+    // refreshed every five minutes like the other queries instead of being asked again on every update.
+    const hist = this._wsCached(`run|${list.join(',')}|${run.from}|${run.ongoing ? 'now' : run.to}`, {
+      type: 'history/history_during_period', start_time: new Date(run.from).toISOString(), ...(run.ongoing ? {} : { end_time: new Date(run.to).toISOString() }),
+      entity_ids: list, minimal_response: true, ...(attrs ? {} : { no_attributes: true }), significant_changes_only: false,
+    }, (res) => res || {});
+    if (!hist) return [];
+    const time = (e) => { const v = e.lu ?? e.lc ?? e.last_updated ?? e.last_changed; return typeof v === 'number' ? (v > 1e11 ? v : v * 1000) : Date.parse(v); };
+    const states = (key) => {
+      const id = this._e[key]; const attr = hfcTempAttr(id, key);
+      return (hist[id] || []).map((e) => ({ t: time(e), s: String((attr ? e.attributes?.[attr] ?? e.a?.[attr] : undefined) ?? e.s ?? e.state) }))
+        .filter((e) => Number.isFinite(e.t)).sort((a, b) => a.t - b.t);
+    };
+    // Numbers of a key in °C for temperatures and l/h for flow rates; a negative flow rate is a marker, not a value (#312).
+    const unit = (key) => this._unit(key).trim().replace(/º/g, '°').replace('℃', '°c').replace('℉', '°f').replace('³', '3');
+    const scale = (key) => {
+      const u = unit(key);
+      if (key === 'volume') return (v) => (v < 0 ? NaN : u === 'm3/h' ? v * 1000 : u === 'l/min' ? v * 60 : v);
+      return u === '°f' ? (v) => (v - 32) * 5 / 9 : u === 'k' && key !== 'compressor_speed' ? (v) => v - 273.15 : (v) => v;
+    };
+    const nums = (key) => { const f = scale(key); return states(key).map((e) => ({ t: e.t, v: f(parseFloat(e.s)) })).filter((e) => Number.isFinite(e.v)); };
+    const at = (pts, t) => { let v = pts[0]?.v; pts.forEach((p) => { if (p.t <= t) v = p.v; }); return v; };
+    const mean = (pts) => {
+      let sum = 0; let w = 0;
+      pts.forEach((p, n) => { const a = Math.max(p.t, run.from); const b = Math.min(pts[n + 1]?.t ?? run.to, run.to); if (b > a) { sum += p.v * (b - a); w += b - a; } });
+      return w ? sum / w : NaN;
+    };
+    const diff = (a, b) => {
+      const pa = nums(a); const pb = nums(b);
+      const times = [...new Set([...pa, ...pb].map((p) => p.t))].sort((x, y) => x - y);
+      return mean(times.map((t) => ({ t, v: at(pa, t) - at(pb, t) })).filter((p) => Number.isFinite(p.v)));
+    };
+    const on = (s) => !['off', 'unavailable', 'unknown', 'none', '', 'false', 'aus'].includes(String(s).toLowerCase()) && !(parseFloat(s) <= 0);
+    // Time a key was on within the run, and how often it switched on.
+    const onTime = (key) => {
+      const ss = states(key); let ms = 0; let starts = 0;
+      ss.forEach((e, n) => {
+        if (!on(e.s)) return;
+        const a = Math.max(e.t, run.from); const b = Math.min(ss[n + 1]?.t ?? run.to, run.to);
+        if (b > a) ms += b - a;
+        if (e.t >= run.from && !(n > 0 && on(ss[n - 1].s))) starts++;
+      });
+      return { ms, starts };
+    };
+    const K = (v) => `${this._fmt(v)} K`;
+    const rows = [];
+    const defrosts = this._has('defrost') ? onTime('defrost').starts : run.phases.filter((p) => p.kind === 'defrost').length;
+    if (dhw) {
+      const tank = nums('dhw_top');
+      const a = at(tank, run.from); const b = at(tank, run.to);
+      if (Number.isFinite(a) && Number.isFinite(b)) rows.push([i.tiles.dhw_top, `${this._esc(this._t(a))} → ${this._esc(this._t(b))} <span class="m">(${b >= a ? '+' : '−'}${this._esc(K(Math.abs(b - a)))})</span>`]);
+      const target = at(nums('dhw_target'), run.to);
+      if (Number.isFinite(target) && Number.isFinite(b)) {
+        rows.push([`${i.target} ${this._fmt(target)} °C`, this._esc(b >= target - 0.5 ? i.run_reached : i.run_missed.replace('{d}', this._fmt(target - b)))]);
+      }
+      const rods = ['heater', ...HFC_TANK_HEATERS.filter((k) => k.startsWith('dhw_'))].filter((k) => keys.includes(k)).map(onTime);
+      if (rods.length) {
+        const ms = Math.max(...rods.map((r) => r.ms));
+        rows.push([i.run_heater, this._esc(ms > 0 ? `${i.run_on} · ${this._timelineDuration(ms)}` : i.run_off)]);
+      }
+    } else {
+      const flow = mean(nums('flow'));
+      const set = mean(nums('hc_setpoint'));
+      if (Number.isFinite(flow)) rows.push([`${i.run_flow} Ø`, `${this._esc(this._t(flow))}${Number.isFinite(set) ? ` <span class="m">(${this._esc(`${i.target} ${this._fmt(set)}`)})</span>` : ''}`]);
+      const spread = keys.includes('return') ? diff('flow', 'return') : NaN;
+      const circuit = keys.includes('hc_flow') && keys.includes('hc_return') ? diff('hc_flow', 'hc_return') : NaN;
+      if (Number.isFinite(spread) || Number.isFinite(circuit)) {
+        rows.push([`${i.tiles.spread} Ø`, [Number.isFinite(spread) ? this._esc(K(spread)) : '', Number.isFinite(circuit) ? `<span class="m">${this._esc(`${i.heating_circuit} ${K(circuit)}`)}</span>` : '']
+          .filter(Boolean).join(' <span class="m">·</span> ')]);
+      }
+      const mod = mean(nums('compressor_speed'));
+      if (Number.isFinite(mod)) rows.push([`${i.det.compressor_speed} Ø`, this._esc(`${this._fmt(mod, 0)} ${this._st('compressor_speed')?.attributes?.unit_of_measurement || ''}`.trim())]);
+      const vol = mean(nums('volume'));
+      if (Number.isFinite(vol)) rows.push([`${i.tiles.volume} Ø`, this._esc(`${this._fmt(vol, 0)} l/h`)]);
+      const out = mean(nums('outdoor'));
+      if (Number.isFinite(out)) rows.push([`${i.outdoor} Ø`, this._esc(this._t(out))]);
+    }
+    if (defrosts > 0 || this._has('defrost')) rows.push([i.tiles.defrosts, String(defrosts)]);
+    return rows;
+  }
+
+  // Detail panel of the selected run under the timeline (#325): head, notes, the phases when the run had more than one kind,
+  // and the values of the run (#326). Its colour bar follows the kind.
+  _runPanel(run, rows = []) {
+    const i = this._i;
+    const color = { dhw: hfcVar('hot'), defrost: hfcVar('cool-strong'), cool: hfcVar('cool') }[run.kind] || hfcVar('heat');
+    const time = {};
+    run.phases.forEach((p) => { const k = ['pv', 'sg-boost', 'sg-forced'].includes(p.kind) ? 'heat' : p.kind; time[k] = (time[k] || 0) + p.to - p.from; });
+    const phases = Object.keys(time).length > 1 ? Object.entries(time).map(([k, ms]) => `${this._timelineLabel({ kind: k })} ${this._timelineDuration(ms)}`) : [];
+    // Each part stays on one line ("Hot water 48 min"); a narrow card wraps between the parts.
+    const line = (parts) => (parts.length ? `<div class="tl-run-sub">${parts.map((p) => `<span>${this._esc(p)}</span>`).join(' · ')}</div>` : '');
+    return `<div class="tl-run" id="tl-run" role="group" aria-live="polite" aria-label="${this._esc(this._runHead(run))}" style="--run-c:${color}">
+        <div class="tl-run-head"><b>${this._esc(this._runHead(run))}</b><button class="tl-run-x" id="tl-run-x" type="button" aria-label="${this._esc(i.run_close)}" title="${this._esc(i.run_close)}">×</button></div>
+        ${line(this._runNotes(run))}${line(phases)}
+        ${rows.length ? `<dl>${rows.map(([k, v]) => `<dt>${this._esc(k)}</dt><dd>${v}</dd>`).join('')}</dl>` : ''}
+      </div>`;
+  }
+
+  // Tap or arrow keys select a period and show its start, end and duration. With runs (#325), a tap on an operating period
+  // selects the run it belongs to and opens its panel, a second tap or Esc closes it; the arrow keys step from run to run.
   _timelineEvents(box) {
+    const redraw = (focus) => { box._k = null; this._updateTimeline(); if (focus) this._$('tl-bar')?.focus({ preventScroll: true }); };
     const select = (n) => {
       const seg = this._tl?.segs[n];
       if (!seg) return;
-      this._tlSel = seg.from; this._tlMarkSel = null;
-      box._k = null; this._updateTimeline();
-      this._$('tl-bar')?.focus({ preventScroll: true });
+      const run = (this._tl.runs || []).find((r) => seg.from < r.to && seg.to > r.from);
+      if (run) { this._tlRun = this._tlRun === run.from ? null : run.from; this._tlSel = null; } else { this._tlSel = seg.from; this._tlRun = null; }
+      this._tlMarkSel = null;
+      redraw(true);
     };
     box.addEventListener('click', (ev) => {
+      if (ev.target.closest('#tl-run-x')) { this._tlRun = null; redraw(true); return; }
       const el = ev.target.closest('[data-seg]'); if (el) { select(+el.dataset.seg); return; }
       // A tap on a lane shows that period; a second tap on the same one clears it.
       const m = ev.target.closest('[data-mseg]');
-      if (m) { this._tlMarkSel = this._tlMarkSel === m.dataset.mseg ? null : m.dataset.mseg; this._tlSel = null; box._k = null; this._updateTimeline(); }
+      if (m) { this._tlMarkSel = this._tlMarkSel === m.dataset.mseg ? null : m.dataset.mseg; this._tlSel = null; this._tlRun = null; redraw(false); }
     });
     box.addEventListener('keydown', (ev) => {
       if (ev.target.id !== 'tl-bar' || !this._tl) return;
-      const segs = this._tl.segs; const cur = segs.findIndex((s) => s.from === this._tlSel);
-      const to = { ArrowRight: cur + 1, ArrowDown: cur + 1, ArrowLeft: cur < 0 ? segs.length - 1 : cur - 1, ArrowUp: cur < 0 ? segs.length - 1 : cur - 1, Home: 0, End: segs.length - 1 }[ev.key];
+      if (ev.key === 'Escape' && (this._tlRun !== null && this._tlRun !== undefined)) { ev.preventDefault(); this._tlRun = null; redraw(true); return; }
+      const runs = this._tl.runs || [];
+      const list = runs.length ? runs : this._tl.segs;
+      const cur = list.findIndex((s) => s.from === (runs.length ? this._tlRun : this._tlSel));
+      const to = { ArrowRight: cur + 1, ArrowDown: cur + 1, ArrowLeft: cur < 0 ? list.length - 1 : cur - 1, ArrowUp: cur < 0 ? list.length - 1 : cur - 1, Home: 0, End: list.length - 1 }[ev.key];
       if (to === undefined) return;
       ev.preventDefault();
-      select(Math.min(Math.max(to, 0), segs.length - 1));
+      const item = list[Math.min(Math.max(to, 0), list.length - 1)];
+      if (runs.length) { this._tlRun = item.from; this._tlSel = null; } else this._tlSel = item.from;
+      this._tlMarkSel = null;
+      redraw(true);
     });
   }
 
@@ -6384,6 +6539,20 @@ HeatpumpFlowCard.styles = `
   .seg.k-blocked, .tl-legend i.k-blocked, .seg.k-sg-blocked, .tl-legend i.k-sg-blocked { background: repeating-linear-gradient(135deg, color-mix(in srgb, var(--hfc-muted) 55%, transparent) 0 3px, transparent 3px 6px); }
   .seg.k-gap, .tl-legend i.k-gap { background: repeating-linear-gradient(135deg, transparent 0 3px, color-mix(in srgb, var(--hfc-muted) 30%, transparent) 3px 4px); }
   .seg.sel { box-shadow: inset 0 0 0 2px var(--primary-text-color); }
+  .tl-bar .tick { position: absolute; top: 0; bottom: 0; width: 1px; margin-left: -.5px; background: var(--primary-text-color); opacity: .45; pointer-events: none; }
+  .tl-bar .run-sel { position: absolute; top: 0; bottom: 0; min-width: 3px; border-radius: 3px; box-shadow: inset 0 0 0 2px var(--primary-text-color); pointer-events: none; }
+  .tl-run { margin: 8px 0 2px; padding: 8px 12px 9px; border-radius: 12px; font-size: max(.86em, 13px); border-left: 4px solid var(--run-c);
+    background: color-mix(in srgb, var(--hfc-muted) 12%, transparent); }
+  .tl-run-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+  .tl-run-head b { font-weight: 600; }
+  .tl-run-x { border: 0; background: none; color: var(--hfc-muted); font: inherit; font-size: 1.2em; line-height: 1; padding: 0 2px; cursor: pointer; }
+  .tl-run-x:focus-visible { outline: 2px solid var(--primary-color, #03a9f4); border-radius: 4px; }
+  .tl-run-sub { color: var(--hfc-muted); margin-top: 2px; }
+  .tl-run-sub span { white-space: nowrap; }
+  .tl-run dl { display: grid; grid-template-columns: max-content 1fr; gap: 3px 16px; margin: 8px 0 0; }
+  .tl-run dt { color: var(--hfc-muted); }
+  .tl-run dd { margin: 0; }
+  .tl-run dd .m { color: var(--hfc-muted); }
   .tl-mark { position: relative; height: 7px; margin-top: 4px; border-radius: 4px; background: color-mix(in srgb, var(--hfc-muted) 10%, transparent); }
   .tl-mark .mseg { position: absolute; top: 0; bottom: 0; min-width: 3px; border-radius: 4px; cursor: pointer; background: ${hfcVar('badge')}; }
   .tl-mark .mseg::before { content: ''; position: absolute; inset: -6px 0; }
@@ -6658,7 +6827,7 @@ class HeatpumpFlowCardEditor extends HTMLElement {
     };
     const custom = Array.isArray(this._config.tiles);
     const controls = r.controls.map((c) => (typeof c === 'string' ? c : c?.entity)).filter(Boolean);
-    const data = { ...this._config, entities: shown, controls, timeline_marks: !!this._config.timeline_marks,
+    const data = { ...this._config, entities: shown, controls, timeline_marks: !!this._config.timeline_marks, timeline_details: this._config.timeline_details !== false,
       errors: this._config.errors !== undefined ? this._config.errors : this._presetErrors,
       error_ok_text: (this._config.error_ok !== undefined ? this._config.error_ok : this._presetErrorOk).join(', '), tiles_custom: custom,
       animations: this._config.animations || 'auto', flow_speed: this._config.flow_speed ?? 1, source_spread: this._config.source_spread !== false,
@@ -6732,6 +6901,7 @@ class HeatpumpFlowCardEditor extends HTMLElement {
     } else if (this._config.valve_map !== undefined) config.valve_map = this._config.valve_map;
     else delete config.valve_map;
     // The switch only knows on and off; a YAML list of marks stays as it is while the switch stays on.
+    if (value.timeline_details !== false) delete config.timeline_details;
     if (!value.timeline_marks) delete config.timeline_marks;
     else if (Array.isArray(this._config.timeline_marks)) config.timeline_marks = this._config.timeline_marks;
     if (!value.animations || value.animations === 'auto') delete config.animations;
