@@ -4685,6 +4685,90 @@
     lc.remove();
   }
 
+  // 22. narrow_focus (#4): on a narrow schematic the key values grow, secondary values move to one line under it or are hidden
+  {
+    const byName = (name, sub = '') => setups.find((s) => s.name === name && s.sub.startsWith(sub));
+    const lambda = byName('Lambda', 'legacy naming'); const ems = byName('Buderus / Bosch'); const ground = byName('Ground source heat pump');
+    const cooling = byName('Cooling dew-point safety');
+    const hassFor = (s, scen = 'heat') => hassOf(toStates(s.states(scen)), s.registry || {}, s.energy, s);
+    const at = async (s, px, extra = {}, scen = 'heat') => {
+      const c = mount({ ...s.config, ...extra }, hassFor(s, scen)); c.style.display = 'block'; c.style.width = `${px}px`; await wait(40);
+      c.hass = hassFor(s, scen); await wait(20); return c;
+    };
+    const el = (c, id) => c.shadowRoot.getElementById(id);
+    const shown = (c, id) => !!el(c, id) && getComputedStyle(el(c, id)).display !== 'none';
+    const size = (c, id) => parseFloat(getComputedStyle(el(c, id)).fontSize);
+    // invalid values, editor switch and labels
+    let threw = false; try { new C().setConfig({ narrow_focus: 'yes' }); } catch (e) { threw = /narrow_focus/.test(e.message); }
+    check(threw, 'narrow_focus: a value other than true or false is rejected');
+    const keysOf = (n) => (n.schema ? n.schema.flatMap(keysOf) : [n.name]);
+    check(C._formSchema({}).schema.flatMap(keysOf).includes('narrow_focus') && Object.keys(HFC_LANGUAGES).every((l) => HFC_EDITOR[l]?.narrow_focus),
+      'narrow_focus: switch in the editor, labelled in every built-in language');
+
+    // option off: nothing of the focus view is drawn
+    let off = await at(lambda, 400);
+    check(!off.shadowRoot.querySelector('ha-card').classList.contains('narrow-focus') && !el(off, 'focus-line') && !el(off, 't-hp-heat')
+      && !off.shadowRoot.querySelector('.nf-big, .nf-moved, .nf-tail, .nf-two'), 'narrow_focus off: no focus line, no extra label, no extra class');
+    const offSizes = { vl: size(off, 't-vl'), cop: size(off, 't-hp-cop'), target: size(off, 't-room-target') };
+    off.remove();
+
+    // option on below 500 px: key values grow, secondary values move or hide
+    let c = await at(lambda, 400, { narrow_focus: true });
+    check(c.shadowRoot.querySelector('ha-card').classList.contains('narrow-focus'), 'narrow_focus: the card carries the class');
+    check(shown(c, 't-hp-heat') && size(c, 't-hp-heat') === 32 && el(c, 't-hp-heat').textContent === '6.3 kW'
+      && !shown(c, 't-hp-power') && !shown(c, 't-hp-status'),
+    `narrow_focus: heat output alone in the heat pump block, input power and status hidden ("${el(c, 't-hp-heat').textContent}", ${size(c, 't-hp-heat')})`);
+    check(size(c, 't-hp-cop') === 32 && size(c, 't-vl') === 30 && size(c, 't-rl') === 30 && size(c, 't-room-target') === 28
+      && size(c, 't-hp-cop') > offSizes.cop && size(c, 't-vl') > offSizes.vl && size(c, 't-room-target') > offSizes.target,
+    `narrow_focus: COP, flow, return and room target grow (${['t-hp-cop', 't-vl', 't-rl', 't-room-target'].map((id) => size(c, id)).join(', ')})`);
+    check(!shown(c, 't-hc') && !shown(c, 't-hc-mode') && !shown(c, 't-src-in') && !shown(c, 't-outdoor-hp')
+      && [...c.shadowRoot.querySelectorAll('.src text')].every((t) => getComputedStyle(t).display === 'none'),
+    'narrow_focus: circuit label, circuit status, air inlet, outdoor and power source texts leave the drawing');
+    const line = el(c, 'focus-line');
+    check(getComputedStyle(line).display === 'block' && line.textContent === 'Outdoor 10.4 °C · Air inlet 9.8 °C · PV 820 W · Battery 0 W · Grid 420 W'
+      && line.querySelectorAll('span').length === 5, `narrow_focus: one line under the schematic ("${line.textContent}")`);
+    check(getComputedStyle(el(c, 't-rl')).transform !== 'none', 'narrow_focus: the return label moves beside the return riser');
+    c.remove();
+    // only the parts that exist: no power sources, no humidity
+    c = await at(ems, 400, { narrow_focus: true });
+    check(el(c, 'focus-line').textContent === 'Outdoor 2.8 °C · Air inlet 3.4 °C', `narrow_focus: missing sources are left out ("${el(c, 'focus-line').textContent}")`);
+    c.remove();
+    // the heat pump is off: a short, smaller status instead of the values
+    c = await at(ems, 400, { narrow_focus: true }, 'idle');
+    check(el(c, 't-hp-heat').textContent === 'Compressor off' && el(c, 't-hp-heat').classList.contains('off') && size(c, 't-hp-heat') === 22,
+      `narrow_focus: an idle heat pump shows the compressor state in smaller type ("${el(c, 't-hp-heat').textContent}")`);
+    c.remove();
+    // the humidity leaves the target line and joins the line under the schematic; a dew-point warning stays in the drawing
+    c = await at(cooling, 400, { narrow_focus: true }, 'defrost');
+    const tail = el(c, 't-room-target').querySelector('.nf-tail');
+    check(!!tail && getComputedStyle(tail).display === 'none' && /(^| · )Humidity \d+ %$/.test(el(c, 'focus-line').textContent),
+      `narrow_focus: humidity moves to the line ("${el(c, 'focus-line').textContent}")`);
+    check(el(c, 't-hc').classList.contains('dew-warning') && shown(c, 't-hc'), 'narrow_focus: a dew-point warning stays in the drawing');
+    c.remove();
+    // several circuits: up to three rows in two lines, the value larger than before
+    c = await at(ground, 400, { narrow_focus: true });
+    check(el(c, 'house-row2').classList.contains('nf-two') && size(c, 't-house-room') === 26 && size(c, 't-house-room2') === 26
+      && !shown(c, 't-outdoor') && /Outdoor -6.5 °C/.test(el(c, 'focus-line').textContent),
+    `narrow_focus: two circuits get two-line room rows; the outdoor temperature moves to the line (${size(c, 't-house-room')})`);
+    c.remove();
+
+    // 500 px and wider: the option changes nothing that is shown
+    for (const s of [lambda, ground]) {
+      off = await at(s, 900); c = await at(s, 900, { narrow_focus: true });
+      const look = (card) => [...card.shadowRoot.querySelectorAll('#svg text')].filter((t) => t.id !== 't-hp-heat')
+        .map((t) => { const cs = getComputedStyle(t); return `${t.id}|${t.textContent}|${cs.display}|${cs.fontSize}|${cs.transform}|${cs.textAnchor}`; }).join('\n');
+      check(look(off) === look(c) && !shown(c, 't-hp-heat') && getComputedStyle(el(c, 'focus-line')).display === 'none',
+        `narrow_focus: no effect on a wide schematic (${s.name})`);
+      off.remove(); c.remove();
+    }
+
+    // together with narrow_values: its kept values stay, narrow_focus decides the rest
+    c = await at(lambda, 400, { narrow_focus: true, narrow_values: true, hc_return_label: true });
+    check(shown(c, 't-buf-bottom') && shown(c, 't-dhw-mode') && !shown(c, 't-hc') && size(c, 't-vl') === 30 && shown(c, 'focus-line'),
+      'narrow_focus with narrow_values: tank sub-values stay, circuit label hidden, flow enlarged');
+    c.remove();
+  }
+
   log.push(`${checks} checks, ${fails.length} failed`);
   document.getElementById('log').textContent = [...log, ...fails.map((f) => `FAIL ${f}`)].join('\n');
   document.getElementById('result').textContent = fails.length ? 'FAIL' : 'PASS';
