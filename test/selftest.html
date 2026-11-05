@@ -3337,6 +3337,34 @@
     check(find(C._formSchema(cfg).schema)?.selector?.entity?.multiple === true, 'editor shows a picker for several entities for a list');
     check(!find(C._formSchema({ preset: 'heishamon' }).schema)?.selector?.entity?.multiple, 'editor keeps the single picker without a list');
   }
+  {
+    // #23: a list of room sensors gives their mean, a list of power or heat meters a sum that forms a COP only when complete.
+    const st = {
+      'sensor.m': 'heating', 'binary_sensor.c': 'on', 'sensor.f': ['35', '°C'], 'sensor.r': ['30', '°C'],
+      'sensor.r1': ['20', '°C'], 'sensor.r2': ['71.6', '°F'], 'climate.r3': 'heat', 'sensor.h1': ['40', '%'], 'sensor.h2': ['50', '%'],
+      'sensor.r4': ['18', '°C'], 'sensor.r5': ['19', '°C'], 'sensor.o1': ['3', '°C'], 'sensor.o2': ['9', '°C'],
+      'sensor.p1': ['600', 'W'], 'sensor.p2': ['0.4', 'kW'], 'sensor.q1': ['2.5', 'kW'], 'sensor.q2': ['1500', 'W'],
+    };
+    const states = toStates(st); states['climate.r3'].attributes = { current_temperature: 25 };
+    const ents = { mode: 'sensor.m', compressor: 'binary_sensor.c', flow: 'sensor.f', return: 'sensor.r', room: ['sensor.r1', 'sensor.r2'], room_humidity: ['sensor.h1', 'sensor.h2'],
+      hc2_room: ['sensor.r4', 'sensor.r5', 'climate.r3'], outdoor: ['sensor.o1', 'sensor.o2'], power: ['sensor.p1', 'sensor.p2'], heat: ['sensor.q1', 'sensor.q2'] };
+    const cfg = { hc_count: 2, entities: ents };
+    const card = mount(cfg, hassOf(states)); await wait(20);
+    const r1 = card._n('room'); const h = card._n('room_humidity'); const r2 = card._n('hc2_room');
+    check(Math.abs(r1 - 21) < 1e-9 && h === 45 && Math.abs(r2 - 62 / 3) < 1e-9 && card._n('outdoor') === 3,
+      `#23: rooms and humidity are averaged (°F converted, climate entities by their current temperature), other keys take the first entity (${r1} / ${h} / ${r2} / ${card._n('outdoor')})`);
+    const cop = () => card.shadowRoot.getElementById('t-hp-cop')?.textContent || '';
+    check(card._w('power') === 1000 && card._kw('heat') === 4 && /COP 4\.0/.test(cop()), `#23: complete sums of power and heat give the COP (${cop()})`);
+    card.hass = hassOf(toStates({ ...st, 'sensor.r1': 'unavailable', 'sensor.p2': 'unavailable' })); await wait(10);
+    check(Math.abs(card._n('room') - 22) < 1e-9 && card._w('power') === 600 && cop() === '',
+      `#23: a missing room sensor leaves the others, a missing power meter leaves the sum shown but no COP (${card._n('room')} / ${card._w('power')} / "${cop()}")`);
+    card.hass = hassOf(toStates({ ...st, 'sensor.r1': 'unavailable', 'sensor.r2': 'unknown' })); await wait(10);
+    check(Number.isNaN(card._n('room')), '#23: without any room value the mean is unknown');
+    card.remove();
+    const report = C._diagnosticReport(cfg, hassOf(states));
+    check(report.includes('- room (average 1): sensor.r1') && report.includes('- room (average 2): sensor.r2') && report.includes('- power (sum 2): sensor.p2'),
+      '#23: the diagnostic report names averaged and summed members');
+  }
 
   // 18f. HeishaMon: refrigerant temperatures and the superheat computed from them
   {
