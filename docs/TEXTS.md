@@ -206,6 +206,7 @@ dhw_top
 room
 brine_pressure
 hc_pressure
+hc_spread
 pv_share
 pv_boost_share
 pv_production
