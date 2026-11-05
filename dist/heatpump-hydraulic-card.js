@@ -1340,7 +1340,7 @@ const HFC_I18N = {
       starts: 'Compressor starts', cycles_heating: 'Heating cycles', cycles_dhw: 'DHW cycles', cycles_cooling: 'Cooling cycles', defrosts: 'Defrosts',
       hours: 'Compressor hours', hours_per_start: 'Runtime per start', load_classes: 'Load classes 1-5', aux_hours: 'Heater hours', aux_starts: 'Heater starts',
       spread: 'Spread', volume: 'Flow rate', heat_estimated: 'Heat output', power: 'Power', heat_live: 'Heat output', compressor_speed: 'Compressor',
-      source_spread: 'Source spread', outdoor: 'Outdoor', dhw_top: 'DHW tank', room: 'Room', brine_pressure: 'Brine pressure', hc_pressure: 'Heating pressure', pv_share: 'PV share today',
+      source_spread: 'Source spread', outdoor: 'Outdoor', dhw_top: 'DHW tank', room: 'Room', brine_pressure: 'Brine pressure', hc_pressure: 'Heating pressure', hc_spread: 'Circuit spread', pv_share: 'PV share today',
       pv_boost_share: 'PV surplus share of heating', pv_production: 'PV yield', solar_thermal: 'Solar thermal', cost: 'Cost', dhw_loss: 'DHW standby loss',
     },
     periods: { now: 'now', today: 'today', yesterday: 'yesterday', week: 'week', month: 'month', year: 'year', total: 'total' },
@@ -1383,7 +1383,7 @@ const HFC_I18N = {
       starts: 'Verdichterstarts', cycles_heating: 'Heizzyklen', cycles_dhw: 'WW-Zyklen', cycles_cooling: 'Kühlzyklen', defrosts: 'Abtauungen',
       hours: 'Verdichterstunden', hours_per_start: 'Laufzeit pro Start', load_classes: 'Lastklassen 1-5', aux_hours: 'Heizstab-Stunden', aux_starts: 'Heizstab-Starts',
       spread: 'Spreizung', volume: 'Volumenstrom', heat_estimated: 'Wärmeleistung', power: 'Leistung', heat_live: 'Wärmeleistung', compressor_speed: 'Verdichter',
-      source_spread: 'Spreizung Quelle', outdoor: 'Außen', dhw_top: 'WW-Speicher', room: 'Raum', brine_pressure: 'Soledruck', hc_pressure: 'Heizungsdruck', pv_share: 'PV-Anteil heute',
+      source_spread: 'Spreizung Quelle', outdoor: 'Außen', dhw_top: 'WW-Speicher', room: 'Raum', brine_pressure: 'Soledruck', hc_pressure: 'Heizungsdruck', hc_spread: 'Spreizung Heizkreis', pv_share: 'PV-Anteil heute',
       pv_boost_share: 'PV-Überschuss-Anteil am Heizen', pv_production: 'PV-Ertrag', solar_thermal: 'Solarthermie', cost: 'Kosten', dhw_loss: 'WW-Standbyverlust',
     },
     periods: { now: 'aktuell', today: 'heute', yesterday: 'gestern', week: 'Woche', month: 'Monat', year: 'Jahr', total: 'gesamt' },
@@ -1428,7 +1428,7 @@ const HFC_I18N = {
       starts: 'Štarty kompresora', cycles_heating: 'Vykurovacie cykly', cycles_dhw: 'Cykly TÚV', cycles_cooling: 'Chladiace cykly', defrosts: 'Odmrazovania',
       hours: 'Prevádzkové hodiny', hours_per_start: 'Doba behu na štart', load_classes: 'Záťažové triedy 1-5', aux_hours: 'Hodiny prídavného ohrevu', aux_starts: 'Štarty prídavného ohrevu',
       spread: 'Rozpätie', volume: 'Prietok', heat_estimated: 'Tepelný výkon', power: 'Výkon', heat_live: 'Tepelný výkon', compressor_speed: 'Kompresor',
-      source_spread: 'Rozpätie zdroja', outdoor: 'Vonku', dhw_top: 'Nádrž TÚV', room: 'Izba', brine_pressure: 'Tlak nemrznúcej zmesi', hc_pressure: 'Tlak vykurovania', pv_share: 'Podiel FVE dnes',
+      source_spread: 'Rozpätie zdroja', outdoor: 'Vonku', dhw_top: 'Nádrž TÚV', room: 'Izba', brine_pressure: 'Tlak nemrznúcej zmesi', hc_pressure: 'Tlak vykurovania', hc_spread: 'Rozpätie okruhu', pv_share: 'Podiel FVE dnes',
       pv_boost_share: 'Podiel prebytku FVE na vykurovaní', pv_production: 'Výnos FVE', solar_thermal: 'Solárne teplo', cost: 'Náklady', dhw_loss: 'Pohotovostná strata TÚV',
     },
     periods: { now: 'teraz', today: 'dnes', yesterday: 'včera', week: 'týždeň', month: 'mesiac', year: 'rok', total: 'celkovo' },
@@ -1472,7 +1472,7 @@ const HFC_I18N = {
       starts: 'Starty kompresoru', cycles_heating: 'Topné cykly', cycles_dhw: 'Cykly TUV', cycles_cooling: 'Chladicí cykly', defrosts: 'Odmrazování',
       hours: 'Provozní hodiny', hours_per_start: 'Doba běhu na start', load_classes: 'Zátěžové třídy 1-5', aux_hours: 'Hodiny přídavného ohřevu', aux_starts: 'Starty přídavného ohřevu',
       spread: 'Rozpětí', volume: 'Průtok', heat_estimated: 'Tepelný výkon', power: 'Výkon', heat_live: 'Tepelný výkon', compressor_speed: 'Kompresor',
-      source_spread: 'Rozpětí zdroje', outdoor: 'Venku', dhw_top: 'Nádrž TUV', room: 'Pokoj', brine_pressure: 'Tlak nemrznoucí směsi', hc_pressure: 'Tlak vytápění', pv_share: 'Podíl FVE dnes',
+      source_spread: 'Rozpětí zdroje', outdoor: 'Venku', dhw_top: 'Nádrž TUV', room: 'Pokoj', brine_pressure: 'Tlak nemrznoucí směsi', hc_pressure: 'Tlak vytápění', hc_spread: 'Rozpětí okruhu', pv_share: 'Podíl FVE dnes',
       pv_boost_share: 'Podíl přebytku FVE na vytápění', pv_production: 'Výnos FVE', solar_thermal: 'Solární teplo', cost: 'Náklady', dhw_loss: 'Pohotovostní ztráta TUV',
     },
     periods: { now: 'nyní', today: 'dnes', yesterday: 'včera', week: 'týden', month: 'měsíc', year: 'rok', total: 'celkově' },
@@ -1515,7 +1515,7 @@ const HFC_I18N = {
       starts: 'Compressorstarts', cycles_heating: 'Verwarmingscycli', cycles_dhw: 'Warmwatercycli', cycles_cooling: 'Koelcycli', defrosts: 'Ontdooiingen',
       hours: 'Compressoruren', hours_per_start: 'Looptijd per start', load_classes: 'Lastklassen 1-5', aux_hours: 'Uren bijverwarming', aux_starts: 'Starts bijverwarming',
       spread: 'ΔT', volume: 'Debiet', heat_estimated: 'Warmtevermogen', power: 'Vermogen', heat_live: 'Warmtevermogen', compressor_speed: 'Compressor',
-      source_spread: 'ΔT bron', outdoor: 'Buiten', dhw_top: 'Warmwatervat', room: 'Kamer', brine_pressure: 'Brondruk', hc_pressure: 'Verwarmingsdruk', pv_share: 'PV-aandeel vandaag',
+      source_spread: 'ΔT bron', outdoor: 'Buiten', dhw_top: 'Warmwatervat', room: 'Kamer', brine_pressure: 'Brondruk', hc_pressure: 'Verwarmingsdruk', hc_spread: 'ΔT groep', pv_share: 'PV-aandeel vandaag',
       pv_boost_share: 'Aandeel PV-overschot in verwarmen', pv_production: 'PV-opbrengst', solar_thermal: 'Zonthermie', cost: 'Kosten', dhw_loss: 'Stilstandsverlies warm water',
     },
     periods: { now: 'nu', today: 'vandaag', yesterday: 'gisteren', week: 'week', month: 'maand', year: 'jaar', total: 'totaal' },
@@ -2298,6 +2298,8 @@ const HFC_TILES = {
   spread: { live: true }, volume: { live: true }, heat_estimated: { live: true }, power: { live: true }, heat_live: { live: true },
   compressor_speed: { live: true }, source_spread: { live: true }, outdoor: { live: true }, dhw_top: { live: true }, room: { live: true },
   brine_pressure: { live: true }, hc_pressure: { live: true },
+  // Spread of a heating circuit from its own flow and return sensors, one tile per circuit (#290).
+  hc_spread: { live: true }, hc2_spread: { live: true }, hc3_spread: { live: true }, hc4_spread: { live: true }, hc5_spread: { live: true }, hc6_spread: { live: true },
   pv_share: { live: true },
   // Share of the heating time in PV surplus mode, from the recorder history of the mode and the `pv_boost` entity.
   pv_boost_share: { kind: 'share', periods: ['today', 'yesterday', 'week'] },
@@ -4100,6 +4102,12 @@ class HeatpumpFlowCard extends HTMLElement {
 
   _tileLabel(key, period, I = this._i) {
     const def = HFC_TILES[key];
+    // A circuit spread is named after its circuit: the configured name, else the number from circuit 2 on.
+    const hc = HeatpumpFlowCard._hcSpreadCircuit(key);
+    if (hc) {
+      const own = this._config?.[this._hk(hc, 'name')];
+      return own ? `${I.tiles.hc_spread} · ${own}` : hc > 1 ? `${I.tiles.hc_spread} ${hc}` : String(I.tiles.hc_spread);
+    }
     const name = String(I.tiles[key]);
     const word = def.live || def.noSuffix || !period ? '' : String(I.periods[period]);
     // A name that already ends in the period word does not repeat it: "COP gesamt" for the total, not "COP gesamt · gesamt" (#288).
@@ -4319,9 +4327,14 @@ class HeatpumpFlowCard extends HTMLElement {
     return out(v, 1, '');
   }
 
+  // The circuit of a circuit-spread tile (hc_spread = 1, hc2_spread = 2 …), else 0.
+  static _hcSpreadCircuit(key) { const m = /^hc(\d)?_spread$/.exec(key); return m ? +(m[1] || 1) : 0; }
+
   // Live tiles: current values from the schematic entities.
   _liveAvail(key) {
     const h = (k) => this._has(k);
+    const hc = HeatpumpFlowCard._hcSpreadCircuit(key);
+    if (hc) return hc <= (this._hcCount ?? hfcHcCount(this._config)) && h(this._hk(hc, 'flow')) && h(this._hk(hc, 'return'));
     return !!{
       cop_live: h('power') && (h('heat') || (h('volume') && h('flow') && h('return'))),
       spread: h('flow') && h('return'), volume: h('volume'),
@@ -4335,6 +4348,12 @@ class HeatpumpFlowCard extends HTMLElement {
 
   _liveTile(key, L) {
     const f = (v, d, u) => (Number.isFinite(v) ? `${this._fmt(v, d)} ${u}`.trim() : '–');
+    // Like the heat-pump spread, a circuit spread is shown only while water moves through the circuit.
+    const hc = HeatpumpFlowCard._hcSpreadCircuit(key);
+    if (hc) {
+      const on = (L.circuits || []).find((c) => c.n === hc)?.on;
+      return [on ? f(this._n(this._hk(hc, 'flow')) - this._n(this._hk(hc, 'return')), 1, 'K') : '–', this._e[this._hk(hc, 'flow')]];
+    }
     switch (key) {
       case 'cop_live': return [Number.isFinite(L.cop) ? `${L.heatEstimated ? '≈' : ''}${this._fmt(L.cop, 1)}` : '–', this._e.heat || this._e.power];
       case 'spread': return [L.loop ? f(L.spread, 1, 'K') : '–', this._e.flow];
@@ -6258,7 +6277,7 @@ class HeatpumpFlowCard extends HTMLElement {
     // statistics: the tile catalog when `tiles` is set, otherwise the default tiles
     const share = this._n('pv_share_today');
     const custom = Array.isArray(this._config.tiles);
-    const tiles = custom ? this._catalogTiles({ loop, flowLoop, spread, vol, heat, heatEstimated, power, cop }) : [];
+    const tiles = custom ? this._catalogTiles({ loop, flowLoop, spread, vol, heat, heatEstimated, power, cop, circuits: F.circuits }) : [];
     const add = (key, label, value) => { if (!custom && this._has(key)) tiles.push([this._statLabel(key, label), value, this._e[key]]); };
     add('cop_heating_today', i.stat_cop_heating, this._fmt(this._n('cop_heating_today'), 2));
     add('cop_dhw_today', i.stat_cop_dhw, this._fmt(this._n('cop_dhw_today'), 2));

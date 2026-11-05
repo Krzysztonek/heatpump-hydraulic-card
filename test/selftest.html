@@ -1502,6 +1502,27 @@
     document.querySelectorAll('heatpump-flow-card').forEach((c) => c.remove());
   }
   {
+    // #290: spread of a heating circuit from its own flow and return, one tile per circuit, shown while the circuit flows.
+    const ents = { mode: 'sensor.m', compressor: 'binary_sensor.c', flow: 'sensor.f', return: 'sensor.r', hc_flow: 'sensor.hf', hc_return: 'sensor.hr', hc_pump: 'binary_sensor.p1',
+      hc2_flow: 'sensor.hf2', hc2_return: 'sensor.hr2', hc2_pump: 'binary_sensor.p2', hc3_flow: 'sensor.hf3', hc3_return: 'sensor.hr3' };
+    const st = toStates({ 'sensor.m': 'heating', 'binary_sensor.c': 'on', 'sensor.f': ['34.3', '°C'], 'sensor.r': ['31.8', '°C'], 'sensor.hf': ['31.7', '°C'], 'sensor.hr': ['29.6', '°C'],
+      'binary_sensor.p1': 'on', 'sensor.hf2': ['30', '°C'], 'sensor.hr2': ['28', '°C'], 'binary_sensor.p2': 'off', 'sensor.hf3': ['30', '°C'], 'sensor.hr3': ['27', '°C'] });
+    const cfg = { hc_count: 2, hc2_name: 'OG', buffer: true, entities: ents, tiles: ['hc_spread', 'hc2_spread', 'hc3_spread'] };
+    const card = mount(cfg, hassOf(st)); await wait(20);
+    const rows = tileRows(card);
+    check(JSON.stringify(rows) === JSON.stringify([['Circuit spread', '2.1 K'], ['Circuit spread · OG', '–']]),
+      `#290: circuit spread per circuit, named after the circuit, "–" while it stands, none beyond hc_count (${JSON.stringify(rows)})`);
+    card.remove();
+    const hass = hassOf(st);
+    // Without a selection: the editor always lists tiles that are already selected.
+    const offered = { ...cfg, tiles: undefined };
+    const opts = C._tileOptions(offered, C._resolve(offered, hass), hass).options.map((o) => o.value);
+    const noReturn = { ...offered, entities: { ...ents, hc_return: undefined } };
+    const optsNoReturn = C._tileOptions(noReturn, C._resolve(noReturn, hass), hass).options.map((o) => o.value);
+    check(opts.includes('hc_spread') && opts.includes('hc2_spread') && !opts.includes('hc3_spread') && !optsNoReturn.includes('hc_spread') && optsNoReturn.includes('hc2_spread'),
+      `#290: the editor offers a circuit spread only with both sensors of that circuit (${opts.filter((o) => o.includes('hc')).join(',')})`);
+  }
+  {
     const s = setups[0];
     const hass = hassOf(toStates(s.states('heat')), {}, null, s);
     const o = C._tileOptions(s.config, C._resolve(s.config, hass), hass);

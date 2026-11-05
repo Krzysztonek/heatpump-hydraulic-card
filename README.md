@@ -381,9 +381,11 @@ Periods: `now`, `today`, `yesterday`, `week`, `month`, `year`, `total`. A tile i
 | Environmental energy | `env_energy` |
 | Heat | `heat`, `heat_heating`, `heat_dhw`, `heat_cooling`, `heat_defrost` |
 | Starts and runtime | `starts`, `cycles_heating`, `cycles_dhw`, `cycles_cooling`, `defrosts`, `hours`, `hours_per_start`, `load_classes`, `aux_hours`, `aux_starts` |
-| Live | `spread`, `volume`, `heat_estimated`, `power`, `heat_live`, `compressor_speed`, `source_spread`, `outdoor`, `dhw_top`, `room`, `brine_pressure`, `hc_pressure`, `pv_share` |
+| Live | `spread`, `volume`, `heat_estimated`, `power`, `heat_live`, `compressor_speed`, `source_spread`, `outdoor`, `dhw_top`, `room`, `brine_pressure`, `hc_pressure`, `hc_spread` … `hc6_spread`, `pv_share` |
 | Other | `pv_production`, `solar_thermal` (ViCare), `cost`, `dhw_loss` (hot-water standby loss, K/h) |
 | PV surplus | `pv_boost_share` (needs `pv_boost`; periods `today`, `yesterday`, `week`) |
+
+`hc_spread` is the spread of heating circuit 1 from its own `hc_flow` and `hc_return`, `hc2_spread` … `hc6_spread` that of the other circuits. Next to `spread` (flow minus return of the heat pump) it shows what the circuit takes behind a buffer or mixer. A circuit spread is offered when both sensors of that circuit are mapped, shows "–" while no water moves through the circuit, and carries the circuit name (`hc2_name` …) or its number.
 
 What the presets provide:
 - **Lambda:** COP heating/DHW/cooling per day, month, year and in total; electricity and heat per mode including defrost and standby; starts, heating/DHW/cooling cycles and defrosts per day and yesterday.
