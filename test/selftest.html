@@ -508,19 +508,21 @@
     const at = (min, s) => ({ s: String(s), lu: (T0 + min * M) / 1000 });
     const series = {
       'sensor.tank': [at(0, 41.2), at(20, 47), at(40, 52.0)], 'sensor.tgt': [at(0, 52)], 'binary_sensor.rod': [at(0, 'off'), at(25, 'on'), at(35, 'off')],
-      'binary_sensor.df': [at(0, 'off')],
+      'binary_sensor.aux': [at(0, 'on'), at(10, 'off'), at(30, 'on'), at(32, 'off')], 'binary_sensor.df': [at(0, 'off')],
       'sensor.f': [at(0, 33), at(20, 35)], 'sensor.r': [at(0, 30), at(20, 31)], 'sensor.hf': [at(0, 31)], 'sensor.hr': [at(0, 29)], 'sensor.set': [at(0, 34)],
-      'sensor.mod': [at(0, 30), at(20, 50)], 'sensor.vol': [at(0, 18), at(10, -1), at(20, 18)], 'sensor.out': [at(0, 3)],
+      'sensor.mod': [at(0, 30), at(20, 50)], 'sensor.vol': [at(0, 18), at(10, -1), at(20, 24)], 'sensor.out': [at(0, 3)],
     };
     const queries = [];
-    const st = toStates({ 'sensor.tank': ['52', '°C'], 'sensor.tgt': ['52', '°C'], 'binary_sensor.rod': 'off', 'binary_sensor.df': 'off', 'sensor.f': ['35', '°C'],
+    const st = toStates({ 'sensor.tank': ['52', '°C'], 'sensor.tgt': ['52', '°C'], 'binary_sensor.rod': 'off', 'binary_sensor.aux': 'off', 'binary_sensor.norec': 'off',
+      'binary_sensor.df': 'off', 'sensor.f': ['35', '°C'],
       'sensor.r': ['31', '°C'], 'sensor.hf': ['31', '°C'], 'sensor.hr': ['29', '°C'], 'sensor.set': ['34', '°C'], 'sensor.mod': ['50', '%'], 'sensor.vol': ['18', 'L/min'],
       'sensor.out': ['3', '°C'], 'sensor.c': ['50', '%'] });
     const hass = { ...hassOf(st), callWS: (m) => {
       queries.push(m);
       return m.type === 'history/history_during_period' ? Promise.resolve(Object.fromEntries(m.entity_ids.map((id) => [id, series[id] || []]))) : Promise.reject(new Error('not simulated'));
     } };
-    const card = mount({ timeline: true, entities: { compressor: 'sensor.c', dhw_top: 'sensor.tank', dhw_target: 'sensor.tgt', dhw_heater: 'binary_sensor.rod', defrost: 'binary_sensor.df',
+    const card = mount({ timeline: true, entities: { compressor: 'sensor.c', dhw_top: 'sensor.tank', dhw_target: 'sensor.tgt', dhw_heater: 'binary_sensor.rod', heater: 'binary_sensor.aux',
+      dhw_heater_top: 'binary_sensor.norec', defrost: 'binary_sensor.df',
       flow: 'sensor.f', return: 'sensor.r', hc_flow: 'sensor.hf', hc_return: 'sensor.hr', hc_setpoint: 'sensor.set', compressor_speed: 'sensor.mod', volume: 'sensor.vol', outdoor: 'sensor.out' } }, hass);
     await wait(30);
     const base = { from: T0, to: T0 + 40 * M, source: 'run', partial: false, ongoing: false, pause: null, series: 1, seriesFrom: T0 };
@@ -531,14 +533,19 @@
     check(q && q.start_time === new Date(T0).toISOString() && q.end_time === new Date(T0 + 40 * M).toISOString(), 'run values: one query for the window of the run');
     const text = (rows) => rows.map(([k, v]) => `${k}: ${v.replace(/<[^>]+>/g, '')}`).join(' | ');
     const dhwRows = text(card._runValues(dhwRun));
-    check(/DHW tank: 41\.2 °C → 52\.0 °C \(\+10\.8 K\)/.test(dhwRows) && /Target 52\.0 °C: reached/.test(dhwRows) && /Heater rod: on · 10 min/.test(dhwRows) && /Defrosts: 0/.test(dhwRows),
-      `run values, hot water: tank, target, heater rod, defrosts (${dhwRows})`);
+    check(/DHW tank: 41\.2 °C → 52\.0 °C \(\+10\.8 K\)/.test(dhwRows) && /Target 52\.0 °C: reached/.test(dhwRows) && /Heater rod: on · 20 min/.test(dhwRows) && /Defrosts: 0/.test(dhwRows),
+      `run values, hot water: tank, target, heaters one after the other add up, an overlap counts once, a heater without history is left out, defrosts (${dhwRows})`);
+    // A run that starts before the first tank sample has no start value: the later sample is not moved back to the start.
+    const early = { ...dhwRun, from: T0 - 10 * M };
+    card._runValues(early); await wait(20);
+    const earlyRows = text(card._runValues(early));
+    check(!/DHW tank/.test(earlyRows) && /Target 52\.0 °C: reached/.test(earlyRows), `run values: no tank start without a sample at or before the start (${earlyRows})`);
     const heatRun = { ...base, kind: 'heat', phases: [{ kind: 'heat', from: T0, to: T0 + 40 * M }] };
     card._runValues(heatRun); await wait(20);
     const heatRows = text(card._runValues(heatRun));
     check(/Flow Ø: 34\.0 °C \(Target 34\.0\)/.test(heatRows) && /Spread Ø: 3\.5 K · Heating circuit 2\.0 K/.test(heatRows) && /Compressor Ø: 40 %/.test(heatRows)
-      && /Flow rate Ø: 1,?080 l\/h/.test(heatRows) && /Outdoor Ø: 3\.0 °C/.test(heatRows),
-      `run values, heating: time-weighted means, -1 l/min left out (${heatRows})`);
+      && /Flow rate Ø: 1,?320 l\/h/.test(heatRows) && /Outdoor Ø: 3\.0 °C/.test(heatRows),
+      `run values, heating: time-weighted means, -1 l/min ends the value before it and its gap is left out (${heatRows})`);
     const html = card._runPanel(heatRun, card._runValues(heatRun));
     check(/<dl><dt>Flow Ø<\/dt><dd>/.test(html), 'the panel lists the values');
     // A run that is still going ends "now", which moves with every update: one open-ended query, not one per update.
@@ -547,6 +554,14 @@
     card._runValues({ ...heatRun, ongoing: true, to: T0 + 43 * M });
     const open = queries.slice(before);
     check(open.length === 1 && !open[0].end_time, `an ongoing run asks once, without an end time (${open.length} queries)`);
+    // A run cut by the window starts at the window start, which moves with every update: one identity, one query.
+    const cutBefore = queries.length;
+    card._runValues({ ...heatRun, partial: true, from: T0 + 1 * M }); card._runValues({ ...heatRun, partial: true, from: T0 + 2 * M }); await wait(20);
+    card._runValues({ ...heatRun, partial: true, from: T0 + 3 * M });
+    check(queries.length - cutBefore === 1 && card._runId({ partial: true, from: 5, to: 20 }) === card._runId({ partial: true, from: 9, to: 20 }) && card._runId({ from: 5 }) === '5',
+      `a run cut by the window keeps its identity as the window moves (${queries.length - cutBefore} queries)`);
+    check(card._runId({ partial: true, from: 5, to: 20 }) !== card._runId({ partial: true, from: 30, to: 50 }),
+      'the next run cut by the window is another run, so a selection does not pass to it');
     card.remove();
   }
   {
@@ -802,6 +817,7 @@
       circuitPump2: add('binary_sensor', 'circuit_2_pump', 'on'),
       cop: add('sensor', 'cop_heating_today', '4.2'),
       dhwStatus: add('sensor', 'domestic_hot_water_status', 'active'),
+      pressure: add('sensor', 'water_pressure', '1.6'),
     };
     const hass = hassOf(toStates(states), registry);
     const stubConfig = C.getStubConfig(hass);
@@ -816,6 +832,10 @@
       && resolved.entities.hc2_setpoint === ids.circuitTarget2 && resolved.entities.hc2_pump === ids.circuitPump2
       && resolved.tiles.cop_heating.today === ids.cop, 'Open3E preset maps both circuits and daily COP entities');
     check(stubConfig.hc_count === 2, `Open3E detects two circuits (got ${stubConfig.hc_count})`);
+    check(resolved.entities.hc_pressure === ids.pressure && !resolved.entities.brine_pressure && !resolved.entities.hc2_pressure,
+      `#318: Open3E water pressure is the heating pressure at circuit 1, not a brine pressure (${resolved.entities.hc_pressure} / ${resolved.entities.brine_pressure})`);
+    const second = C._resolve({ preset: 'open3e', hc_count: 1, index: { hc: 2 } }, hass).entities;
+    check(second.hc_pressure === ids.pressure && second.hc_flow === ids.circuitFlow2, 'Open3E: the heating pressure stays when the card starts at circuit 2');
     const card = mount({ preset: 'open3e' }, hass);
     check(/Hot water/.test(card.shadowRoot.getElementById('chip-mode')?.textContent || ''), 'Open3E hot_water valve state selects DHW mode');
     check(/Hot water/.test(card.shadowRoot.getElementById('t-dhw-mode')?.textContent || ''), 'Open3E domestic_hot_water_status "active" shows hot water charging');
@@ -2718,6 +2738,24 @@
     c.shadowRoot.querySelector('#timeline .seg.k-heat').dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }));
     check(!q('#tl-run'), 'a second tap on the same run closes the panel');
     c.remove();
+    {
+      // A period that holds several runs (the mode stays on heating while the compressor cycles): the tap selects the run
+      // under the pointer, not the first run of the period.
+      const H = 3600000; const now = Date.now();
+      const lu = (h, s) => ({ s, lu: (now - h * H) / 1000 });
+      const series = { 'sensor.m': [lu(30, 'heating')], 'sensor.c': [lu(30, 'off'), lu(10, 'on'), lu(9, 'off'), lu(4, 'on'), lu(3, 'off')] };
+      const h = { ...hassOf(toStates({ 'sensor.m': 'heating', 'sensor.c': 'off' })), callWS: (m) => (m.type === 'history/history_during_period'
+        ? Promise.resolve(Object.fromEntries(m.entity_ids.map((id) => [id, series[id] || []]))) : Promise.reject(new Error('not simulated'))) };
+      const k = mount({ timeline: true, entities: { mode: 'sensor.m', compressor: 'sensor.c' } }, h); await wait(60);
+      const seg = k.shadowRoot.querySelector('#timeline .seg.k-heat');
+      const runsIn = k._tl ? k._tl.runs.filter((r) => k._tl.segs[+seg.dataset.seg].from < r.to && k._tl.segs[+seg.dataset.seg].to > r.from) : [];
+      const target = runsIn[runsIn.length - 1];
+      const bar = k.shadowRoot.getElementById('tl-bar').getBoundingClientRect();
+      const x = target ? bar.left + (((target.from + target.to) / 2 - k._tl.start) / (k._tl.now - k._tl.start)) * bar.width : 0;
+      seg.dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true, clientX: x, clientY: bar.top + 2 }));
+      check(runsIn.length === 2 && k._tlRun === k._runId(target), `a tap selects the run at the tapped time, not the first run of the period (${runsIn.length} runs)`);
+      k.remove();
+    }
     // The wall display, which nobody taps, keeps the one-line detail; the arrow keys step through runs there as well.
     c = await tl(s, { layout: 'wall' });
     c.shadowRoot.querySelector('#timeline .seg.k-heat').dispatchEvent(new MouseEvent('click', { bubbles: true, composed: true }));
