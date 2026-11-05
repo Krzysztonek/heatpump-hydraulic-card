@@ -2089,6 +2089,9 @@ const HFC_MAX_HC = 6;
 // Entities that make a preset match useful; the best match is the preset that finds most of them live (#143).
 const HFC_CORE_KEYS = ['mode', 'compressor', 'power', 'flow', 'return', 'dhw_top'];
 const hfcHcCount = (config) => Math.min(Math.max(Math.round(+config?.hc_count) || 1, 1), HFC_MAX_HC);
+// Keys whose list of entities is averaged (#23): room temperature and humidity of each circuit. Power, heat and the power
+// sources add up their lists instead; every other key takes the first entity of a list.
+const hfcMeanKey = (key) => /^(hc[2-6]_)?room(_humidity)?$/.test(key);
 
 const HFC_ENTITY_GROUPS = {
   sec_hp: ['mode', 'status', 'compressor', 'fan_speed', 'defrost', 'power', 'heat', 'flow', 'return', 'volume', 'source_volume', 'source_in', 'source_out', 'brine_pressure', 'outdoor', 'valve', 'heater', 'pv_boost', 'sg_ready'],
@@ -3124,7 +3127,7 @@ class HeatpumpFlowCard extends HTMLElement {
       ...detection,
       '',
       'Entity mappings (source: [preset] found by the preset, [own] set in the card configuration):',
-      ...keys.filter((key) => r.entities[key]).flatMap((key) => (r.sums[key] ? r.sums[key].map((id, n) => `${entityLine(`${key} (sum ${n + 1})`, id)} [${source(key, id)}]`)
+      ...keys.filter((key) => r.entities[key]).flatMap((key) => (r.sums[key] ? r.sums[key].map((id, n) => `${entityLine(`${key} (${hfcMeanKey(key) ? 'average' : 'sum'} ${n + 1})`, id)} [${source(key, id)}]`)
         : [`${entityLine(key, r.entities[key])} [${source(key, r.entities[key])}]`])),
       ...(cleared.length ? [`- Cleared on purpose: ${cleared.join(', ')}`] : []),
       `- Not mapped: ${unmapped.length ? unmapped.join(', ') : 'none'} (an empty key is fine when the installation does not have it)`,
@@ -3342,10 +3345,28 @@ class HeatpumpFlowCard extends HTMLElement {
   _has(key) { return !!this._st(key); }
   _s(key) { return this._st(key)?.state; }
   _n(key) {
+    if (this._sums?.[key] && hfcMeanKey(key)) return this._mean(key);
     const attr = hfcTempAttr(this._e[key], key);
     const v = parseFloat(attr ? this._st(key)?.attributes?.[attr] : this._s(key));
     return Number.isFinite(v) ? v : NaN;
   }
+  // Mean of a list of room sensors (#23): the members that report a number, each converted to the unit of the first member,
+  // so the key keeps that member's unit. Unknown only when no member reports a number.
+  _mean(key) {
+    const unitOf = (id) => String(this._hass?.states[id]?.attributes?.unit_of_measurement || '').trim().toLowerCase().replace(/º/g, '°').replace('℃', '°c').replace('℉', '°f');
+    const toC = (v, u) => (u === '°f' ? (v - 32) * 5 / 9 : u === 'k' ? v - 273.15 : v);
+    const fromC = (v, u) => (u === '°f' ? v * 9 / 5 + 32 : u === 'k' ? v + 273.15 : v);
+    const humidity = key.endsWith('_humidity'); const base = unitOf(this._e[key]);
+    const values = this._sums[key].map((id) => {
+      const st = this._hass?.states[id]; const attr = hfcTempAttr(id, key);
+      const v = parseFloat(attr ? st?.attributes?.[attr] : st?.state);
+      return !Number.isFinite(v) || humidity ? v : fromC(toC(v, unitOf(id)), base);
+    }).filter(Number.isFinite);
+    return values.length ? values.reduce((a, b) => a + b, 0) / values.length : NaN;
+  }
+  // A sum is complete when every member reports a number. An incomplete sum is still shown, but no COP is formed from it:
+  // with one of two units of a cascade missing, heat and power would not belong to the same machines (#23, #173).
+  _sumComplete(key) { return !this._sums?.[key] || this._sums[key].every((id) => Number.isFinite(hfcPowerW(this._hass?.states[id]))); }
   _unit(key) { return String(this._st(key)?.attributes?.unit_of_measurement || '').toLowerCase(); }
   // Absolute temperature normalized to Celsius. Most of the drawing uses the installation's native values, but physical
   // calculations (dew point and its margin) need one common scale; a temperature difference in °F is not a kelvin difference.
@@ -6099,7 +6120,7 @@ class HeatpumpFlowCard extends HTMLElement {
     this._txt('t-hp-power', running
       ? (Number.isFinite(power) ? `${this._fmt(power, 0)} W${heatTxt ? ` → ${heatTxt}` : ''}` : (heatTxt || i.running))
       : i.compressor_off);
-    const cop = running && power > 50 && heat > 0 ? (heat * 1000) / power : NaN;
+    const cop = running && power > 50 && heat > 0 && this._sumComplete('power') && this._sumComplete('heat') ? (heat * 1000) / power : NaN;
     this._txt('t-hp-cop', Number.isFinite(cop) ? `COP ${heatEstimated ? '≈' : ''}${this._fmt(cop, 1)}` : '');
     const hpHeat = this._$('t-hp-heat');
     if (hpHeat) {
