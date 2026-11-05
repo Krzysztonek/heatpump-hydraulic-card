@@ -558,8 +558,10 @@
     const cutBefore = queries.length;
     card._runValues({ ...heatRun, partial: true, from: T0 + 1 * M }); card._runValues({ ...heatRun, partial: true, from: T0 + 2 * M }); await wait(20);
     card._runValues({ ...heatRun, partial: true, from: T0 + 3 * M });
-    check(queries.length - cutBefore === 1 && card._runId({ partial: true, from: 5 }) === card._runId({ partial: true, from: 9 }) && card._runId({ from: 5 }) === '5',
+    check(queries.length - cutBefore === 1 && card._runId({ partial: true, from: 5, to: 20 }) === card._runId({ partial: true, from: 9, to: 20 }) && card._runId({ from: 5 }) === '5',
       `a run cut by the window keeps its identity as the window moves (${queries.length - cutBefore} queries)`);
+    check(card._runId({ partial: true, from: 5, to: 20 }) !== card._runId({ partial: true, from: 30, to: 50 }),
+      'the next run cut by the window is another run, so a selection does not pass to it');
     card.remove();
   }
   {

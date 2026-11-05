@@ -5298,6 +5298,8 @@ class HeatpumpFlowCard extends HTMLElement {
     const runs = this._config.timeline_details === false ? [] : this._timelineRuns(hist, ids, segs, start, now);
     // The values of a selected run arrive with their own query (#326); the panel redraws when they are there.
     const run = runs.find((r) => this._runId(r) === this._tlRun);
+    // A selected run that left the window is no longer selected, so a later run cannot take its place.
+    if (!run) this._tlRun = null;
     const panel = run && this._layout !== 'wall';
     const rows = panel ? this._runValues(run) : [];
     const minute = Math.floor(now / 60000);
@@ -5336,8 +5338,8 @@ class HeatpumpFlowCard extends HTMLElement {
   }
 
   // Identity of a run for the selection and its query. A run cut by the window starts at the window start, which moves with
-  // every update; it is always the first run, so it keeps one fixed identity.
-  _runId(run) { return run.partial ? 'partial' : String(run.from); }
+  // every update, so it is known by its end; one that also still runs is the only run in the window.
+  _runId(run) { return run.partial ? `partial-${run.ongoing ? 'now' : run.to}` : String(run.from); }
 
   // "Hot water · 10:07–10:55 · 48 min" for a run.
   _runHead(run) {
