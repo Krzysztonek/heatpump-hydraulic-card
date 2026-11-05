@@ -584,7 +584,9 @@ const HFC_PRESETS = {
         room: s(`thermostat_${hc}_currtemp`, `thermostat_${hc}_current_room_temperature`),
         room_target: s(`thermostat_${hc}_seltemp`).concat(`number.${x}thermostat_${hc}_seltemp`, `number.${x}thermostat_${hc}_selected_room_temperature`),
         program: s(`thermostat_${hc}_modetype`),
-        hours: s('boiler_uptimecomp', 'boiler_uptimetotal', 'boiler_heatpump_total_uptime'),
+        // Compressor operating time of all modes: "total operating time heat" (uptimecontrol). "heatpump total uptime" (uptimetotal)
+        // also counts standby, and uptimecomp is the hot-water share under the dhw tag (#333).
+        hours: s('boiler_uptimecontrol', 'boiler_total_operating_time_heat'),
         starts_total: s('boiler_totalcompstarts', 'boiler_total_compressor_control_starts'),
         energy_total: s('boiler_nrgconstotal', 'boiler_total_energy_consumption'),
         heat_total: s('boiler_nrgsupptotal', 'boiler_total_energy_supplied'),
@@ -605,7 +607,7 @@ const HFC_PRESETS = {
         energy_cooling: t('nrgconscompcooling', 'metercool'), energy_aux: t('auxelecheatnrgconstotal', 'metereheat'),
         heat: t('nrgsupptotal', 'total_energy_supplied'), heat_heating: t('nrgsuppheating'), heat_dhw: t('dhw_nrgsupp'), heat_cooling: t('nrgsuppcooling'),
         starts: t('totalcompstarts', 'total_compressor_control_starts'), cycles_heating: t('heatingstarts'), cycles_dhw: t('dhw_startshp'), cycles_cooling: t('coolingstarts'),
-        hours: t('uptimetotal', 'uptimecompheating', 'heatpump_total_uptime'),
+        hours: t('uptimecontrol', 'total_operating_time_heat'),
       };
     },
     mode_map: {
@@ -1323,6 +1325,7 @@ const HFC_I18N = {
     source_flow: 'Source', target: 'Target', curve_offset: 'curve', curve_shift: 'shift', mixer: 'Mixer', mixer_opening: 'opening', mixer_closing: 'closing', return_short: 'RL', error: 'Error', circulation: 'Circ.', circulation_from: 'from', circulation_until: 'until', valve_dhw: 'DHW', solar: 'Solar',
     brine_pressure: 'Brine pressure', hc_pressure: 'Heating pressure', pressure_normal: 'normal', pressure_warning: 'warning', pressure_critical: 'critical',
     timeline_title: 'Last {h} hours', timeline_gap: 'No data', timeline_aria: 'Operating mode of the last {h} hours. Arrow keys select a period.',
+    run_series: 'run {n} since {t}', run_pause: 'pause before {d}', run_partial: 'began before the timeline', run_ongoing: 'still running', run_phase: 'operating period, no compressor data', run_close: 'Close', run_flow: 'Flow', run_reached: 'reached', run_missed: '{d} K below', run_heater: 'Heater rod', run_on: 'on', run_off: 'off',
     programs: { eco: 'Eco', night: 'Night', party: 'Party', holiday: 'Holiday' },
     sg_ready: { normal: 'SG normal', blocked: 'Utility lock', boost: 'SG boost', forced: 'SG forced on' },
     valve_heating: 'Heating', valve_cooling: 'Cooling', bypass: 'Bypass', pv: 'PV', pv_boost: 'PV surplus', battery: 'Battery', grid: 'Grid',
@@ -1365,6 +1368,7 @@ const HFC_I18N = {
     source_flow: 'Quelle', target: 'Soll', curve_offset: 'Kurve', curve_shift: 'Verschiebung', mixer: 'Mischer', mixer_opening: 'öffnet', mixer_closing: 'schließt', return_short: 'RL', error: 'Fehler', circulation: 'Zirk.', circulation_from: 'ab', circulation_until: 'bis', valve_dhw: 'WW', solar: 'Solar',
     brine_pressure: 'Soledruck', hc_pressure: 'Heizungsdruck', pressure_normal: 'normal', pressure_warning: 'Warnung', pressure_critical: 'kritisch',
     timeline_title: 'Letzte {h} Stunden', timeline_gap: 'Keine Daten', timeline_aria: 'Betriebsart der letzten {h} Stunden. Mit den Pfeiltasten einen Zeitraum wählen.',
+    run_series: '{n}. Lauf seit {t}', run_pause: 'Pause davor {d}', run_partial: 'begann vor der Zeitleiste', run_ongoing: 'läuft noch', run_phase: 'Betriebsphase, ohne Verdichterdaten', run_close: 'Schließen', run_flow: 'Vorlauf', run_reached: 'erreicht', run_missed: '{d} K darunter', run_heater: 'Heizstab', run_on: 'an', run_off: 'aus',
     programs: { eco: 'Eco', night: 'Nacht', party: 'Party', holiday: 'Urlaub' },
     sg_ready: { normal: 'SG normal', blocked: 'EVU-Sperre', boost: 'SG-Anhebung', forced: 'SG-Zwangsbetrieb' },
     valve_heating: 'Heizen', valve_cooling: 'Kühlen', bypass: 'Bypass', pv: 'PV', pv_boost: 'PV-Überschuss', battery: 'Akku', grid: 'Netz',
@@ -1409,6 +1413,7 @@ const HFC_I18N = {
     source_flow: 'Zdroj', target: 'Cieľ', curve_offset: 'krivka', curve_shift: 'posun', return_short: 'RL', error: 'Chyba', circulation: 'Cirk.', circulation_from: 'od', circulation_until: 'do', valve_dhw: 'TÚV', solar: 'Solár',
     brine_pressure: 'Tlak nemrznúcej zmesi', hc_pressure: 'Tlak vykurovania', pressure_normal: 'normálny', pressure_warning: 'varovanie', pressure_critical: 'kritický',
     timeline_title: 'Posledných {h} hodín', timeline_gap: 'Žiadne dáta', timeline_aria: 'Prevádzkový režim za posledných {h} hodín. Šípkami vyberte obdobie.',
+    run_series: '{n}. beh od {t}', run_pause: 'prestávka predtým {d}', run_partial: 'začal pred časovou osou', run_ongoing: 'stále beží', run_phase: 'prevádzková fáza, bez údajov kompresora', run_close: 'Zavrieť', run_flow: 'Prívod', run_reached: 'dosiahnutý', run_missed: '{d} K pod', run_heater: 'Vykurovacia tyč', run_on: 'zap', run_off: 'vyp',
     programs: { eco: 'Eko', night: 'Nočný', party: 'Párty', holiday: 'Dovolenka' },
     sg_ready: { normal: 'SG normálna prevádzka', blocked: 'Blokovanie distribučnou sieťou', boost: 'SG zvýšená prevádzka', forced: 'SG vynútená prevádzka' },
     valve_heating: 'Vykurovanie', valve_cooling: 'Chladenie', bypass: 'Obtok (Bypass)', pv: 'FVE', pv_boost: 'Prebytok FVE', battery: 'Batéria', grid: 'Sieť',
@@ -1452,6 +1457,7 @@ const HFC_I18N = {
     source_flow: 'Zdroj', target: 'Cíl', curve_offset: 'křivka', curve_shift: 'posun', return_short: 'RL', error: 'Chyba', circulation: 'Cirk.', circulation_from: 'od', circulation_until: 'do', valve_dhw: 'TUV', solar: 'Solár',
     brine_pressure: 'Tlak nemrznoucí směsi', hc_pressure: 'Tlak vytápění', pressure_normal: 'normální', pressure_warning: 'varování', pressure_critical: 'kritický',
     timeline_title: 'Posledních {h} hodin', timeline_gap: 'Žádná data', timeline_aria: 'Provozní režim za posledních {h} hodin. Šipkami vyberte období.',
+    run_series: '{n}. běh od {t}', run_pause: 'pauza předtím {d}', run_partial: 'začal před časovou osou', run_ongoing: 'stále běží', run_phase: 'provozní fáze, bez údajů kompresoru', run_close: 'Zavřít', run_flow: 'Přívod', run_reached: 'dosažen', run_missed: '{d} K pod', run_heater: 'Topná tyč', run_on: 'zap', run_off: 'vyp',
     programs: { eco: 'Eko', night: 'Noční', party: 'Párty', holiday: 'Dovolená' },
     sg_ready: { normal: 'SG normální provoz', blocked: 'Blokování distribuční sítí', boost: 'SG zvýšený provoz', forced: 'SG vynucený provoz' },
     valve_heating: 'Vytápění', valve_cooling: 'Chlazení', bypass: 'Obtok (Bypass)', pv: 'FVE', pv_boost: 'Přebytek FVE', battery: 'Baterie', grid: 'Síť',
@@ -1494,6 +1500,7 @@ const HFC_I18N = {
     source_flow: 'Bron', target: 'Doel', curve_offset: 'stooklijn', curve_shift: 'verschuiving', return_short: 'RL', error: 'Storing', circulation: 'Circ.', circulation_from: 'vanaf', circulation_until: 'tot', valve_dhw: 'WW', solar: 'Zon',
     brine_pressure: 'Brondruk', hc_pressure: 'Verwarmingsdruk', pressure_normal: 'normaal', pressure_warning: 'waarschuwing', pressure_critical: 'kritiek',
     timeline_title: 'Laatste {h} uur', timeline_gap: 'Geen gegevens', timeline_aria: 'Bedrijfsstand van de laatste {h} uur. Kies een periode met de pijltjestoetsen.',
+    run_series: 'run {n} sinds {t}', run_pause: 'pauze ervoor {d}', run_partial: 'begon vóór de tijdlijn', run_ongoing: 'loopt nog', run_phase: 'bedrijfsperiode, geen compressorgegevens', run_close: 'Sluiten', run_flow: 'Aanvoer', run_reached: 'bereikt', run_missed: '{d} K eronder', run_heater: 'Verwarmingselement', run_on: 'aan', run_off: 'uit',
     programs: { eco: 'Eco', night: 'Nacht', party: 'Party', holiday: 'Vakantie' },
     sg_ready: { normal: 'SG normaal', blocked: 'Netblokkering', boost: 'SG-verhoging', forced: 'SG gedwongen aan' },
     valve_heating: 'Verwarmen', valve_cooling: 'Koelen', bypass: 'Bypass', pv: 'PV', pv_boost: 'PV-overschot', battery: 'Accu', grid: 'Net',
@@ -1542,13 +1549,13 @@ const HFC_EDITOR = {
     hc_count: 'Heating circuits', hc2_type: 'Circuit 2 emitter', hc3_type: 'Circuit 3 emitter', hc4_type: 'Circuit 4 emitter', hc5_type: 'Circuit 5 emitter', hc6_type: 'Circuit 6 emitter',
     unit_style: 'Unit drawing', unit_auto: 'Automatic (from the preset)', unit_generic: 'Generic (fan)', unit_lambda: 'Lambda EU-L', unit_vaillant: 'Vaillant aroTHERM plus', unit_panasonic: 'Panasonic Aquarea', unit_viessmann: 'Viessmann Vitocal', unit_bosch: 'Bosch / Buderus', unit_saunier: 'Saunier Duval GeniaAir', unit_samsung: 'Samsung EHS Mono', unit_wolf: 'Wolf CHA', unit_kronoterm: 'Kronoterm ADAPT', unit_alpha_innotec: 'Alpha Innotec Hybrox', unit_stiebel: 'Stiebel Eltron WPL-A',
     unit_size: 'Size of the unit drawing', size_pana_medium: '1 fan (3 to 9 kW)', size_pana_large: '2 fans (T-CAP, 12 and 16 kW)', size_small: '3.5 / 5.5 kW (1 fan, low)', size_medium: '7.5 kW (1 fan)', size_large: '10.5 / 12.5 kW (2 fans)',
-    timeline: 'Timeline of the operating mode', timeline_hours: 'Timeline length (hours)', timeline_marks: 'Show the badges (e.g. Boost) as extra lanes',
+    timeline: 'Timeline of the operating mode', timeline_hours: 'Timeline length (hours)', timeline_details: 'Run details under the timeline', timeline_marks: 'Show the badges (e.g. Boost) as extra lanes',
     layout: 'Layout', layout_default: 'Default', layout_compact: 'Compact (narrow columns)', layout_wide: 'Wide (tiles beside the schematic)', layout_wall: 'Wall display (large, controls fade out)',
     animations: 'Animations', animations_auto: 'Automatic (respect reduced motion)', animations_always: 'Always', animations_off: 'Off',
     flow_speed: 'Animation speed', source_spread: 'Show source spread',
     theme: 'Card theme', theme_auto: 'Automatic (dashboard)', theme_night: 'Night', theme_contrast: 'High contrast', fullscreen: 'Full-screen button', diagnostic: 'Diagnostic report button',
     wall_timeout: 'Hide controls after (seconds, 0 = never)',
-    hc_flow_label: 'Show circuit flow temperature', hc_return_label: 'Show circuit return temperature', dew_point_margin: 'Minimum dew-point margin (K)', narrow_values: 'Keep tank sub-values, hot-water target and circuit return on narrow cards', buffer_values: 'Buffer temperature emphasis', buffer_values_default: 'Top value prominent (default)', buffer_values_equal: 'All configured values equal', storage: 'Storage', storage_separate: 'Separate hot-water tank and buffer', storage_combined: 'Combined storage (one tank, hot-water zone on top)', buffer: 'Parallel buffer (also without sensors)', dhw_type: 'Hot-water preparation', dhw_type_coil: 'Tank with heat-exchanger coil', dhw_type_fresh_water: 'Fresh-water station (on the buffer or the combined storage)', dhw_type_tank_in_tank: 'Tank in tank (combined storage)', series_buffer: 'Series buffer in the return', series_bypass: 'Series buffer with bypass valve (off: the circuits run in defrost)', primary_pump: 'Primary pump', hc_name: 'Circuit 1 name', hc2_name: 'Circuit 2 name', hc3_name: 'Circuit 3 name', hc4_name: 'Circuit 4 name', hc5_name: 'Circuit 5 name', hc6_name: 'Circuit 6 name',
+    hc_flow_label: 'Show circuit flow temperature', hc_return_label: 'Show circuit return temperature', dew_point_margin: 'Minimum dew-point margin (K)', narrow_values: 'Keep tank sub-values, hot-water target and circuit return on narrow cards', narrow_focus: 'Phone focus: larger key values on narrow cards, secondary values in one line below', buffer_values: 'Buffer temperature emphasis', buffer_values_default: 'Top value prominent (default)', buffer_values_equal: 'All configured values equal', storage: 'Storage', storage_separate: 'Separate hot-water tank and buffer', storage_combined: 'Combined storage (one tank, hot-water zone on top)', buffer: 'Parallel buffer (also without sensors)', dhw_type: 'Hot-water preparation', dhw_type_coil: 'Tank with heat-exchanger coil', dhw_type_fresh_water: 'Fresh-water station (on the buffer or the combined storage)', dhw_type_tank_in_tank: 'Tank in tank (combined storage)', series_buffer: 'Series buffer in the return', series_bypass: 'Series buffer with bypass valve (off: the circuits run in defrost)', primary_pump: 'Primary pump', hc_name: 'Circuit 1 name', hc2_name: 'Circuit 2 name', hc3_name: 'Circuit 3 name', hc4_name: 'Circuit 4 name', hc5_name: 'Circuit 5 name', hc6_name: 'Circuit 6 name',
     sec_hc2: 'Heating circuit 2', sec_hc3: 'Heating circuit 3', sec_hc4: 'Heating circuit 4', sec_hc5: 'Heating circuit 5', sec_hc6: 'Heating circuit 6', sec_details: 'Details: operation', sec_refrigerant: 'Details: refrigerant circuit', sec_cutouts: 'Details: cut-out counters',
     controls: 'Quick controls (switch, button, select, number …)', details_open: 'Details open by default',
     from_preset: 'Found by the preset', more_fields: 'More fields',
@@ -1635,13 +1642,13 @@ const HFC_EDITOR = {
     hc_count: 'Heizkreise', hc2_type: 'Wärmeabgabe Heizkreis 2', hc3_type: 'Wärmeabgabe Heizkreis 3', hc4_type: 'Wärmeabgabe Heizkreis 4', hc5_type: 'Wärmeabgabe Heizkreis 5', hc6_type: 'Wärmeabgabe Heizkreis 6',
     unit_style: 'Geräte-Zeichnung', unit_auto: 'Automatisch (aus der Voreinstellung)', unit_generic: 'Allgemein (Lüfter)', unit_lambda: 'Lambda EU-L', unit_vaillant: 'Vaillant aroTHERM plus', unit_panasonic: 'Panasonic Aquarea', unit_viessmann: 'Viessmann Vitocal', unit_bosch: 'Bosch / Buderus', unit_saunier: 'Saunier Duval GeniaAir', unit_samsung: 'Samsung EHS Mono', unit_wolf: 'Wolf CHA', unit_kronoterm: 'Kronoterm ADAPT', unit_alpha_innotec: 'Alpha Innotec Hybrox', unit_stiebel: 'Stiebel Eltron WPL-A',
     unit_size: 'Größe der Geräte-Zeichnung', size_pana_medium: '1 Lüfter (3 bis 9 kW)', size_pana_large: '2 Lüfter (T-CAP, 12 und 16 kW)', size_small: '3,5 / 5,5 kW (1 Lüfter, niedrig)', size_medium: '7,5 kW (1 Lüfter)', size_large: '10,5 / 12,5 kW (2 Lüfter)',
-    timeline: 'Zeitleiste der Betriebsart', timeline_hours: 'Länge der Zeitleiste (Stunden)', timeline_marks: 'Badges (z. B. Boost) als zusätzliche Spuren zeigen',
+    timeline: 'Zeitleiste der Betriebsart', timeline_hours: 'Länge der Zeitleiste (Stunden)', timeline_details: 'Laufdetails unter der Zeitleiste', timeline_marks: 'Badges (z. B. Boost) als zusätzliche Spuren zeigen',
     layout: 'Layout', layout_default: 'Standard', layout_compact: 'Kompakt (schmale Spalten)', layout_wide: 'Breit (Kacheln neben dem Schema)', layout_wall: 'Wanddisplay (groß, Bedienelemente blenden aus)',
     animations: 'Animationen', animations_auto: 'Automatisch (reduzierte Bewegung beachten)', animations_always: 'Immer', animations_off: 'Aus',
     flow_speed: 'Animationsgeschwindigkeit', source_spread: 'Quellenspreizung anzeigen',
     theme: 'Kartendarstellung', theme_auto: 'Automatisch (Dashboard)', theme_night: 'Nacht', theme_contrast: 'Hoher Kontrast', fullscreen: 'Vollbild-Schaltfläche', diagnostic: 'Diagnosebericht-Schaltfläche',
     wall_timeout: 'Bedienelemente ausblenden nach (Sekunden, 0 = nie)',
-    hc_flow_label: 'Heizkreis-Vorlauf anzeigen', hc_return_label: 'Heizkreis-Rücklauf anzeigen', dew_point_margin: 'Mindestabstand zum Taupunkt (K)', narrow_values: 'Speicher-Unterwerte, WW-Soll und Heizkreis-Rücklauf auf schmalen Karten zeigen', buffer_values: 'Gewichtung der Puffertemperaturen', buffer_values_default: 'Oberen Wert hervorheben (Standard)', buffer_values_equal: 'Alle vorhandenen Werte gleich', storage: 'Speicher', storage_separate: 'Getrennter Warmwasserspeicher und Puffer', storage_combined: 'Kombispeicher (ein Speicher, Warmwasserzone oben)', buffer: 'Parallelpuffer (auch ohne Sensoren)', dhw_type: 'Warmwasserbereitung', dhw_type_coil: 'Speicher mit Wärmetauscher-Wendel', dhw_type_fresh_water: 'Frischwasserstation (am Puffer oder Kombispeicher)', dhw_type_tank_in_tank: 'Tank im Tank (Kombispeicher)', series_buffer: 'Reihenpuffer im Rücklauf', series_bypass: 'Reihenpuffer mit Bypass-Ventil (aus: die Heizkreise laufen beim Abtauen)', primary_pump: 'Primärpumpe', hc_name: 'Name Heizkreis 1', hc2_name: 'Name Heizkreis 2', hc3_name: 'Name Heizkreis 3', hc4_name: 'Name Heizkreis 4', hc5_name: 'Name Heizkreis 5', hc6_name: 'Name Heizkreis 6',
+    hc_flow_label: 'Heizkreis-Vorlauf anzeigen', hc_return_label: 'Heizkreis-Rücklauf anzeigen', dew_point_margin: 'Mindestabstand zum Taupunkt (K)', narrow_values: 'Speicher-Unterwerte, WW-Soll und Heizkreis-Rücklauf auf schmalen Karten zeigen', narrow_focus: 'Handy-Fokus: Kernwerte auf schmalen Karten größer, Nebenwerte in einer Zeile darunter', buffer_values: 'Gewichtung der Puffertemperaturen', buffer_values_default: 'Oberen Wert hervorheben (Standard)', buffer_values_equal: 'Alle vorhandenen Werte gleich', storage: 'Speicher', storage_separate: 'Getrennter Warmwasserspeicher und Puffer', storage_combined: 'Kombispeicher (ein Speicher, Warmwasserzone oben)', buffer: 'Parallelpuffer (auch ohne Sensoren)', dhw_type: 'Warmwasserbereitung', dhw_type_coil: 'Speicher mit Wärmetauscher-Wendel', dhw_type_fresh_water: 'Frischwasserstation (am Puffer oder Kombispeicher)', dhw_type_tank_in_tank: 'Tank im Tank (Kombispeicher)', series_buffer: 'Reihenpuffer im Rücklauf', series_bypass: 'Reihenpuffer mit Bypass-Ventil (aus: die Heizkreise laufen beim Abtauen)', primary_pump: 'Primärpumpe', hc_name: 'Name Heizkreis 1', hc2_name: 'Name Heizkreis 2', hc3_name: 'Name Heizkreis 3', hc4_name: 'Name Heizkreis 4', hc5_name: 'Name Heizkreis 5', hc6_name: 'Name Heizkreis 6',
     sec_hc2: 'Heizkreis 2', sec_hc3: 'Heizkreis 3', sec_hc4: 'Heizkreis 4', sec_hc5: 'Heizkreis 5', sec_hc6: 'Heizkreis 6', sec_details: 'Details: Betrieb', sec_refrigerant: 'Details: Kältekreis', sec_cutouts: 'Details: Abschaltzähler',
     controls: 'Schnellbedienung (Schalter, Taste, Auswahl, Zahl …)', details_open: 'Details standardmäßig offen',
     from_preset: 'Von der Voreinstellung gefunden', more_fields: 'Weitere Felder',
@@ -1729,13 +1736,14 @@ const HFC_EDITOR = {
     hc_count: 'Vykurovacie okruhy', hc2_type: 'Teleso okruhu 2', hc3_type: 'Teleso okruhu 3', hc4_type: 'Teleso okruhu 4', hc5_type: 'Teleso okruhu 5', hc6_type: 'Teleso okruhu 6',
     unit_style: 'Nákres jednotky', unit_auto: 'Automaticky (z predvoľby)', unit_generic: 'Všeobecná (ventilátor)', unit_lambda: 'Lambda EU-L', unit_vaillant: 'Vaillant aroTHERM plus', unit_panasonic: 'Panasonic Aquarea', unit_viessmann: 'Viessmann Vitocal', unit_bosch: 'Bosch / Buderus', unit_saunier: 'Saunier Duval GeniaAir', unit_samsung: 'Samsung EHS Mono',
     unit_size: 'Veľkosť Vaillant', size_small: '3.5 / 5.5 kW (1 ventilátor, nízky)', size_medium: '7.5 kW (1 ventilátor)', size_large: '10.5 / 12.5 kW (2 ventilátory)',
-    timeline: 'Časová os prevádzkového režimu', timeline_hours: 'Dĺžka časovej osi (hodiny)', timeline_marks: 'Zobraziť odznaky (napr. Boost) ako extra riadky',
+    timeline: 'Časová os prevádzkového režimu', timeline_hours: 'Dĺžka časovej osi (hodiny)', timeline_details: 'Podrobnosti behu pod časovou osou', timeline_marks: 'Zobraziť odznaky (napr. Boost) ako extra riadky',
     layout: 'Rozloženie', layout_default: 'Predvolené', layout_compact: 'Kompaktné (úzke stĺpce)', layout_wide: 'Široké (dlaždice vedľa schémy)', layout_wall: 'Nástenný displej (veľký, ovládacie prvky miznú)',
     animations: 'Animácie', animations_auto: 'Automaticky (rešpektovať obmedzenie pohybu)', animations_always: 'Vždy', animations_off: 'Vypnuté',
     flow_speed: 'Rýchlosť animácie', source_spread: 'Zobraziť rozpätie (spread) zdroja',
     theme: 'Téma karty', theme_auto: 'Automaticky (podľa panelu)', theme_night: 'Nočná', theme_contrast: 'Vysoký kontrast', fullscreen: 'Tlačidlo na celú obrazovku', diagnostic: 'Tlačidlo diagnostickej správy',
     wall_timeout: 'Skryť ovládacie prvky po (sekundy, 0 = nikdy)',
     narrow_values: 'Ponechať podhodnoty akumulačnej nádrže a spiatočku okruhu na úzkych kartách',
+    narrow_focus: 'Mobilné zobrazenie: hlavné hodnoty na úzkych kartách väčšie, vedľajšie v jednom riadku pod schémou',
     buffer_values: 'Zvýraznenie teplôt akumulačnej nádrže', buffer_values_default: 'Zvýrazniť hornú hodnotu (predvolené)', buffer_values_equal: 'Všetky nakonfigurované hodnoty rovnocenné',
     assistant_device: 'Nájsť entity na tomto zariadení tepelného čerpadla',
     assistant_device_help: 'Dostupné iba vtedy, ak nie je detegovaný žiadny podporovaný profil (preset). Návrhy sa neuložia, kým ich nevyberiete a nepotvrdíte.',
@@ -1858,13 +1866,14 @@ const HFC_EDITOR = {
     hc_count: 'Topné okruhy', hc2_type: 'Těleso okruhu 2', hc3_type: 'Těleso okruhu 3', hc4_type: 'Těleso okruhu 4', hc5_type: 'Těleso okruhu 5', hc6_type: 'Těleso okruhu 6',
     unit_style: 'Nákres jednotky', unit_auto: 'Automaticky (z předvolby)', unit_generic: 'Obecná (ventilátor)', unit_lambda: 'Lambda EU-L', unit_vaillant: 'Vaillant aroTHERM plus', unit_panasonic: 'Panasonic Aquarea', unit_viessmann: 'Viessmann Vitocal', unit_bosch: 'Bosch / Buderus', unit_saunier: 'Saunier Duval GeniaAir', unit_samsung: 'Samsung EHS Mono',
     unit_size: 'Velikost Vaillant', size_small: '3.5 / 5.5 kW (1 ventilátor, nízký)', size_medium: '7.5 kW (1 ventilátor)', size_large: '10.5 / 12.5 kW (2 ventilátory)',
-    timeline: 'Časová osa provozního režimu', timeline_hours: 'Délka časové osy (hodiny)', timeline_marks: 'Zobrazit odznaky (např. Boost) jako extra řádky',
+    timeline: 'Časová osa provozního režimu', timeline_hours: 'Délka časové osy (hodiny)', timeline_details: 'Podrobnosti běhu pod časovou osou', timeline_marks: 'Zobrazit odznaky (např. Boost) jako extra řádky',
     layout: 'Rozvržení', layout_default: 'Výchozí', layout_compact: 'Kompaktní (úzké sloupce)', layout_wide: 'Široké (dlaždice vedle schématu)', layout_wall: 'Nástěnný displej (velký, ovládací prvky mizí)',
     animations: 'Animace', animations_auto: 'Automaticky (respektovat omezení pohybu)', animations_always: 'Vždy', animations_off: 'Vypnuto',
     flow_speed: 'Rychlost animace', source_spread: 'Zobrazit rozpětí (spread) zdroje',
     theme: 'Téma karty', theme_auto: 'Automaticky (podle panelu)', theme_night: 'Noční', theme_contrast: 'Vysoký kontrast', fullscreen: 'Tlačítko na celou obrazovku', diagnostic: 'Tlačítko diagnostické zprávy',
     wall_timeout: 'Skrýt ovládací prvky po (sekundy, 0 = nikdy)',
     narrow_values: 'Ponechat podhodnoty akumulační nádrže a zpátečku okruhu na úzkých kartách',
+    narrow_focus: 'Mobilní zobrazení: hlavní hodnoty na úzkých kartách větší, vedlejší v jednom řádku pod schématem',
     buffer_values: 'Zvýraznění teplot akumulační nádrže', buffer_values_default: 'Zvýraznit horní hodnotu (výchozí)', buffer_values_equal: 'Všechny nakonfigurované hodnoty rovnocenné',
     assistant_device: 'Najít entity na tomto zařízení tepelného čerpadla',
     assistant_device_help: 'Dostupné pouze tehdy, pokud není detekován žádný podporovaný profil (preset). Návrhy se neuloží, dokud je nevyberete a nepotvrdíte.',
@@ -1986,13 +1995,13 @@ const HFC_EDITOR = {
     hc_count: 'Verwarmingsgroepen', hc2_type: 'Afgifte groep 2', hc3_type: 'Afgifte groep 3', hc4_type: 'Afgifte groep 4', hc5_type: 'Afgifte groep 5', hc6_type: 'Afgifte groep 6',
     unit_style: 'Tekening buitenunit', unit_auto: 'Automatisch (uit de preset)', unit_generic: 'Algemeen (ventilator)', unit_lambda: 'Lambda EU-L', unit_vaillant: 'Vaillant aroTHERM plus', unit_panasonic: 'Panasonic Aquarea', unit_viessmann: 'Viessmann Vitocal', unit_bosch: 'Bosch / Buderus', unit_saunier: 'Saunier Duval GeniaAir', unit_samsung: 'Samsung EHS Mono', unit_wolf: 'Wolf CHA', unit_kronoterm: 'Kronoterm ADAPT', unit_alpha_innotec: 'Alpha Innotec Hybrox', unit_stiebel: 'Stiebel Eltron WPL-A',
     unit_size: 'Grootte van de buitenunit', size_pana_medium: '1 ventilator (3 tot 9 kW)', size_pana_large: '2 ventilatoren (T-CAP, 12 en 16 kW)', size_small: '3,5 / 5,5 kW (1 ventilator, laag)', size_medium: '7,5 kW (1 ventilator)', size_large: '10,5 / 12,5 kW (2 ventilatoren)',
-    timeline: 'Tijdlijn van de bedrijfsstand', timeline_hours: 'Lengte tijdlijn (uren)', timeline_marks: 'Badges (bijv. Boost) als extra banen tonen',
+    timeline: 'Tijdlijn van de bedrijfsstand', timeline_hours: 'Lengte tijdlijn (uren)', timeline_details: 'Rundetails onder de tijdlijn', timeline_marks: 'Badges (bijv. Boost) als extra banen tonen',
     layout: 'Opmaak', layout_default: 'Standaard', layout_compact: 'Compact (smalle kolommen)', layout_wide: 'Breed (tegels naast het schema)', layout_wall: 'Wandscherm (groot, bediening verdwijnt)',
     animations: 'Animaties', animations_auto: 'Automatisch (respecteert minder beweging)', animations_always: 'Altijd', animations_off: 'Uit',
     flow_speed: 'Animatiesnelheid', source_spread: 'ΔT van de bron tonen',
     theme: 'Kaartthema', theme_auto: 'Automatisch (dashboard)', theme_night: 'Nacht', theme_contrast: 'Hoog contrast', fullscreen: 'Knop volledig scherm', diagnostic: 'Knop diagnoserapport',
     wall_timeout: 'Bediening verbergen na (seconden, 0 = nooit)',
-    hc_flow_label: 'Aanvoertemperatuur per groep tonen', hc_return_label: 'Retourtemperatuur per groep tonen', dew_point_margin: 'Minimale dauwpuntsmarge (K)', narrow_values: 'Vat-subwaarden, warmwaterdoel en groepsretour op smalle kaarten tonen', buffer_values: 'Nadruk buffertemperaturen', buffer_values_default: 'Bovenste waarde prominent (standaard)', buffer_values_equal: 'Alle ingestelde waarden gelijk', storage: 'Opslag', storage_separate: 'Apart warmwatervat en buffervat', storage_combined: 'Combivat (één vat, warmwaterzone bovenin)', buffer: 'Parallel buffervat (ook zonder sensoren)', dhw_type: 'Warmwaterbereiding', dhw_type_coil: 'Vat met warmtewisselaarspiraal', dhw_type_fresh_water: 'Verswaterstation (op het buffervat of het combivat)', dhw_type_tank_in_tank: 'Tank in tank (combivat)', series_buffer: 'Seriebuffer in de retour', series_bypass: 'Seriebuffer met bypassklep (uit: de groepen draaien door bij ontdooien)', primary_pump: 'Primaire pomp', hc_name: 'Naam groep 1', hc2_name: 'Naam groep 2', hc3_name: 'Naam groep 3', hc4_name: 'Naam groep 4', hc5_name: 'Naam groep 5', hc6_name: 'Naam groep 6',
+    hc_flow_label: 'Aanvoertemperatuur per groep tonen', hc_return_label: 'Retourtemperatuur per groep tonen', dew_point_margin: 'Minimale dauwpuntsmarge (K)', narrow_values: 'Vat-subwaarden, warmwaterdoel en groepsretour op smalle kaarten tonen', narrow_focus: 'Telefoonweergave: kernwaarden groter op smalle kaarten, bijwaarden in één regel eronder', buffer_values: 'Nadruk buffertemperaturen', buffer_values_default: 'Bovenste waarde prominent (standaard)', buffer_values_equal: 'Alle ingestelde waarden gelijk', storage: 'Opslag', storage_separate: 'Apart warmwatervat en buffervat', storage_combined: 'Combivat (één vat, warmwaterzone bovenin)', buffer: 'Parallel buffervat (ook zonder sensoren)', dhw_type: 'Warmwaterbereiding', dhw_type_coil: 'Vat met warmtewisselaarspiraal', dhw_type_fresh_water: 'Verswaterstation (op het buffervat of het combivat)', dhw_type_tank_in_tank: 'Tank in tank (combivat)', series_buffer: 'Seriebuffer in de retour', series_bypass: 'Seriebuffer met bypassklep (uit: de groepen draaien door bij ontdooien)', primary_pump: 'Primaire pomp', hc_name: 'Naam groep 1', hc2_name: 'Naam groep 2', hc3_name: 'Naam groep 3', hc4_name: 'Naam groep 4', hc5_name: 'Naam groep 5', hc6_name: 'Naam groep 6',
     sec_hc2: 'Verwarmingsgroep 2', sec_hc3: 'Verwarmingsgroep 3', sec_hc4: 'Verwarmingsgroep 4', sec_hc5: 'Verwarmingsgroep 5', sec_hc6: 'Verwarmingsgroep 6', sec_details: 'Details: bedrijf', sec_refrigerant: 'Details: koudemiddelcircuit', sec_cutouts: 'Details: uitschakeltellers',
     controls: 'Snelbediening (schakelaar, knop, keuzelijst, getal …)', details_open: 'Details standaard open',
     from_preset: 'Gevonden door de preset', more_fields: 'Meer velden',
@@ -2194,6 +2203,9 @@ const HFC_STAT_PERIODS = { today: ['day', 0], yesterday: ['day', -1], week: ['we
 const HFC_ACTIONS = ['tap_action', 'hold_action', 'double_tap_action'];
 const HFC_LAYOUTS = ['default', 'compact', 'wide', 'wall'];
 const HFC_BUFFER_VALUES = ['default', 'equal'];
+// Option for phones: key values of the schematic grow below 500 px, secondary ones move to one line under it (#4). The name lives
+// here, in the editor labels and in the CSS class narrow-focus.
+const HFC_NARROW_FOCUS = 'narrow_focus';
 const HFC_ANIMATIONS = ['auto', 'always', 'off'];
 const HFC_THEMES = ['auto', 'night', 'contrast'];
 // Storage: a hot-water tank and a buffer, or one combined (layered) tank with the hot-water zone on top (docs/TOPOLOGY.md, phase 1).
@@ -2551,6 +2563,7 @@ class HeatpumpFlowCard extends HTMLElement {
               { name: 'hc_return_label', selector: { boolean: {} } },
               { name: 'dew_point_margin', selector: { number: { min: 0, max: 10, step: 0.5, mode: 'box', unit_of_measurement: 'K' } } },
               { name: 'narrow_values', selector: { boolean: {} } },
+              { name: HFC_NARROW_FOCUS, selector: { boolean: {} } },
               { name: 'buffer_values', selector: { select: { mode: 'dropdown', options: HFC_BUFFER_VALUES.map((v) => ({ value: v, label: L[`buffer_values_${v}`] })) } } },
               { name: 'storage', selector: { select: { mode: 'dropdown', options: HFC_STORAGES.map((v) => ({ value: v, label: L[`storage_${v}`] })) } } },
               { name: 'dhw_type', selector: { select: { mode: 'dropdown', options: HFC_DHW_TYPES.filter((v) => v !== 'tank_in_tank' || (config && config.storage === 'combined')).map((v) => ({ value: v, label: L[`dhw_type_${v}`] })) } } },
@@ -2565,7 +2578,7 @@ class HeatpumpFlowCard extends HTMLElement {
                 ? [{ name: 'unit_size', selector: { select: { mode: 'dropdown', options: ['medium', 'large'].map((v) => ({ value: v, label: L[`size_pana_${v}`] })) } } }] : []),
               { name: 'primary_pump', selector: { boolean: {} } },
               { name: 'timeline', selector: { boolean: {} } },
-              ...(config && config.timeline ? [{ name: 'timeline_hours', selector: { number: { min: 3, max: 72, step: 1, mode: 'box', unit_of_measurement: 'h' } } }, { name: 'timeline_marks', selector: { boolean: {} } }] : []),
+              ...(config && config.timeline ? [{ name: 'timeline_hours', selector: { number: { min: 3, max: 72, step: 1, mode: 'box', unit_of_measurement: 'h' } } }, { name: 'timeline_details', selector: { boolean: {} } }, { name: 'timeline_marks', selector: { boolean: {} } }] : []),
               { name: 'details_open', selector: { boolean: {} } },
               ...(config && config.layout === 'wall' ? [{ name: 'wall_timeout', selector: { number: { min: 0, max: 600, step: 1, mode: 'box', unit_of_measurement: 's' } } }] : []),
             ],
@@ -2663,6 +2676,9 @@ class HeatpumpFlowCard extends HTMLElement {
     if (config.narrow_values !== undefined && config.narrow_values !== null && typeof config.narrow_values !== 'boolean') {
       throw new Error('narrow_values must be true or false');
     }
+    if (config[HFC_NARROW_FOCUS] !== undefined && config[HFC_NARROW_FOCUS] !== null && typeof config[HFC_NARROW_FOCUS] !== 'boolean') {
+      throw new Error(`${HFC_NARROW_FOCUS} must be true or false`);
+    }
     if (config.buffer !== undefined && config.buffer !== null && typeof config.buffer !== 'boolean') {
       throw new Error('buffer must be true or false');
     }
@@ -2726,6 +2742,9 @@ class HeatpumpFlowCard extends HTMLElement {
     }
     if (config.timeline !== undefined && config.timeline !== null && typeof config.timeline !== 'boolean') throw new Error('timeline must be true or false');
     if (config.timeline_hours !== undefined && config.timeline_hours !== null && !(+config.timeline_hours > 0)) throw new Error('timeline_hours must be a number of hours above 0 (3 to 72)');
+    if (config.timeline_details !== undefined && config.timeline_details !== null && typeof config.timeline_details !== 'boolean') {
+      throw new Error('timeline_details must be true or false');
+    }
     if (config.timeline_marks !== undefined && config.timeline_marks !== null && typeof config.timeline_marks !== 'boolean') {
       if (!Array.isArray(config.timeline_marks)) throw new Error('timeline_marks must be true or a list of entities');
       config.timeline_marks.forEach((m) => { if (!(typeof m === 'string' ? m : m && m.entity)) throw new Error('timeline_marks: every entry needs an entity'); });
@@ -3576,6 +3595,27 @@ class HeatpumpFlowCard extends HTMLElement {
     return true;
   }
 
+  // The line under the schematic in the narrow focus view: outdoor and air inlet temperatures, the power from PV, battery and grid
+  // (as configured, in the format of the schematic) and the room humidity of a single circuit. Missing values are left out.
+  _focusLine(srcParts) {
+    const el = this._$('focus-line'); const i = this._i; const P = this._parts;
+    const parts = [];
+    if (this._has('outdoor')) parts.push(`${i.outdoor} ${this._t(this._n('outdoor'))}`);
+    if (this._sourceType === 'air') parts.push(...srcParts);
+    if (P.power) {
+      const split = P.power === 'energy' ? this._energySplit() : null;
+      const labels = { pv: i.pv, battery: i.battery, grid: i.grid };
+      this._srcKeys().forEach((key) => {
+        const w = P.power === 'energy' ? (split ? split[key] : NaN) : this._w(key);
+        if (Number.isFinite(w)) parts.push(`${labels[key]} ${P.power === 'energy' ? '≈' : ''}${this._fmt(w, 0)} W`);
+      });
+    }
+    const humidity = P.house && this._hcCount === 1 ? this._roomHumidity(1) : NaN;
+    if (Number.isFinite(humidity)) parts.push(`${i.humidity} ${this._fmt(humidity, 0)} %`);
+    const html = parts.map((p) => `<span>${this._esc(p)}</span>`).join(' · ');
+    if (el.innerHTML !== html) el.innerHTML = html;
+  }
+
   // Room keys of circuit n: circuit 1 uses the room and target of the house, circuits 2 to 6 their own.
   _roomKey(n, key = 'room') { return n === 1 ? key : `hc${n}_${key}`; }
 
@@ -3613,6 +3653,18 @@ class HeatpumpFlowCard extends HTMLElement {
     el.append(t, text);
   }
   _txt(id, text) { const el = this._$(id); if (el && el.textContent !== text) el.textContent = text; }
+  // Label whose tail (for example the humidity after the room target) the narrow focus view hides; without the option a plain label.
+  _txtTail(id, main, tail) {
+    if (!this._narrowFocus()) { this._txt(id, `${main}${tail}`); return; }
+    const el = this._$(id); if (!el) return;
+    const key = `${main}|${tail}`;
+    if (el._k === key) return;
+    el._k = key; el.textContent = main;
+    if (!tail) return;
+    const t = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+    t.setAttribute('class', 'nf-tail'); t.textContent = tail;
+    el.append(t);
+  }
   _cls(id, on) { const el = this._$(id); if (el) el.classList.toggle('on', !!on); }
   _esc(s) { return String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
 
@@ -3734,6 +3786,7 @@ class HeatpumpFlowCard extends HTMLElement {
     const U = this._sourceType === 'air' ? this._unitArt() : null;
     const H = 560 + (showHc ? (this._hcCount - 1) * 250 : 0);
     const equalBuffer = this._config.buffer_values === 'equal';
+    const nf = this._narrowFocus();
     const bufferKeys = ['buffer_top', 'buffer_middle', 'buffer_bottom'].filter((key) => this._has(key));
     const bufferY = equalBuffer && bufferKeys.length
       ? Object.fromEntries(bufferKeys.map((key, n) => [key, bufferKeys.length === 1 ? 446 : 382 + n * (118 / (bufferKeys.length - 1))]))
@@ -3742,7 +3795,7 @@ class HeatpumpFlowCard extends HTMLElement {
     this._renderRoot().innerHTML = `
       <style>${HeatpumpFlowCard.styles}</style>
       <div class="fullscreen-backdrop" id="fullscreen-backdrop" ${this._fullscreenOpen ? '' : 'hidden'}></div>
-      <ha-card class="layout-${this._layout} motion-${this._animations} theme-${this._theme}${this._config.narrow_values ? ' narrow-values' : ''}${equalBuffer ? ' buffer-values-equal' : ''}${this._fullscreenOpen ? ' fullscreen' : ''}"${this._fullscreenOpen ? ` role="dialog" aria-modal="true" aria-label="${T}"` : ''}>
+      <ha-card class="layout-${this._layout} motion-${this._animations} theme-${this._theme}${this._config.narrow_values ? ' narrow-values' : ''}${nf ? ' narrow-focus' : ''}${equalBuffer ? ' buffer-values-equal' : ''}${this._fullscreenOpen ? ' fullscreen' : ''}"${this._fullscreenOpen ? ` role="dialog" aria-modal="true" aria-label="${T}"` : ''}>
         <div class="head">
           ${T ? `<div class="title">${T}</div>` : '<div></div>'}
           <div class="head-right">
@@ -3797,7 +3850,7 @@ class HeatpumpFlowCard extends HTMLElement {
             <circle class="pump" cx="${P.boiler ? 316 : 340}" cy="250" r="16"/>
             <g class="impeller" id="impeller-primary" style="transform-origin:${P.boiler ? 316 : 340}px 250px"><path d="M${P.boiler ? 316 : 340} 238 L${P.boiler ? 322 : 346} 250 L${P.boiler ? 310 : 334} 250Z M${P.boiler ? 316 : 340} 262 L${P.boiler ? 310 : 334} 250 L${P.boiler ? 322 : 346} 250Z" class="imp"/></g>
           </g>` : ''}
-          <g class="tap" ${de('flow')}><text class="pipe-label" id="t-vl" x="${P.boiler ? 316 : (this._primaryPump() ? 340 : 338)}" y="${this._primaryPump() ? 226 : 236}" text-anchor="middle"></text></g>
+          <g class="tap" ${de('flow')}><text class="pipe-label${nf && !P.boiler ? ' nf-big' : ''}" id="t-vl" x="${P.boiler ? 316 : (this._primaryPump() ? 340 : 338)}" y="${this._primaryPump() ? 226 : 236}" text-anchor="middle"></text></g>
           <g class="tap" ${de('volume')}><text class="vol-label" id="t-vol" x="${P.boiler ? 316 : (this._primaryPump() ? 340 : 346)}" y="${this._primaryPump() ? 284 : 275}" text-anchor="middle"></text></g>
           <g class="tap" ${de('return')}><text class="pipe-label" id="t-rl" x="335" y="406" text-anchor="middle"></text></g>
 
@@ -3812,8 +3865,9 @@ class HeatpumpFlowCard extends HTMLElement {
             <text class="unit-status" id="t-hp-status" x="170" y="366" text-anchor="middle"></text>
             <text class="unit-val" id="t-hp-power" x="170" y="390" text-anchor="middle"></text>
             <text class="unit-val strong" id="t-hp-cop" x="170" y="412" text-anchor="middle"></text>
+            ${nf ? '<text class="unit-val" id="t-hp-heat" x="170" y="374" text-anchor="middle"></text>' : ''}
           </g>
-          ${this._sourceType === 'air' ? `<g class="tap" ${de(e.source_in ? 'source_in' : 'source_volume')}><text class="small" id="t-src-in" x="170" y="450" text-anchor="middle"></text></g>${this._has('outdoor') ? `<g class="tap" ${de('outdoor')}><text class="small" id="t-outdoor-hp" x="170" y="472" text-anchor="middle"></text></g>` : ''}` : ''}
+          ${this._sourceType === 'air' ? `<g class="tap" ${de(e.source_in ? 'source_in' : 'source_volume')}><text class="small${nf ? ' nf-moved' : ''}" id="t-src-in" x="170" y="450" text-anchor="middle"></text></g>${this._has('outdoor') ? `<g class="tap" ${de('outdoor')}><text class="small" id="t-outdoor-hp" x="170" y="472" text-anchor="middle"></text></g>` : ''}` : ''}
           ${this._heaterSvg('heater', 'inline')}
           ${P.boiler ? `<g class="tap boiler" id="boiler" ${de(e.boiler_state ? 'boiler_state' : (e.boiler_power ? 'boiler_power' : 'boiler_flow'))}>
             <text class="boiler-title" x="372" y="207" text-anchor="middle">${this._esc(i.boiler)}</text>
@@ -3868,6 +3922,7 @@ class HeatpumpFlowCard extends HTMLElement {
 
           ${P.house ? this._houseSvg() : (this._has('outdoor') && this._sourceType !== 'air' ? `<g class="tap" ${de('outdoor')}><text class="small" id="t-outdoor" x="880" y="120" text-anchor="middle"></text></g>` : '')}
         </svg>
+        ${nf ? '<div class="focus-line" id="focus-line"></div>' : ''}
         </div>
         <div class="side">
           ${this._config.timeline ? '<div class="timeline" id="timeline" hidden></div>' : ''}
@@ -4457,13 +4512,15 @@ class HeatpumpFlowCard extends HTMLElement {
         ${this._sourceType === 'air' ? '' : '<text class="small" id="t-outdoor" x="830" y="226" text-anchor="middle"></text>'}
       </g>`;
     }
+    // narrow_focus with up to three circuits: each row takes two lines on a narrow schematic, the name above a larger value.
+    const twoLines = this._narrowFocus() && this._hcCount <= 3 ? ' nf-two' : '';
     const rows = Array.from({ length: this._hcCount }, (_, x) => {
       const n = x + 1; const s = n === 1 ? '' : String(n); const key = this._roomKey(n);
       const target = this._roomKey(n, 'room_target'); const humidity = this._roomKey(n, 'room_humidity');
       const entityKey = [key, target, humidity].find((candidate) => e[candidate]);
       const name = this._config[n === 1 ? 'hc_name' : `hc${n}_name`] || `${i.heating_circuit} ${n}`;
       const y = 118 + x * 21.5;
-      return `<g class="tap house-row" id="house-row${s}" ${de(entityKey)} data-name="${this._esc(name)}">
+      return `<g class="tap house-row${twoLines}" id="house-row${s}" ${de(entityKey)} data-name="${this._esc(name)}">
         <circle class="house-comfort unknown" id="house-comfort${s}" cx="734" cy="${y - 4}" r="5"/>
         <text class="house-row-name" x="746" y="${y}">${this._esc(name)}</text>
         <text class="house-row-value" id="t-house-room${s}" x="950" y="${y}" text-anchor="end"></text>
@@ -4533,6 +4590,9 @@ class HeatpumpFlowCard extends HTMLElement {
   // The heat pump has its own primary pump (`primary_pump`, default from the preset). It is drawn on the flow pipe next to the
   // heat pump block, centred between the flow temperature and the flow rate. A single direct circuit without its own pump sensor then has no pump of its own.
   _primaryPump() { return this._config.primary_pump ?? !!this._preset?.primary_pump; }
+  // narrow_focus (#4): below 500 px the key values grow and the secondary ones move to one line under the schematic. Only CSS
+  // inside the narrow container query uses it, so wider schematics look the same with and without the option.
+  _narrowFocus() { return this._config[HFC_NARROW_FOCUS] === true; }
   // Three-way mixer of circuit n (#214): drawn as soon as one of its keys is mapped. Most controllers drive a three-point motor
   // without position feedback, so opening and closing are motor pulses and hc_mixer is shown as reported, not read as a position.
   _hasMixer(n) { return ['mixer', 'mixer_opening', 'mixer_closing'].some((key) => this._has(this._hk(n, key))); }
@@ -5235,11 +5295,17 @@ class HeatpumpFlowCard extends HTMLElement {
     const segs = this._timelineSegments(hist, ids, start, now);
     if (!segs.length) { box.hidden = true; return; }
     const lanes = marks.map((m, n) => ({ ...m, n, segs: this._timelineMarkSegments(hist, m, start, now) })).filter((l) => l.segs.length);
+    // Runs and their detail panel (#325); `timeline_details: false` keeps the one-line period detail of before.
+    const runs = this._config.timeline_details === false ? [] : this._timelineRuns(hist, ids, segs, start, now);
+    // The values of a selected run arrive with their own query (#326); the panel redraws when they are there.
+    const run = runs.find((r) => r.from === this._tlRun);
+    const panel = run && this._layout !== 'wall';
+    const rows = panel ? this._runValues(run) : [];
     const minute = Math.floor(now / 60000);
-    const key = `${minute}|${segs.map((s) => `${s.kind}${s.from}${s.to}`).join(',')}|${lanes.map((l) => `${l.n}${l.label}${l.segs.map((s) => `${s.from}-${s.to}`).join(',')}`).join(';')}|${this._lang}|${this._tlSel ?? ''}|${this._tlMarkSel ?? ''}`;
+    const key = `${minute}|${segs.map((s) => `${s.kind}${s.from}${s.to}`).join(',')}|${lanes.map((l) => `${l.n}${l.label}${l.segs.map((s) => `${s.from}-${s.to}`).join(',')}`).join(';')}|${this._lang}|${this._tlSel ?? ''}|${this._tlMarkSel ?? ''}|${this._tlRun ?? ''}|${runs.length}|${rows.map((r) => r.join('=')).join(';')}`;
     if (box._k === key) return;
     box._k = key; box.hidden = false;
-    this._tl = { segs, start, now, lanes };
+    this._tl = { segs, start, now, lanes, runs };
     const pct = (t) => (((t - start) / (now - start)) * 100).toFixed(3);
     const i = this._i;
     // Hour ticks at clock times (every 6 h for a day), found in the Home Assistant time zone.
@@ -5256,37 +5322,178 @@ class HeatpumpFlowCard extends HTMLElement {
     const markDetail = (l, s) => `${l.label} · ${this._timelineTime(s.from)}–${this._timelineTime(s.to)} · ${this._timelineDuration(s.to - s.from)}`;
     let detail = sel >= 0 ? this._timelineDetail(segs[sel]) : '';
     lanes.forEach((l) => l.segs.forEach((s) => { if (`${l.n}:${s.from}` === this._tlMarkSel) detail = markDetail(l, s); }));
+    // A selected run opens the panel under the axis; the wall display, which nobody taps, keeps the one line.
+    if (run) detail = panel ? '' : [this._runHead(run), ...this._runNotes(run)].join(' · ');
+    const edges = [...new Set(runs.filter((r) => r.source === 'run').flatMap((r) => [r.from, r.to]).filter((t) => t > start && t < now))];
     box.innerHTML = `<div class="tl-head"><span>${this._esc(i.timeline_title.replace('{h}', hours))}</span><span class="tl-detail" id="tl-detail" aria-live="polite">${this._esc(detail)}</span></div>
       <div class="tl-bar" id="tl-bar" tabindex="0" role="group" aria-label="${this._esc(i.timeline_aria.replace('{h}', hours))}">${segs.map((s, n) =>
-    `<span class="seg k-${s.kind}${n === sel ? ' sel' : ''}" data-seg="${n}" style="left:${pct(s.from)}%;width:${(pct(s.to) - pct(s.from)).toFixed(3)}%" title="${this._esc(this._timelineDetail(s))}"></span>`).join('')}</div>
+    `<span class="seg k-${s.kind}${n === sel && !run ? ' sel' : ''}" data-seg="${n}" style="left:${pct(s.from)}%;width:${(pct(s.to) - pct(s.from)).toFixed(3)}%" title="${this._esc(this._timelineDetail(s))}"></span>`).join('')}${edges.map((t) =>
+    `<span class="tick" style="left:${pct(t)}%"></span>`).join('')}${run ? `<span class="run-sel" style="left:${pct(run.from)}%;width:${(pct(run.to) - pct(run.from)).toFixed(3)}%"></span>` : ''}</div>
       ${lanes.map((l) => `<div class="tl-mark" role="img" aria-label="${this._esc(`${l.label}: ${l.segs.map((s) => `${this._timelineTime(s.from)}–${this._timelineTime(s.to)}`).join(', ')}`)}">${l.segs.map((s) =>
     `<span class="mseg${`${l.n}:${s.from}` === this._tlMarkSel ? ' sel' : ''}" data-mseg="${l.n}:${s.from}" style="left:${pct(s.from)}%;width:${(pct(s.to) - pct(s.from)).toFixed(3)}%" title="${this._esc(markDetail(l, s))}"></span>`).join('')}</div>`).join('')}
       <div class="tl-axis">${ticks.map(([t, l]) => `<span style="left:${pct(t)}%">${l}</span>`).join('')}</div>
+      ${panel ? this._runPanel(run, rows) : ''}
       <div class="tl-legend">${kinds.map((k) => `<span><i class="k-${k}"></i>${this._esc(this._timelineLabel({ kind: k }))}</span>`).join('')}${lanes.map((l) => `<span><i class="k-mark"></i>${this._esc(l.label)}</span>`).join('')}</div>`;
   }
 
-  // Tap or arrow keys select a period and show its start, end and duration.
+  // "Hot water · 10:07–10:55 · 48 min" for a run.
+  _runHead(run) {
+    return `${this._timelineLabel({ kind: run.kind })} · ${this._timelineTime(run.from)}–${this._timelineTime(run.to)} · ${this._timelineDuration(run.to - run.from)}`;
+  }
+
+  // The line under the head: phase run, cut by the window or still running, its place in a series and the pause before it.
+  _runNotes(run) {
+    const i = this._i;
+    return [
+      run.source === 'phase' ? i.run_phase : '',
+      run.partial ? i.run_partial : '', run.ongoing ? i.run_ongoing : '',
+      run.series > 1 ? i.run_series.replace('{n}', run.series).replace('{t}', this._timelineTime(run.seriesFrom)) : '',
+      run.pause !== null ? i.run_pause.replace('{d}', this._timelineDuration(run.pause)) : '',
+    ].filter(Boolean);
+  }
+
+  // Values of a run (#326), from the recorder history of its window only, fetched when the run is selected and cached like the
+  // other queries. Hot water: tank at start and end, target reached, heater rod, defrosts. Heating and other runs: mean flow
+  // against the circuit target, mean spread of the heat pump and of circuit 1, mean compressor modulation, flow rate and outdoor
+  // temperature, defrosts. Means are weighted by time. A value without data is left out. Returns [[label, html]], [] while loading.
+  _runValues(run) {
+    const i = this._i;
+    const dhw = run.kind === 'dhw';
+    const keys = (dhw ? ['dhw_top', 'dhw_target', 'heater', ...HFC_TANK_HEATERS.filter((k) => k.startsWith('dhw_')), 'defrost']
+      : ['flow', 'return', 'hc_flow', 'hc_return', 'hc_setpoint', 'compressor_speed', 'volume', 'outdoor', 'defrost']).filter((k) => this._has(k));
+    if (!keys.length) return [];
+    const list = [...new Set(keys.map((k) => this._e[k]))];
+    const attrs = keys.some((k) => hfcTempAttr(this._e[k], k));
+    // A run that is still going ends "now", which moves with every update: its query has no end and a fixed key, so it is
+    // refreshed every five minutes like the other queries instead of being asked again on every update.
+    const hist = this._wsCached(`run|${list.join(',')}|${run.from}|${run.ongoing ? 'now' : run.to}`, {
+      type: 'history/history_during_period', start_time: new Date(run.from).toISOString(), ...(run.ongoing ? {} : { end_time: new Date(run.to).toISOString() }),
+      entity_ids: list, minimal_response: true, ...(attrs ? {} : { no_attributes: true }), significant_changes_only: false,
+    }, (res) => res || {});
+    if (!hist) return [];
+    const time = (e) => { const v = e.lu ?? e.lc ?? e.last_updated ?? e.last_changed; return typeof v === 'number' ? (v > 1e11 ? v : v * 1000) : Date.parse(v); };
+    const states = (key) => {
+      const id = this._e[key]; const attr = hfcTempAttr(id, key);
+      return (hist[id] || []).map((e) => ({ t: time(e), s: String((attr ? e.attributes?.[attr] ?? e.a?.[attr] : undefined) ?? e.s ?? e.state) }))
+        .filter((e) => Number.isFinite(e.t)).sort((a, b) => a.t - b.t);
+    };
+    // Numbers of a key in °C for temperatures and l/h for flow rates; a negative flow rate is a marker, not a value (#312).
+    const unit = (key) => this._unit(key).trim().replace(/º/g, '°').replace('℃', '°c').replace('℉', '°f').replace('³', '3');
+    const scale = (key) => {
+      const u = unit(key);
+      if (key === 'volume') return (v) => (v < 0 ? NaN : u === 'm3/h' ? v * 1000 : u === 'l/min' ? v * 60 : v);
+      return u === '°f' ? (v) => (v - 32) * 5 / 9 : u === 'k' && key !== 'compressor_speed' ? (v) => v - 273.15 : (v) => v;
+    };
+    const nums = (key) => { const f = scale(key); return states(key).map((e) => ({ t: e.t, v: f(parseFloat(e.s)) })).filter((e) => Number.isFinite(e.v)); };
+    const at = (pts, t) => { let v = pts[0]?.v; pts.forEach((p) => { if (p.t <= t) v = p.v; }); return v; };
+    const mean = (pts) => {
+      let sum = 0; let w = 0;
+      pts.forEach((p, n) => { const a = Math.max(p.t, run.from); const b = Math.min(pts[n + 1]?.t ?? run.to, run.to); if (b > a) { sum += p.v * (b - a); w += b - a; } });
+      return w ? sum / w : NaN;
+    };
+    const diff = (a, b) => {
+      const pa = nums(a); const pb = nums(b);
+      const times = [...new Set([...pa, ...pb].map((p) => p.t))].sort((x, y) => x - y);
+      return mean(times.map((t) => ({ t, v: at(pa, t) - at(pb, t) })).filter((p) => Number.isFinite(p.v)));
+    };
+    const on = (s) => !['off', 'unavailable', 'unknown', 'none', '', 'false', 'aus'].includes(String(s).toLowerCase()) && !(parseFloat(s) <= 0);
+    // Time a key was on within the run, and how often it switched on.
+    const onTime = (key) => {
+      const ss = states(key); let ms = 0; let starts = 0;
+      ss.forEach((e, n) => {
+        if (!on(e.s)) return;
+        const a = Math.max(e.t, run.from); const b = Math.min(ss[n + 1]?.t ?? run.to, run.to);
+        if (b > a) ms += b - a;
+        if (e.t >= run.from && !(n > 0 && on(ss[n - 1].s))) starts++;
+      });
+      return { ms, starts };
+    };
+    const K = (v) => `${this._fmt(v)} K`;
+    const rows = [];
+    const defrosts = this._has('defrost') ? onTime('defrost').starts : run.phases.filter((p) => p.kind === 'defrost').length;
+    if (dhw) {
+      const tank = nums('dhw_top');
+      const a = at(tank, run.from); const b = at(tank, run.to);
+      if (Number.isFinite(a) && Number.isFinite(b)) rows.push([i.tiles.dhw_top, `${this._esc(this._t(a))} → ${this._esc(this._t(b))} <span class="m">(${b >= a ? '+' : '−'}${this._esc(K(Math.abs(b - a)))})</span>`]);
+      const target = at(nums('dhw_target'), run.to);
+      if (Number.isFinite(target) && Number.isFinite(b)) {
+        rows.push([`${i.target} ${this._fmt(target)} °C`, this._esc(b >= target - 0.5 ? i.run_reached : i.run_missed.replace('{d}', this._fmt(target - b)))]);
+      }
+      const rods = ['heater', ...HFC_TANK_HEATERS.filter((k) => k.startsWith('dhw_'))].filter((k) => keys.includes(k)).map(onTime);
+      if (rods.length) {
+        const ms = Math.max(...rods.map((r) => r.ms));
+        rows.push([i.run_heater, this._esc(ms > 0 ? `${i.run_on} · ${this._timelineDuration(ms)}` : i.run_off)]);
+      }
+    } else {
+      const flow = mean(nums('flow'));
+      const set = mean(nums('hc_setpoint'));
+      if (Number.isFinite(flow)) rows.push([`${i.run_flow} Ø`, `${this._esc(this._t(flow))}${Number.isFinite(set) ? ` <span class="m">(${this._esc(`${i.target} ${this._fmt(set)}`)})</span>` : ''}`]);
+      const spread = keys.includes('return') ? diff('flow', 'return') : NaN;
+      const circuit = keys.includes('hc_flow') && keys.includes('hc_return') ? diff('hc_flow', 'hc_return') : NaN;
+      if (Number.isFinite(spread) || Number.isFinite(circuit)) {
+        rows.push([`${i.tiles.spread} Ø`, [Number.isFinite(spread) ? this._esc(K(spread)) : '', Number.isFinite(circuit) ? `<span class="m">${this._esc(`${i.heating_circuit} ${K(circuit)}`)}</span>` : '']
+          .filter(Boolean).join(' <span class="m">·</span> ')]);
+      }
+      const mod = mean(nums('compressor_speed'));
+      if (Number.isFinite(mod)) rows.push([`${i.det.compressor_speed} Ø`, this._esc(`${this._fmt(mod, 0)} ${this._st('compressor_speed')?.attributes?.unit_of_measurement || ''}`.trim())]);
+      const vol = mean(nums('volume'));
+      if (Number.isFinite(vol)) rows.push([`${i.tiles.volume} Ø`, this._esc(`${this._fmt(vol, 0)} l/h`)]);
+      const out = mean(nums('outdoor'));
+      if (Number.isFinite(out)) rows.push([`${i.outdoor} Ø`, this._esc(this._t(out))]);
+    }
+    if (defrosts > 0 || this._has('defrost')) rows.push([i.tiles.defrosts, String(defrosts)]);
+    return rows;
+  }
+
+  // Detail panel of the selected run under the timeline (#325): head, notes, the phases when the run had more than one kind,
+  // and the values of the run (#326). Its colour bar follows the kind.
+  _runPanel(run, rows = []) {
+    const i = this._i;
+    const color = { dhw: hfcVar('hot'), defrost: hfcVar('cool-strong'), cool: hfcVar('cool') }[run.kind] || hfcVar('heat');
+    const time = {};
+    run.phases.forEach((p) => { const k = ['pv', 'sg-boost', 'sg-forced'].includes(p.kind) ? 'heat' : p.kind; time[k] = (time[k] || 0) + p.to - p.from; });
+    const phases = Object.keys(time).length > 1 ? Object.entries(time).map(([k, ms]) => `${this._timelineLabel({ kind: k })} ${this._timelineDuration(ms)}`) : [];
+    // Each part stays on one line ("Hot water 48 min"); a narrow card wraps between the parts.
+    const line = (parts) => (parts.length ? `<div class="tl-run-sub">${parts.map((p) => `<span>${this._esc(p)}</span>`).join(' · ')}</div>` : '');
+    return `<div class="tl-run" id="tl-run" role="group" aria-live="polite" aria-label="${this._esc(this._runHead(run))}" style="--run-c:${color}">
+        <div class="tl-run-head"><b>${this._esc(this._runHead(run))}</b><button class="tl-run-x" id="tl-run-x" type="button" aria-label="${this._esc(i.run_close)}" title="${this._esc(i.run_close)}">×</button></div>
+        ${line(this._runNotes(run))}${line(phases)}
+        ${rows.length ? `<dl>${rows.map(([k, v]) => `<dt>${this._esc(k)}</dt><dd>${v}</dd>`).join('')}</dl>` : ''}
+      </div>`;
+  }
+
+  // Tap or arrow keys select a period and show its start, end and duration. With runs (#325), a tap on an operating period
+  // selects the run it belongs to and opens its panel, a second tap or Esc closes it; the arrow keys step from run to run.
   _timelineEvents(box) {
+    const redraw = (focus) => { box._k = null; this._updateTimeline(); if (focus) this._$('tl-bar')?.focus({ preventScroll: true }); };
     const select = (n) => {
       const seg = this._tl?.segs[n];
       if (!seg) return;
-      this._tlSel = seg.from; this._tlMarkSel = null;
-      box._k = null; this._updateTimeline();
-      this._$('tl-bar')?.focus({ preventScroll: true });
+      const run = (this._tl.runs || []).find((r) => seg.from < r.to && seg.to > r.from);
+      if (run) { this._tlRun = this._tlRun === run.from ? null : run.from; this._tlSel = null; } else { this._tlSel = seg.from; this._tlRun = null; }
+      this._tlMarkSel = null;
+      redraw(true);
     };
     box.addEventListener('click', (ev) => {
+      if (ev.target.closest('#tl-run-x')) { this._tlRun = null; redraw(true); return; }
       const el = ev.target.closest('[data-seg]'); if (el) { select(+el.dataset.seg); return; }
       // A tap on a lane shows that period; a second tap on the same one clears it.
       const m = ev.target.closest('[data-mseg]');
-      if (m) { this._tlMarkSel = this._tlMarkSel === m.dataset.mseg ? null : m.dataset.mseg; this._tlSel = null; box._k = null; this._updateTimeline(); }
+      if (m) { this._tlMarkSel = this._tlMarkSel === m.dataset.mseg ? null : m.dataset.mseg; this._tlSel = null; this._tlRun = null; redraw(false); }
     });
     box.addEventListener('keydown', (ev) => {
       if (ev.target.id !== 'tl-bar' || !this._tl) return;
-      const segs = this._tl.segs; const cur = segs.findIndex((s) => s.from === this._tlSel);
-      const to = { ArrowRight: cur + 1, ArrowDown: cur + 1, ArrowLeft: cur < 0 ? segs.length - 1 : cur - 1, ArrowUp: cur < 0 ? segs.length - 1 : cur - 1, Home: 0, End: segs.length - 1 }[ev.key];
+      if (ev.key === 'Escape' && (this._tlRun !== null && this._tlRun !== undefined)) { ev.preventDefault(); this._tlRun = null; redraw(true); return; }
+      const runs = this._tl.runs || [];
+      const list = runs.length ? runs : this._tl.segs;
+      const cur = list.findIndex((s) => s.from === (runs.length ? this._tlRun : this._tlSel));
+      const to = { ArrowRight: cur + 1, ArrowDown: cur + 1, ArrowLeft: cur < 0 ? list.length - 1 : cur - 1, ArrowUp: cur < 0 ? list.length - 1 : cur - 1, Home: 0, End: list.length - 1 }[ev.key];
       if (to === undefined) return;
       ev.preventDefault();
-      select(Math.min(Math.max(to, 0), segs.length - 1));
+      const item = list[Math.min(Math.max(to, 0), list.length - 1)];
+      if (runs.length) { this._tlRun = item.from; this._tlSel = null; } else this._tlSel = item.from;
+      this._tlMarkSel = null;
+      redraw(true);
     });
   }
 
@@ -5845,6 +6052,11 @@ class HeatpumpFlowCard extends HTMLElement {
       : i.compressor_off);
     const cop = running && power > 50 && heat > 0 ? (heat * 1000) / power : NaN;
     this._txt('t-hp-cop', Number.isFinite(cop) ? `COP ${heatEstimated ? '≈' : ''}${this._fmt(cop, 1)}` : '');
+    const hpHeat = this._$('t-hp-heat');
+    if (hpHeat) {
+      this._txt('t-hp-heat', running ? (heatTxt || (Number.isFinite(power) ? `${this._fmt(power, 0)} W` : i.running)) : i.compressor_off);
+      hpHeat.classList.toggle('off', !running);
+    }
     const srcVol = this._lh('source_volume');
     const srcParts = [];
     if (this._has('source_in')) srcParts.push(`${i.source_in} ${this._t(this._n('source_in'))}`);
@@ -5919,7 +6131,8 @@ class HeatpumpFlowCard extends HTMLElement {
         const humidity = this._roomHumidity(1); const humidityText = Number.isFinite(humidity) ? `${i.humidity} ${this._fmt(humidity, 0)} %` : '';
         // Room sensor missing or unknown: promote the target to the big line.
         this._txt('t-room', Number.isFinite(r) ? this._t(r) : tgt);
-        this._txt('t-room-target', [Number.isFinite(r) ? tgt : '', humidityText].filter(Boolean).join(' · '));
+        const target = Number.isFinite(r) ? tgt : '';
+        this._txtTail('t-room-target', target, humidityText ? `${target ? ' · ' : ''}${humidityText}` : '');
       } else {
         for (let n = 1; n <= this._hcCount; n++) {
           const s = n === 1 ? '' : String(n); const key = this._roomKey(n); const targetKey = this._roomKey(n, 'room_target');
@@ -5927,8 +6140,8 @@ class HeatpumpFlowCard extends HTMLElement {
           const hasRoom = !!this._e[key]; const hasTarget = !!this._e[targetKey];
           const humidity = this._roomHumidity(n); const humidityText = Number.isFinite(humidity) ? `${this._fmt(humidity, 0)} %` : '';
           const temperatures = hasRoom && hasTarget ? `${value(r)} / ${value(rt)} °C` : hasRoom ? `${value(r)} °C` : hasTarget ? `${i.target} ${value(rt)} °C` : '';
-          const text = [temperatures, humidityText].filter(Boolean).join(' · ') || '–';
-          this._txt(`t-house-room${s}`, text);
+          if (temperatures || !humidityText) this._txtTail(`t-house-room${s}`, temperatures || '–', humidityText ? ` · ${humidityText}` : '');
+          else this._txtTail(`t-house-room${s}`, '', humidityText);
           const state = Number.isFinite(r) && Number.isFinite(rt) ? (r < rt - 0.5 ? 'below' : r > rt + 0.5 ? 'above' : 'on') : 'unknown';
           const dot = this._$(`house-comfort${s}`); const row = this._$(`house-row${s}`);
           if (dot) dot.setAttribute('class', `house-comfort ${state}`);
@@ -5952,6 +6165,7 @@ class HeatpumpFlowCard extends HTMLElement {
         this._txt(`t-src-${id}-v`, on ? `${P.power === 'energy' ? '≈' : ''}${this._fmt(w, 0)} W` : '');
       });
     }
+    if (this._$('focus-line')) this._focusLine(srcParts);
 
     // header chips
     const chip = this._$('chip-mode');
@@ -6329,6 +6543,20 @@ HeatpumpFlowCard.styles = `
   .seg.k-blocked, .tl-legend i.k-blocked, .seg.k-sg-blocked, .tl-legend i.k-sg-blocked { background: repeating-linear-gradient(135deg, color-mix(in srgb, var(--hfc-muted) 55%, transparent) 0 3px, transparent 3px 6px); }
   .seg.k-gap, .tl-legend i.k-gap { background: repeating-linear-gradient(135deg, transparent 0 3px, color-mix(in srgb, var(--hfc-muted) 30%, transparent) 3px 4px); }
   .seg.sel { box-shadow: inset 0 0 0 2px var(--primary-text-color); }
+  .tl-bar .tick { position: absolute; top: 0; bottom: 0; width: 1px; margin-left: -.5px; background: var(--primary-text-color); opacity: .45; pointer-events: none; }
+  .tl-bar .run-sel { position: absolute; top: 0; bottom: 0; min-width: 3px; border-radius: 3px; box-shadow: inset 0 0 0 2px var(--primary-text-color); pointer-events: none; }
+  .tl-run { margin: 8px 0 2px; padding: 8px 12px 9px; border-radius: 12px; font-size: max(.86em, 13px); border-left: 4px solid var(--run-c);
+    background: color-mix(in srgb, var(--hfc-muted) 12%, transparent); }
+  .tl-run-head { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+  .tl-run-head b { font-weight: 600; }
+  .tl-run-x { border: 0; background: none; color: var(--hfc-muted); font: inherit; font-size: 1.2em; line-height: 1; padding: 0 2px; cursor: pointer; }
+  .tl-run-x:focus-visible { outline: 2px solid var(--primary-color, #03a9f4); border-radius: 4px; }
+  .tl-run-sub { color: var(--hfc-muted); margin-top: 2px; }
+  .tl-run-sub span { white-space: nowrap; }
+  .tl-run dl { display: grid; grid-template-columns: max-content 1fr; gap: 3px 16px; margin: 8px 0 0; }
+  .tl-run dt { color: var(--hfc-muted); }
+  .tl-run dd { margin: 0; }
+  .tl-run dd .m { color: var(--hfc-muted); }
   .tl-mark { position: relative; height: 7px; margin-top: 4px; border-radius: 4px; background: color-mix(in srgb, var(--hfc-muted) 10%, transparent); }
   .tl-mark .mseg { position: absolute; top: 0; bottom: 0; min-width: 3px; border-radius: 4px; cursor: pointer; background: ${hfcVar('badge')}; }
   .tl-mark .mseg::before { content: ''; position: absolute; inset: -6px 0; }
@@ -6347,6 +6575,27 @@ HeatpumpFlowCard.styles = `
   .stage { container-type: inline-size; }
   @container (max-width: 640px) { #svg { --k: 1.2; --ku: 1.1; --kp: 1; --k2: 1; --ks: 1.2; --kt: 1.15; } }
   @container (max-width: 500px) { #svg { --k: 1.4; --ku: 1.25; --kp: 1.4; --k2: 1.3; --ks: 1.4; --kt: 1.3; } .vol-label, .tank-sub, .pre, #t-valve, #t-circ, #t-dhw-mode { display: none; } .narrow-values #t-buf-middle, .narrow-values #t-buf-bottom, .narrow-values #t-dhw-middle, .narrow-values #t-dhw-bottom, .narrow-values #t-dhw-mode, .narrow-values [id^="t-hc-rl"] { display: block; font-size: calc(13px * var(--k2, 1)); } }
+  /* narrow_focus: below 500 px the key values grow to about the size of the tank temperature; the outdoor, air inlet and power
+     source values move to one line under the schematic, and the secondary labels are hidden. Wins over narrow_values. */
+  #t-hp-heat, .focus-line { display: none; }
+  .focus-line { margin: 2px 4px 0; text-align: center; font-size: .85em; line-height: 1.45; color: var(--primary-text-color); }
+  .focus-line span { white-space: nowrap; }
+  @container (max-width: 500px) {
+    .narrow-focus #t-hp-status, .narrow-focus #t-hp-power, .narrow-focus .src text, .narrow-focus .nf-moved, .narrow-focus #t-outdoor, .narrow-focus #t-outdoor-hp,
+    .narrow-focus .pipe-label[id^="t-hc"]:not(.dew-warning), .narrow-focus [id^="t-hc-mode"], .narrow-focus #t-valve, .narrow-focus #t-bypass, .narrow-focus .nf-tail { display: none; }
+    .narrow-focus #t-hp-heat { display: inline; font-size: 32px; font-weight: 700; fill: var(--primary-text-color); }
+    .narrow-focus #t-hp-heat.off { font-size: 22px; font-weight: 600; fill: var(--hfc-muted); }
+    .narrow-focus #t-hp-cop { font-size: 32px; }
+    .narrow-focus #t-vl.nf-big { font-size: 30px; transform: translate(7px, -31px); }
+    .narrow-focus #t-rl { font-size: 30px; text-anchor: start; transform: translate(57px, 14px); }
+    .narrow-focus #t-room-target { font-size: 28px; transform: translateY(6px); }
+    .narrow-focus .house-row-value { font-size: 20px; }
+    .narrow-focus .house-row-name { clip-path: polygon(0 0, 72px 0, 72px 100%, 0 100%); }
+    .narrow-focus .nf-two .house-row-name { font-size: 18px; clip-path: polygon(0 0, 200px 0, 200px 100%, 0 100%); }
+    .narrow-focus .nf-two .house-row-value { font-size: 26px; text-anchor: start; transform: translate(-204px, 27px); }
+    .narrow-focus #house-row2.nf-two { transform: translateY(24.5px); } .narrow-focus #house-row3.nf-two { transform: translateY(49px); }
+    .narrow-focus .focus-line:not(:empty) { display: block; }
+  }
   /* layout: compact – tighter spacing for narrow dashboard columns */
   ha-card.layout-compact { padding: 6px 6px 4px; }
   .layout-compact .head { margin: 0 2px 2px; }
@@ -6582,7 +6831,7 @@ class HeatpumpFlowCardEditor extends HTMLElement {
     };
     const custom = Array.isArray(this._config.tiles);
     const controls = r.controls.map((c) => (typeof c === 'string' ? c : c?.entity)).filter(Boolean);
-    const data = { ...this._config, entities: shown, controls, timeline_marks: !!this._config.timeline_marks,
+    const data = { ...this._config, entities: shown, controls, timeline_marks: !!this._config.timeline_marks, timeline_details: this._config.timeline_details !== false,
       errors: this._config.errors !== undefined ? this._config.errors : this._presetErrors,
       error_ok_text: (this._config.error_ok !== undefined ? this._config.error_ok : this._presetErrorOk).join(', '), tiles_custom: custom,
       animations: this._config.animations || 'auto', flow_speed: this._config.flow_speed ?? 1, source_spread: this._config.source_spread !== false,
@@ -6656,6 +6905,7 @@ class HeatpumpFlowCardEditor extends HTMLElement {
     } else if (this._config.valve_map !== undefined) config.valve_map = this._config.valve_map;
     else delete config.valve_map;
     // The switch only knows on and off; a YAML list of marks stays as it is while the switch stays on.
+    if (value.timeline_details !== false) delete config.timeline_details;
     if (!value.timeline_marks) delete config.timeline_marks;
     else if (Array.isArray(this._config.timeline_marks)) config.timeline_marks = this._config.timeline_marks;
     if (!value.animations || value.animations === 'auto') delete config.animations;

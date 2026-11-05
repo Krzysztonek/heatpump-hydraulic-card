@@ -17,6 +17,7 @@ Only the keys below are accepted. Every leaf must be a string. Values are render
 
 - `{sources}` in `energy_missing`
 - `{h}` in `timeline_title` and `timeline_aria`
+- `{n}` and `{t}` in `run_series`, `{d}` in `run_pause` and `run_missed`
 
 ## Top-level keys
 
@@ -88,6 +89,18 @@ pressure_critical
 timeline_title
 timeline_gap
 timeline_aria
+run_series
+run_pause
+run_partial
+run_ongoing
+run_phase
+run_close
+run_flow
+run_reached
+run_missed
+run_heater
+run_on
+run_off
 valve_heating
 valve_cooling
 bypass
