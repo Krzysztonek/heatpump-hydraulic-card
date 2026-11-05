@@ -1,0 +1,1 @@
+- Circulation window: an end of "24:00", which ebusd's controller program uses for a slot that runs to the end of the day, is accepted; before, the whole window disappeared (#331).

@@ -2198,6 +2198,10 @@
 
     card = await render({ 'time.start': '2030-01-01 05:45:00', 'time.end': '2030-01-01 08:15:00' }); label = card.shadowRoot.getElementById('t-circ');
     check(label?.textContent === '↻ Circ. 05:45–08:15', 'local date-time entity states keep their wall-clock time'); card.remove();
+    // #331: ebusd's controller program ends a slot at "24:00" (end of day); 24:30 or 25:00 stay invalid.
+    card = await render({ 'time.start': '05:30', 'time.end': '24:00' }); label = card.shadowRoot.getElementById('t-circ');
+    check(label?.textContent === '↻ Circ. 05:30–24:00', `"24:00" is the end of the day (${label?.textContent})`); card.remove();
+    check(card._timeText('24:00:00') === '24:00' && card._timeText('24:30') === '' && card._timeText('25:00') === '', 'only 24:00 itself is accepted beyond 23:59');
     card = await render({ 'time.start': 'unknown', 'time.end': 'unavailable', 'schedule.circ': { state: 'unavailable', attributes: { next_event: null } } });
     label = card.shadowRoot.getElementById('t-circ');
     check(label?.textContent === '↻ Circ.', 'missing program values leave only the existing pump label'); card.remove();

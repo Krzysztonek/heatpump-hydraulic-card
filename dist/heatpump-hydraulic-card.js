@@ -3477,8 +3477,10 @@ class HeatpumpFlowCard extends HTMLElement {
   _timeText(raw) {
     const value = String(raw ?? '').trim();
     if (!value || ['unknown', 'unavailable', 'none'].includes(value.toLowerCase())) return '';
-    const clock = /^(\d{1,2}):(\d{2})(?::\d{2}(?:\.\d+)?)?$/.exec(value);
+    const clock = /^(\d{1,2}):(\d{2})(?::(\d{2})(?:\.\d+)?)?$/.exec(value);
     if (clock && +clock[1] < 24 && +clock[2] < 60) return `${clock[1].padStart(2, '0')}:${clock[2]}`;
+    // A program slot that runs to the end of the day ends at 24:00 (ebusd CcTimer, #331).
+    if (clock && +clock[1] === 24 && +clock[2] === 0 && !+(clock[3] || 0)) return '24:00';
     const local = /^\d{4}-\d{2}-\d{2}[ T](\d{2}):(\d{2})(?::\d{2}(?:\.\d+)?)?$/.exec(value);
     if (local && +local[1] < 24 && +local[2] < 60) return `${local[1]}:${local[2]}`;
     const ms = Date.parse(value);
