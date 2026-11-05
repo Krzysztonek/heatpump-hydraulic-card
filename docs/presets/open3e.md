@@ -23,7 +23,8 @@ Open3E's `hot_water` valve state is recognized as DHW operation. Add a power met
 
 ## Mapped
 
-- Refrigeration circuit mode, compressor, diverter valve, system electrical and thermal power, flow and return temperatures, primary inlet temperature, outdoor temperature and water pressure.
+- Refrigeration circuit mode, compressor, diverter valve, system electrical and thermal power, flow and return temperatures, primary inlet temperature and outdoor temperature.
+- Water pressure as the heating pressure (`hc_pressure`), drawn at the first circuit the card shows, also when it starts at circuit 2 (`index: { hc: 2 }`). Up to 0.18 it was mapped as brine pressure, which an air unit does not draw (#318).
 - DHW tank levels, target and status; heating buffer temperature and mode; additional heater.
 - Heating circuits: `flow_circuitN_temperature`, `flow_circuit_N_supply_temp_setpoint`, `circuit_N_pump` and `climate_circuit_N`, for every circuit up to `hc_count`. The room temperature `room1_temperature` is the house room of circuit 1.
 - COP and energy for today, compressor and additional-heater counters, and available refrigerant measurements.

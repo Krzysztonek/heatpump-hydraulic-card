@@ -33,7 +33,7 @@ The percentage says how complete a preset is, not how well it was tested: see th
 | [`stiebel_isg`](#stiebel_isg) | 100 % | – | `heat`, `hc_return` | 17 of 49 | 9 of 29 | yes | yes | – |
 | [`ebusd`](#ebusd) | 100 % | – | `hc_return` | 20 of 49 | 8 of 29 | yes | – | – |
 | [`samsung`](#samsung) | 100 % | – | `hc_return`, `hc_pump` | 11 of 49 | 4 of 29 | yes | – | – |
-| [`espaltherma`](#espaltherma) | 92 % | `hc_pump` | `hc_flow`, `hc_return` | 13 of 49 | 9 of 29 | yes | – | – |
+| [`espaltherma`](#espaltherma) | 92 % | `hc_pump` | `hc_flow`, `hc_return` | 14 of 49 | 9 of 29 | yes | – | – |
 
 ## Languages
 
@@ -104,9 +104,9 @@ Viessmann (Open3E). Core fields 92 %, stat tiles: `cop_heating`, `cop_dhw`, `cop
 
 | Area | Mapped | Shown without its own entity | Not mapped, with reason | Open |
 |---|---|---|---|---|
-| Heat pump | **`mode`**, **`compressor`**, `defrost`, **`power`**, **`heat`**, **`flow`**, **`return`**, `source_in`, `brine_pressure`, **`outdoor`**, **`valve`**, `heater` | – | – | `status`, `fan_speed`, **`volume`**, `source_volume`, `source_out`, `pv_boost` |
+| Heat pump | **`mode`**, **`compressor`**, `defrost`, **`power`**, **`heat`**, **`flow`**, **`return`**, `source_in`, **`outdoor`**, **`valve`**, `heater` | – | – | `status`, `fan_speed`, **`volume`**, `source_volume`, `source_out`, `brine_pressure`, `pv_boost` |
 | Tanks | **`dhw_top`**, `dhw_middle`, `dhw_bottom`, **`dhw_target`**, `dhw_mode`, `buffer_top`, `buffer_mode` | – | – | `circulation`, `dhw_heater`, `buffer_middle`, `buffer_bottom`, `buffer_heater`, `solar_collector`, `solar_pump` |
-| Heating circuit | **`hc_flow`**, `hc_setpoint`, `hc_mode`, **`hc_pump`**, **`room`** | – | **`hc_return`** | `hc_volume`, `hc_curve_offset`, `hc_mixer`, `hc_pressure`, `room_target`, `program` |
+| Heating circuit | **`hc_flow`**, `hc_setpoint`, `hc_mode`, **`hc_pump`**, `hc_pressure`, **`room`** | – | **`hc_return`** | `hc_volume`, `hc_curve_offset`, `hc_mixer`, `room_target`, `program` |
 | Details | `hours`, `starts_total`, `compressor_speed`, `evap_temp`, `suction_temp`, `hot_gas`, `low_pressure`, `high_pressure`, `eev` | – | – | `aux_hours`, `energy_total`, `env_energy`, `heat_total`, `cond_temp`, `liquid_temp`, `superheat`, `subcooling`, `cutout_high_pressure`, `cutout_low_pressure`, `cutout_temperature` |
 
 Not mapped:
@@ -260,7 +260,7 @@ Daikin Altherma (ESPAltherma). Core fields 92 %, stat tiles: `cop_heating`, `cop
 | Heat pump | **`compressor`**, `fan_speed`, `defrost`, **`power`**, **`heat`**, **`flow`**, **`return`**, **`volume`**, **`outdoor`**, **`valve`**, `heater` | **`mode`** | – | `status`, `source_volume`, `source_in`, `source_out`, `brine_pressure`, `pv_boost` |
 | Tanks | **`dhw_top`**, **`dhw_target`**, `circulation`, `dhw_heater` | – | – | `dhw_middle`, `dhw_bottom`, `dhw_mode`, `buffer_top`, `buffer_middle`, `buffer_bottom`, `buffer_mode`, `buffer_heater`, `solar_collector`, `solar_pump` |
 | Heating circuit | `hc_setpoint`, `hc_pressure`, **`room`**, `room_target` | – | **`hc_flow`**, **`hc_return`** | `hc_mode`, **`hc_pump`**, `hc_volume`, `hc_curve_offset`, `hc_mixer`, `program` |
-| Details | `compressor_speed`, `evap_temp`, `suction_temp`, `hot_gas`, `liquid_temp` | – | – | `hours`, `starts_total`, `aux_hours`, `energy_total`, `env_energy`, `heat_total`, `cond_temp`, `low_pressure`, `high_pressure`, `eev`, `superheat`, `subcooling`, `cutout_high_pressure`, `cutout_low_pressure`, `cutout_temperature` |
+| Details | `compressor_speed`, `evap_temp`, `cond_temp`, `suction_temp`, `hot_gas`, `liquid_temp` | – | – | `hours`, `starts_total`, `aux_hours`, `energy_total`, `env_energy`, `heat_total`, `low_pressure`, `high_pressure`, `eev`, `superheat`, `subcooling`, `cutout_high_pressure`, `cutout_low_pressure`, `cutout_temperature` |
 
 Not mapped:
 

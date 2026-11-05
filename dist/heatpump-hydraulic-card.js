@@ -387,7 +387,8 @@ const HFC_PRESETS = {
         return: s('return_temperature'),
         source_in: s('primary_inlet_temperature'),
         outdoor: s('outside_temperature'),
-        brine_pressure: s('water_pressure'),
+        // The pressure of the heating water, drawn at the first circuit; an air unit has no brine loop to show it at (#318).
+        hc_pressure: s('water_pressure'),
         dhw_top: s('dhw_buffer_top_temperature', 'domestic_hot_water_temperature'),
         dhw_middle: s('dhw_buffer_mid_temperature'),
         dhw_bottom: s('dhw_buffer_bottom_temperature'),
@@ -5296,7 +5297,7 @@ class HeatpumpFlowCard extends HTMLElement {
     // Runs and their detail panel (#325); `timeline_details: false` keeps the one-line period detail of before.
     const runs = this._config.timeline_details === false ? [] : this._timelineRuns(hist, ids, segs, start, now);
     // The values of a selected run arrive with their own query (#326); the panel redraws when they are there.
-    const run = runs.find((r) => r.from === this._tlRun);
+    const run = runs.find((r) => this._runId(r) === this._tlRun);
     const panel = run && this._layout !== 'wall';
     const rows = panel ? this._runValues(run) : [];
     const minute = Math.floor(now / 60000);
@@ -5334,6 +5335,10 @@ class HeatpumpFlowCard extends HTMLElement {
       <div class="tl-legend">${kinds.map((k) => `<span><i class="k-${k}"></i>${this._esc(this._timelineLabel({ kind: k }))}</span>`).join('')}${lanes.map((l) => `<span><i class="k-mark"></i>${this._esc(l.label)}</span>`).join('')}</div>`;
   }
 
+  // Identity of a run for the selection and its query. A run cut by the window starts at the window start, which moves with
+  // every update; it is always the first run, so it keeps one fixed identity.
+  _runId(run) { return run.partial ? 'partial' : String(run.from); }
+
   // "Hot water · 10:07–10:55 · 48 min" for a run.
   _runHead(run) {
     return `${this._timelineLabel({ kind: run.kind })} · ${this._timelineTime(run.from)}–${this._timelineTime(run.to)} · ${this._timelineDuration(run.to - run.from)}`;
@@ -5363,8 +5368,9 @@ class HeatpumpFlowCard extends HTMLElement {
     const list = [...new Set(keys.map((k) => this._e[k]))];
     const attrs = keys.some((k) => hfcTempAttr(this._e[k], k));
     // A run that is still going ends "now", which moves with every update: its query has no end and a fixed key, so it is
-    // refreshed every five minutes like the other queries instead of being asked again on every update.
-    const hist = this._wsCached(`run|${list.join(',')}|${run.from}|${run.ongoing ? 'now' : run.to}`, {
+    // refreshed every five minutes like the other queries instead of being asked again on every update. The same holds for the
+    // start of a run cut by the window, which moves with the window.
+    const hist = this._wsCached(`run|${list.join(',')}|${this._runId(run)}|${run.ongoing ? 'now' : run.to}`, {
       type: 'history/history_during_period', start_time: new Date(run.from).toISOString(), ...(run.ongoing ? {} : { end_time: new Date(run.to).toISOString() }),
       entity_ids: list, minimal_response: true, ...(attrs ? {} : { no_attributes: true }), significant_changes_only: false,
     }, (res) => res || {});
@@ -5382,33 +5388,47 @@ class HeatpumpFlowCard extends HTMLElement {
       if (key === 'volume') return (v) => (v < 0 ? NaN : u === 'm3/h' ? v * 1000 : u === 'l/min' ? v * 60 : v);
       return u === '°f' ? (v) => (v - 32) * 5 / 9 : u === 'k' && key !== 'compressor_speed' ? (v) => v - 273.15 : (v) => v;
     };
-    const nums = (key) => { const f = scale(key); return states(key).map((e) => ({ t: e.t, v: f(parseFloat(e.s)) })).filter((e) => Number.isFinite(e.v)); };
-    const at = (pts, t) => { let v = pts[0]?.v; pts.forEach((p) => { if (p.t <= t) v = p.v; }); return v; };
+    // An invalid sample (unavailable, a negative flow-rate marker) stays in the list as NaN: it ends the valid value before it,
+    // so a mean leaves the gap out instead of carrying that value across it.
+    const nums = (key) => { const f = scale(key); return states(key).map((e) => ({ t: e.t, v: f(parseFloat(e.s)) })); };
+    // The value held at t; without a sample at or before t it is unknown, a later sample is never moved back to the start.
+    const at = (pts, t) => { let v = NaN; pts.forEach((p) => { if (p.t <= t) v = p.v; }); return v; };
     const mean = (pts) => {
       let sum = 0; let w = 0;
-      pts.forEach((p, n) => { const a = Math.max(p.t, run.from); const b = Math.min(pts[n + 1]?.t ?? run.to, run.to); if (b > a) { sum += p.v * (b - a); w += b - a; } });
+      pts.forEach((p, n) => {
+        const a = Math.max(p.t, run.from); const b = Math.min(pts[n + 1]?.t ?? run.to, run.to);
+        if (b > a && Number.isFinite(p.v)) { sum += p.v * (b - a); w += b - a; }
+      });
       return w ? sum / w : NaN;
     };
     const diff = (a, b) => {
       const pa = nums(a); const pb = nums(b);
       const times = [...new Set([...pa, ...pb].map((p) => p.t))].sort((x, y) => x - y);
-      return mean(times.map((t) => ({ t, v: at(pa, t) - at(pb, t) })).filter((p) => Number.isFinite(p.v)));
+      return mean(times.map((t) => ({ t, v: at(pa, t) - at(pb, t) })));
     };
     const on = (s) => !['off', 'unavailable', 'unknown', 'none', '', 'false', 'aus'].includes(String(s).toLowerCase()) && !(parseFloat(s) <= 0);
-    // Time a key was on within the run, and how often it switched on.
+    // Periods a key was on within the run, and how often it switched on. A key without recorder history in the window is
+    // unknown, not off.
     const onTime = (key) => {
-      const ss = states(key); let ms = 0; let starts = 0;
+      const ss = states(key); const spans = []; let starts = 0;
       ss.forEach((e, n) => {
         if (!on(e.s)) return;
         const a = Math.max(e.t, run.from); const b = Math.min(ss[n + 1]?.t ?? run.to, run.to);
-        if (b > a) ms += b - a;
+        if (b > a) spans.push([a, b]);
         if (e.t >= run.from && !(n > 0 && on(ss[n - 1].s))) starts++;
       });
-      return { ms, starts };
+      return { spans, starts, known: ss.length > 0 };
+    };
+    // Length of the union of periods: two heaters one after the other count both, two at the same time once.
+    const union = (spans) => {
+      let ms = 0; let end = -Infinity;
+      [...spans].sort((x, y) => x[0] - y[0]).forEach(([a, b]) => { if (b > end) { ms += b - Math.max(a, end); end = b; } });
+      return ms;
     };
     const K = (v) => `${this._fmt(v)} K`;
     const rows = [];
-    const defrosts = this._has('defrost') ? onTime('defrost').starts : run.phases.filter((p) => p.kind === 'defrost').length;
+    const thaw = this._has('defrost') ? onTime('defrost') : null;
+    const defrosts = thaw?.known ? thaw.starts : run.phases.filter((p) => p.kind === 'defrost').length;
     if (dhw) {
       const tank = nums('dhw_top');
       const a = at(tank, run.from); const b = at(tank, run.to);
@@ -5417,9 +5437,9 @@ class HeatpumpFlowCard extends HTMLElement {
       if (Number.isFinite(target) && Number.isFinite(b)) {
         rows.push([`${i.target} ${this._fmt(target)} °C`, this._esc(b >= target - 0.5 ? i.run_reached : i.run_missed.replace('{d}', this._fmt(target - b)))]);
       }
-      const rods = ['heater', ...HFC_TANK_HEATERS.filter((k) => k.startsWith('dhw_'))].filter((k) => keys.includes(k)).map(onTime);
+      const rods = ['heater', ...HFC_TANK_HEATERS.filter((k) => k.startsWith('dhw_'))].filter((k) => keys.includes(k)).map(onTime).filter((r) => r.known);
       if (rods.length) {
-        const ms = Math.max(...rods.map((r) => r.ms));
+        const ms = union(rods.flatMap((r) => r.spans));
         rows.push([i.run_heater, this._esc(ms > 0 ? `${i.run_on} · ${this._timelineDuration(ms)}` : i.run_off)]);
       }
     } else {
@@ -5439,7 +5459,7 @@ class HeatpumpFlowCard extends HTMLElement {
       const out = mean(nums('outdoor'));
       if (Number.isFinite(out)) rows.push([`${i.outdoor} Ø`, this._esc(this._t(out))]);
     }
-    if (defrosts > 0 || this._has('defrost')) rows.push([i.tiles.defrosts, String(defrosts)]);
+    if (defrosts > 0 || thaw?.known) rows.push([i.tiles.defrosts, String(defrosts)]);
     return rows;
   }
 
@@ -5464,17 +5484,25 @@ class HeatpumpFlowCard extends HTMLElement {
   // selects the run it belongs to and opens its panel, a second tap or Esc closes it; the arrow keys step from run to run.
   _timelineEvents(box) {
     const redraw = (focus) => { box._k = null; this._updateTimeline(); if (focus) this._$('tl-bar')?.focus({ preventScroll: true }); };
-    const select = (n) => {
+    // A period can hold several runs (heating while the compressor cycles): the run at the tapped time, else the nearest one.
+    const select = (n, t) => {
       const seg = this._tl?.segs[n];
       if (!seg) return;
-      const run = (this._tl.runs || []).find((r) => seg.from < r.to && seg.to > r.from);
-      if (run) { this._tlRun = this._tlRun === run.from ? null : run.from; this._tlSel = null; } else { this._tlSel = seg.from; this._tlRun = null; }
+      const near = (r) => (Number.isFinite(t) ? Math.max(r.from - t, t - r.to, 0) : 0);
+      const run = (this._tl.runs || []).filter((r) => seg.from < r.to && seg.to > r.from).sort((a, b) => near(a) - near(b))[0];
+      if (run) { const id = this._runId(run); this._tlRun = this._tlRun === id ? null : id; this._tlSel = null; } else { this._tlSel = seg.from; this._tlRun = null; }
       this._tlMarkSel = null;
       redraw(true);
     };
+    // Time under the pointer on the bar; none for a click without a position.
+    const timeAt = (ev) => {
+      const r = this._$('tl-bar')?.getBoundingClientRect();
+      if (!r?.width || !this._tl || !(ev.clientX >= r.left && ev.clientX <= r.right)) return NaN;
+      return this._tl.start + ((ev.clientX - r.left) / r.width) * (this._tl.now - this._tl.start);
+    };
     box.addEventListener('click', (ev) => {
       if (ev.target.closest('#tl-run-x')) { this._tlRun = null; redraw(true); return; }
-      const el = ev.target.closest('[data-seg]'); if (el) { select(+el.dataset.seg); return; }
+      const el = ev.target.closest('[data-seg]'); if (el) { select(+el.dataset.seg, timeAt(ev)); return; }
       // A tap on a lane shows that period; a second tap on the same one clears it.
       const m = ev.target.closest('[data-mseg]');
       if (m) { this._tlMarkSel = this._tlMarkSel === m.dataset.mseg ? null : m.dataset.mseg; this._tlSel = null; this._tlRun = null; redraw(false); }
@@ -5484,12 +5512,12 @@ class HeatpumpFlowCard extends HTMLElement {
       if (ev.key === 'Escape' && (this._tlRun !== null && this._tlRun !== undefined)) { ev.preventDefault(); this._tlRun = null; redraw(true); return; }
       const runs = this._tl.runs || [];
       const list = runs.length ? runs : this._tl.segs;
-      const cur = list.findIndex((s) => s.from === (runs.length ? this._tlRun : this._tlSel));
+      const cur = list.findIndex((s) => (runs.length ? this._runId(s) === this._tlRun : s.from === this._tlSel));
       const to = { ArrowRight: cur + 1, ArrowDown: cur + 1, ArrowLeft: cur < 0 ? list.length - 1 : cur - 1, ArrowUp: cur < 0 ? list.length - 1 : cur - 1, Home: 0, End: list.length - 1 }[ev.key];
       if (to === undefined) return;
       ev.preventDefault();
       const item = list[Math.min(Math.max(to, 0), list.length - 1)];
-      if (runs.length) { this._tlRun = item.from; this._tlSel = null; } else this._tlSel = item.from;
+      if (runs.length) { this._tlRun = this._runId(item); this._tlSel = null; } else this._tlSel = item.from;
       this._tlMarkSel = null;
       redraw(true);
     });
